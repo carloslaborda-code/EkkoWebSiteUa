@@ -1,8 +1,4 @@
 {
   "name": "ekk",
-  "private": true,
-  "scripts": {
-    "client": "cd client && npm start",
-    "server": "cd server && npm run dev"
-  }
+  "private": true
 }
