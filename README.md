@@ -5,6 +5,34 @@ El objetivo es construir una web (pila MEAN, con foco en frontend) para buscar c
 - `frontend/`: aplicacion Angular 16 inicial, con estructura base y enrutado preparado.
 - `backend/`: API Express base con CORS, parseo JSON, variables de entorno y endpoint de prueba.
 
+## Ejecucion local
+<table>
+  <tr>
+    <th>Frontend</th>
+    <th>Backend</th>
+  </tr>
+  <tr>
+    <td style="vertical-align:top; padding-top:0;">
+      <pre style="margin:0;"><code>cd frontend
+npm install
+npm start</code></pre>
+      <ul style="margin-top:0;">
+        <li>Plantilla por defecto de Angular pendiente de reemplazar por la interfaz final.</li>
+      </ul>
+    </td>
+    <td style="vertical-align:top; padding-top:0;">
+      <pre style="margin:0;"><code>cd backend
+npm install
+npm start</code></pre>
+      <ul style="margin-top:0;">
+        <li>Configuracion de entorno con <code>dotenv</code>.</li>
+        <li>Endpoint de comprobacion: <code>GET /</code> devuelve un mensaje JSON de estado de la API.</li>
+        <li>Arranque con <code>nodemon</code> usando <code>PORT</code> o <code>5000</code> por defecto.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
 # Posible estructura del proyecto:
 ## Carpetas:
 ekk/
@@ -301,26 +329,3 @@ Dependencias:
 
 Dependencias de desarrollo:
 - `nodemon`
-
-## Ejecucion local
-### Frontend
-```bash
-cd frontend
-npm install
-npm start
-```
-- Plantilla por defecto de Angular pendiente de reemplazar por la interfaz final.
-
-
-### Backend
-```bash
-cd backend
-npm install
-npm start
-```
-- Configuracion de entorno con `dotenv`.
-- Endpoint de comprobacion:
-  - `GET /` devuelve un mensaje JSON de estado de la API.
-- Arranque con `nodemon` usando `PORT` o `5000` por defecto.
-
-
