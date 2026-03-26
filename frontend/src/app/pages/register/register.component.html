@@ -1,0 +1,85 @@
+<div class="min-h-screen bg-black text-white relative overflow-hidden flex items-center justify-center px-6 py-10">
+  <div class="pointer-events-none absolute inset-0">
+    <div class="absolute top-8 left-8 h-14 w-14 rounded-full bg-white/30 blur-xl"></div>
+    <div class="absolute top-12 right-6 h-10 w-10 rounded-full bg-white/40 blur-xl"></div>
+    <div class="absolute top-36 left-6 h-8 w-8 rounded-full bg-white/20 blur-lg"></div>
+    <div class="absolute top-40 right-14 h-8 w-8 rounded-full bg-white/20 blur-lg"></div>
+    <div class="absolute bottom-40 left-6 h-10 w-10 rounded-full bg-white/20 blur-xl"></div>
+    <div class="absolute bottom-20 right-8 h-12 w-12 rounded-full bg-white/30 blur-xl"></div>
+  </div>
+
+  <div class="relative w-full max-w-sm">
+    <button type="button" aria-label="Volver" class="mb-10 text-white">
+      <span class="text-4xl leading-none">‹</span>
+    </button>
+
+    <div class="text-center mb-10">
+      <h1 class="text-5xl font-light tracking-tight mb-2">ekko</h1>
+      <h2 class="text-4xl font-semibold">Crear cuenta</h2>
+    </div>
+
+    <form class="flex flex-col gap-5" (ngSubmit)="register()">
+      <div>
+        <label for="username" class="sr-only">Nombre completo</label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          [(ngModel)]="username"
+          placeholder="Nombre completo"
+          class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] focus:ring-2 focus:ring-[#1F41BB]"
+        />
+      </div>
+
+      <div>
+        <label for="email" class="sr-only">Email</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          [(ngModel)]="email"
+          placeholder="Email"
+          class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] focus:ring-2 focus:ring-[#1F41BB]"
+        />
+      </div>
+
+      <div>
+        <label for="password" class="sr-only">Contraseña</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          [(ngModel)]="password"
+          placeholder="Contraseña"
+          class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] focus:ring-2 focus:ring-[#1F41BB]"
+        />
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="sr-only">Confirmar contraseña</label>
+        <input
+          id="confirmPassword"
+          name="confirmPassword"
+          type="password"
+          [(ngModel)]="confirmPassword"
+          placeholder="Confirmar contraseña"
+          class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] focus:ring-2 focus:ring-[#1F41BB]"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="mt-2 w-full rounded-xl bg-[#FFE8B7]/70 py-4 text-xl font-semibold text-white"
+      >
+        Sign up
+      </button>
+    </form>
+
+    <div class="mt-10 text-center text-base font-semibold">
+      <span class="text-white">¿Ya tienes cuenta? </span>
+      <a routerLink="/login" class="text-white hover:underline">
+        Inicia Sesión
+      </a>
+    </div>
+  </div>
+</div>
