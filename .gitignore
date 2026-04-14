@@ -67,3 +67,6 @@ frontend/node_modules
 .env
 backend/.env
 frontend/.env
+
+# Documentos propios (Ionatan)
+comandos.txt

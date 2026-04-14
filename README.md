@@ -101,7 +101,7 @@ Ejemplo:
 
 PORT=5000  
 MONGO_URI=mongodb://usuario:password@cluster.mongodb.net/ekkoDB  
-JWT_SECRET=supersecret  
+JWT_SECRET=supersecret
 
 ## Ejecutar el servidor
 
