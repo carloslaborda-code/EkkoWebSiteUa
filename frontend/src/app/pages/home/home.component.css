@@ -326,6 +326,13 @@
   text-decoration: none;
 }
 
+.nav-button-reset {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+}
+
 .nav-item svg {
   width: 24px;
   height: 24px;

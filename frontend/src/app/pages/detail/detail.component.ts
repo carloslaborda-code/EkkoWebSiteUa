@@ -56,11 +56,6 @@ export class DetailComponent implements OnInit {
   }
 
   startPlayback(): void {
-    if (!this.isLoggedIn) {
-      this.message = 'Inicia sesion para reproducir este contenido.';
-      return;
-    }
-
     this.isPlaying = true;
     this.message = '';
   }
@@ -71,7 +66,7 @@ export class DetailComponent implements OnInit {
     }
 
     if (!this.isLoggedIn) {
-      this.message = 'Inicia sesion para descargar el contenido.';
+      this.router.navigate(['/login']);
       return;
     }
 
@@ -95,7 +90,7 @@ export class DetailComponent implements OnInit {
     }
 
     if (!this.isLoggedIn) {
-      this.message = 'Inicia sesion para guardar esta publicacion.';
+      this.router.navigate(['/login']);
       return;
     }
 
@@ -152,5 +147,9 @@ export class DetailComponent implements OnInit {
     const ss = String(seconds).padStart(2, '0');
 
     return `${hh}:${mm}:${ss}`;
+  }
+
+  openProfile(): void {
+    this.router.navigate([this.isLoggedIn ? '/profile' : '/login']);
   }
 }

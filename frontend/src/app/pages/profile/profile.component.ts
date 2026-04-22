@@ -14,6 +14,11 @@ export class ProfileComponent implements OnInit {
   constructor(private userService: UserService, public router: Router) {}
 
   ngOnInit(): void {
+    if (!localStorage.getItem('token')) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     this.userService.getCurrentUser().subscribe({
       next: (profile) => {
         this.profile = profile;
@@ -21,6 +26,7 @@ export class ProfileComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
+        this.router.navigate(['/login']);
       }
     });
   }

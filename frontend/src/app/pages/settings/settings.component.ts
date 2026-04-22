@@ -21,9 +21,17 @@ export class SettingsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    if (!localStorage.getItem('token')) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     this.userService.getCurrentUser().subscribe({
       next: (profile) => {
         this.profile = profile;
+      },
+      error: () => {
+        this.router.navigate(['/login']);
       }
     });
   }

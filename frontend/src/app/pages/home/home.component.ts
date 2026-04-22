@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Quote, QuoteService } from '../../services/quotes.services';
 
 @Component({
@@ -12,7 +13,7 @@ export class HomeComponent implements OnInit {
   searchTerm = '';
   loading = true;
 
-  constructor(private quoteService: QuoteService) {}
+  constructor(private quoteService: QuoteService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadQuotes();
@@ -44,6 +45,14 @@ export class HomeComponent implements OnInit {
     return quote._id;
   }
 
+  openProfile(): void {
+    this.router.navigate([this.isLoggedIn ? '/profile' : '/login']);
+  }
+
+  get isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
   private loadQuotes(): void {
     this.quoteService.getQuotes().subscribe({
       next: (quotes) => {
@@ -59,4 +68,3 @@ export class HomeComponent implements OnInit {
     });
   }
 }
-

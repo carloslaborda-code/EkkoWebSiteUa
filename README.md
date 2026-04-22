@@ -83,10 +83,12 @@ Actualmente el proyecto ya incluye:
 - `Detalle` de publicación para audio o vídeo
 - guardado de publicaciones por usuario
 - conteo real de descargas del usuario
+- sincronización correcta de guardados sin duplicados
 - `Perfil` con datos del usuario y elementos guardados
 - `Ajustes` de accesibilidad
 - tamaño de texto funcional en toda la app
 - diseño adaptado a móvil
+- flujo mixto de invitado y usuario autenticado
 
 ---
 
@@ -122,6 +124,8 @@ Funcionalidad actual:
 - permite navegar al detalle de cada publicación
 - usa diseño móvil basado en Figma
 - incluye navegación inferior
+- está disponible tanto para invitados como para usuarios autenticados
+- si un invitado intenta entrar al perfil desde la navegación, se le redirige al login
 
 #### Login
 
@@ -165,9 +169,10 @@ Funcionalidad actual:
 - si la publicación es de vídeo, permite reproducir vídeo
 - si la publicación es de audio, permite reproducir audio
 - muestra actor, personaje, duración, año, sinopsis y hashtags
-- permite descargar el contenido si el usuario está autenticado
-- permite guardar o quitar de guardados
 - muestra la duración real del archivo cuando los metadatos están disponibles
+- la reproducción está disponible sin necesidad de login
+- si un invitado intenta guardar o descargar, se le redirige al login
+- si el usuario está autenticado, puede guardar o quitar de guardados
 
 #### Profile
 
@@ -184,6 +189,7 @@ Funcionalidad actual:
 - muestra guardados del usuario
 - muestra estado vacío si aún no hay subidas
 - enlaza a ajustes
+- si se intenta acceder sin sesión, redirige al login
 
 Nota importante:
 
@@ -205,6 +211,7 @@ Funcionalidad actual:
 - opción de alto contraste preparada
 - opción de filtros de color preparada
 - logout
+- si se intenta acceder sin sesión, redirige al login
 
 ### 5.3 Servicios del frontend
 
@@ -228,6 +235,7 @@ Responsabilidad:
 - actualizar perfil
 - actualizar ajustes
 - persistir datos del usuario en `localStorage`
+- sincronizar guardados del usuario tras guardar o desguardar publicaciones
 
 #### QuoteService
 
@@ -265,6 +273,7 @@ Se han ajustado especialmente:
 - `Home`
 - `Profile`
 - `Settings`
+- `Detail`
 - estilos globales en [frontend/src/styles.css](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/styles.css:1)
 
 ---
@@ -389,6 +398,7 @@ Funcionalidad implementada:
 - crear publicaciones desde backend
 - guardar y desguardar publicaciones
 - registrar descargas del usuario autenticado
+- normalizar guardados para evitar duplicados en `savedQuotes`
 
 ### 6.4 Middleware
 
@@ -441,6 +451,23 @@ Las rutas protegidas usan el token almacenado para:
 - registrar descargas
 - actualizar ajustes
 
+### Flujo de invitado
+
+La aplicación permite una experiencia parcial sin autenticación:
+
+- un invitado puede entrar en `Home`
+- un invitado puede abrir `Detalle`
+- un invitado puede reproducir audio o vídeo
+
+Las siguientes acciones requieren login:
+
+- guardar publicaciones
+- descargar contenido
+- acceder a `Perfil`
+- acceder a `Ajustes`
+
+Si un invitado intenta realizar alguna de esas acciones, la app lo redirige al login.
+
 ---
 
 ## 8. Flujo de publicaciones
@@ -462,6 +489,7 @@ Las rutas protegidas usan el token almacenado para:
 - el usuario autenticado pulsa guardar
 - Angular llama a `POST /api/quotes/:id/save`
 - el backend añade o elimina la publicación de `savedQuotes`
+- el frontend sincroniza el estado local del usuario para evitar contadores desfasados
 
 ### Descarga
 
@@ -523,6 +551,9 @@ Resumen de hitos ya implementados:
 - guardado de publicaciones por usuario
 - descargas registradas por usuario
 - corrección de contadores mock en perfil
+- corrección del flujo de guardado para evitar duplicados
+- apertura pública de `Home` y `Detalle` sin login
+- redirección al login para acciones privadas
 
 ---
 
