@@ -83,6 +83,28 @@ export class UserService {
       );
   }
 
+  syncSavedQuotes(savedQuoteIds: string[]): void {
+    const savedUser = localStorage.getItem('user');
+
+    if (!savedUser) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(savedUser) as Record<string, unknown>;
+      const currentSavedQuotes = Array.isArray(parsed['savedQuotes']) ? (parsed['savedQuotes'] as Array<Record<string, unknown>>) : [];
+
+      parsed['savedQuotes'] = currentSavedQuotes.filter((savedQuote) => {
+        const savedId = savedQuote?.['_id'];
+        return typeof savedId === 'string' && savedQuoteIds.includes(savedId);
+      });
+
+      localStorage.setItem('user', JSON.stringify(parsed));
+    } catch {
+      return;
+    }
+  }
+
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token') || '';
     return new HttpHeaders({

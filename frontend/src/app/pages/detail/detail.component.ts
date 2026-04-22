@@ -100,9 +100,10 @@ export class DetailComponent implements OnInit {
     }
 
     this.quoteService.toggleSave(this.quote._id).subscribe({
-      next: ({ saved, message }) => {
+      next: ({ saved, message, savedQuoteIds }) => {
         this.isSaved = saved;
         this.message = message;
+        this.userService.syncSavedQuotes(savedQuoteIds);
       },
       error: () => {
         this.message = 'No se pudo actualizar el guardado.';

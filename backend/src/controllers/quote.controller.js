@@ -2,6 +2,21 @@ const Quote = require('../models/quote');
 const seedQuotes = require('../data/seedQuotes');
 const User = require('../models/user');
 
+const normalizeSavedQuotes = (savedQuotes = []) => {
+  const seenIds = new Set();
+
+  return savedQuotes.filter((savedQuote) => {
+    const id = savedQuote?.toString();
+
+    if (!id || seenIds.has(id)) {
+      return false;
+    }
+
+    seenIds.add(id);
+    return true;
+  });
+};
+
 const ensureSeedQuotes = async () => {
   const totalQuotes = await Quote.countDocuments();
 
@@ -136,10 +151,21 @@ const toggleSaveQuote = async (req, res) => {
     }
 
     const user = await User.findById(req.user._id);
-    const alreadySaved = user.savedQuotes.some((savedId) => savedId.toString() === quote._id.toString());
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    const normalizedSavedQuotes = normalizeSavedQuotes(user.savedQuotes);
+    if (normalizedSavedQuotes.length !== user.savedQuotes.length) {
+      user.savedQuotes = normalizedSavedQuotes;
+    }
+
+    const quoteId = quote._id.toString();
+    const alreadySaved = user.savedQuotes.some((savedId) => savedId.toString() === quoteId);
 
     if (alreadySaved) {
-      user.savedQuotes = user.savedQuotes.filter((savedId) => savedId.toString() !== quote._id.toString());
+      user.savedQuotes = user.savedQuotes.filter((savedId) => savedId.toString() !== quoteId);
     } else {
       user.savedQuotes.push(quote._id);
     }
@@ -148,7 +174,9 @@ const toggleSaveQuote = async (req, res) => {
 
     res.json({
       message: alreadySaved ? 'Contenido eliminado de guardados' : 'Contenido guardado correctamente',
-      saved: !alreadySaved
+      saved: !alreadySaved,
+      savedCount: user.savedQuotes.length,
+      savedQuoteIds: user.savedQuotes.map((savedId) => savedId.toString())
     });
   } catch (error) {
     res.status(500).json({ message: 'Error al guardar la publicacion', error: error.message });

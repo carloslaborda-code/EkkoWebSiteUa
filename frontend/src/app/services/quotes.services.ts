@@ -36,8 +36,8 @@ export class QuoteService {
     return this.http.get<Quote>(`${this.apiUrl}/${id}`);
   }
 
-  toggleSave(id: string): Observable<{ message: string; saved: boolean }> {
-    return this.http.post<{ message: string; saved: boolean }>(`${this.apiUrl}/${id}/save`, {}, {
+  toggleSave(id: string): Observable<{ message: string; saved: boolean; savedCount: number; savedQuoteIds: string[] }> {
+    return this.http.post<{ message: string; saved: boolean; savedCount: number; savedQuoteIds: string[] }>(`${this.apiUrl}/${id}/save`, {}, {
       headers: this.getHeaders()
     });
   }
