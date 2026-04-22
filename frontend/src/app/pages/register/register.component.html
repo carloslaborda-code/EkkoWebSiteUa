@@ -1,0 +1,157 @@
+<div class="min-h-screen bg-black text-white relative overflow-hidden flex items-center justify-center px-6 py-10">
+  <div class="pointer-events-none absolute inset-0">
+    <div class="absolute top-8 left-8 h-14 w-14 rounded-full bg-white/30 blur-xl"></div>
+    <div class="absolute top-12 right-6 h-10 w-10 rounded-full bg-white/40 blur-xl"></div>
+    <div class="absolute top-36 left-6 h-8 w-8 rounded-full bg-white/20 blur-lg"></div>
+    <div class="absolute top-40 right-14 h-8 w-8 rounded-full bg-white/20 blur-lg"></div>
+    <div class="absolute bottom-40 left-6 h-10 w-10 rounded-full bg-white/20 blur-xl"></div>
+    <div class="absolute bottom-20 right-8 h-12 w-12 rounded-full bg-white/30 blur-xl"></div>
+  </div>
+
+  <div class="relative w-full max-w-sm">
+    <button type="button" aria-label="Volver" class="mb-10 text-white">
+      <span class="text-4xl leading-none">‹</span>
+    </button>
+
+    <div class="text-center mb-10">
+      <h1 class="text-5xl font-light tracking-tight mb-2 transition-all duration-300 hover:-translate-y-0.5">
+        ekko
+      </h1>
+
+      <h2 class="text-4xl font-semibold transition-all duration-300 hover:-translate-y-0.5">
+        Crear cuenta
+      </h2>
+    </div>
+
+    <form class="flex flex-col gap-5" (ngSubmit)="register()">
+      <!-- <div>
+        <label for="username" class="sr-only">Nombre completo</label>
+        <input id="username" name="username" type="text" [(ngModel)]="username" placeholder="Nombre completo" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+           outline-none placeholder:text-[#626262]
+           transition-all duration-200 ease-out
+           hover:bg-white hover:shadow-md hover:-translate-y-0.5
+           focus:shadow-[inset_0_0_0_2px_#FFE8B7]
+           focus:bg-white" />
+      </div> -->
+
+      <div class="relative group">
+        <input id="username" name="username" type="text" [(ngModel)]="username" class="peer w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+           outline-none transition-all duration-200 ease-out
+           hover:bg-white hover:shadow-md hover:-translate-y-0.5
+           focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
+
+        <label for="username" class="absolute left-5 transition-all duration-200 pointer-events-none
+
+           top-4 text-base text-[#626262]
+
+           peer-focus:top-1 peer-focus:text-xs peer-focus:text-gray-900
+
+           group-hover:-translate-y-0.5 group-hover:text-gray-800" [ngClass]="{
+      'top-1 text-xs text-gray-900': username && username.trim().length > 0
+    }">
+          Nombre completo
+        </label>
+      </div>
+
+      <!-- <div>
+        <label for="email" class="sr-only">Email</label>
+        <input id="email" name="email" type="email" [(ngModel)]="email" placeholder="Email" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+           outline-none placeholder:text-[#626262]
+           transition-all duration-200 ease-out
+           hover:bg-white hover:shadow-md hover:-translate-y-0.5
+           focus:shadow-[inset_0_0_0_2px_#FFE8B7]
+           focus:bg-white" />
+      </div> -->
+
+      <div class="relative group">
+        <input id="email" name="email" type="email" [(ngModel)]="email" class="peer w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+           outline-none transition-all duration-200 ease-out
+           hover:bg-white hover:shadow-md hover:-translate-y-0.5
+           focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
+
+        <label for="email" class="absolute left-5 transition-all duration-200 pointer-events-none
+           top-4 text-base text-[#626262]
+
+           peer-focus:top-1 peer-focus:text-xs peer-focus:text-gray-900
+
+           group-hover:-translate-y-0.5 group-hover:text-gray-800" [ngClass]="{
+      'top-1 text-xs text-gray-900': email && email.trim().length > 0
+    }">
+          Email
+        </label>
+      </div>
+
+      <!-- <div>
+        <label for="password" class="sr-only">Contraseña</label>
+        <input id="password" name="password" type="password" [(ngModel)]="password" placeholder="Contraseña" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+           outline-none placeholder:text-[#626262]
+           transition-all duration-200 ease-out
+           hover:bg-white hover:shadow-md hover:-translate-y-0.5
+           focus:shadow-[inset_0_0_0_2px_#FFE8B7]
+           focus:bg-white" />
+      </div> -->
+
+      <div class="relative group">
+        <input id="password" name="password" type="password" [(ngModel)]="password" class="peer w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+           outline-none transition-all duration-200 ease-out
+           hover:bg-white hover:shadow-md hover:-translate-y-0.5
+           focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
+
+        <label for="password" class="absolute left-5 transition-all duration-200 pointer-events-none
+           top-4 text-base text-[#626262]
+
+           peer-focus:top-1 peer-focus:text-xs peer-focus:text-gray-900
+
+           group-hover:-translate-y-0.5 group-hover:text-gray-800" [ngClass]="{
+      'top-1 text-xs text-gray-900': password && password.trim().length > 0
+    }">
+          Contraseña
+        </label>
+      </div>
+
+      <!-- <div>
+        <label for="confirmPassword" class="sr-only">Confirmar contraseña</label>
+        <input id="confirmPassword" name="confirmPassword" type="password" [(ngModel)]="confirmPassword"
+          placeholder="Confirmar contraseña" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+           outline-none placeholder:text-[#626262]
+           transition-all duration-200 ease-out
+           hover:bg-white hover:shadow-md hover:-translate-y-0.5
+           focus:shadow-[inset_0_0_0_2px_#FFE8B7]
+           focus:bg-white" />
+      </div> -->
+
+      <div class="relative group">
+        <input id="confirmPassword" name="confirmPassword" type="password" [(ngModel)]="confirmPassword" class="peer w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+           outline-none transition-all duration-200 ease-out
+           hover:bg-white hover:shadow-md hover:-translate-y-0.5
+           focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
+
+        <label for="confirmPassword" class="absolute left-5 transition-all duration-200 pointer-events-none
+           top-4 text-base text-[#626262]
+
+           peer-focus:top-1 peer-focus:text-xs peer-focus:text-gray-900
+
+           group-hover:-translate-y-0.5 group-hover:text-gray-800" [ngClass]="{
+      'top-1 text-xs text-gray-900': confirmPassword && confirmPassword.trim().length > 0
+    }">
+          Confirmar contraseña
+        </label>
+      </div>
+
+      <button type="submit" class="mt-2 w-full rounded-xl bg-[#FFE8B7]/70 py-4 text-xl font-semibold text-white
+         hover:bg-[#FFE8B7] hover:text-gray-900 hover:scale-[1.02] hover:shadow-lg
+         active:scale-[0.98]
+         transition-all duration-200">
+        Sign up
+      </button>
+    </form>
+
+    <div class="mt-10 text-center text-base font-semibold">
+      <span class="text-white">¿Ya tienes cuenta? </span>
+      <a routerLink="/login"
+        class="text-gray-400 hover:text-gray-300 relative after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-gray-300 after:transition-all hover:after:w-full transition-colors">
+        Inicia Sesión
+      </a>
+    </div>
+  </div>
+</div>
