@@ -8,7 +8,7 @@ export interface Quote {
   workTitle: string;
   year: number;
   rating: number;
-  views: number;
+  views: string;
   image: string;
   category: string;
 }

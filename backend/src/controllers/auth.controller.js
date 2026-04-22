@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../models/user');
 
 const register = async (req, res) => {
   try {
@@ -10,7 +10,9 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
 
-    const existingUser = await User.findOne({ email });
+    const normalizedEmail = email.trim().toLowerCase();
+    const existingUser = await User.findOne({ email: normalizedEmail });
+
     if (existingUser) {
       return res.status(400).json({ message: 'El usuario ya existe' });
     }
@@ -18,8 +20,8 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      username,
-      email,
+      username: username.trim(),
+      email: normalizedEmail,
       password: hashedPassword
     });
 
@@ -39,12 +41,17 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const identifier = email?.trim();
 
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email y contraseña obligatorios' });
+    if (!identifier || !password) {
+      return res.status(400).json({ message: 'Email o usuario y contrasena obligatorios' });
     }
 
-    const user = await User.findOne({ email });
+    const normalizedEmail = identifier.toLowerCase();
+    const user = await User.findOne({
+      $or: [{ email: normalizedEmail }, { username: identifier }]
+    });
+
     if (!user) {
       return res.status(401).json({ message: 'Credenciales incorrectas' });
     }

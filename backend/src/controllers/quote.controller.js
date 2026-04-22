@@ -1,7 +1,17 @@
 const Quote = require('../models/quote');
+const seedQuotes = require('../data/seedQuotes');
+
+const ensureSeedQuotes = async () => {
+  const totalQuotes = await Quote.countDocuments();
+
+  if (!totalQuotes) {
+    await Quote.insertMany(seedQuotes);
+  }
+};
 
 const getQuotes = async (req, res) => {
   try {
+    await ensureSeedQuotes();
     const quotes = await Quote.find().sort({ createdAt: -1 });
     res.status(200).json(quotes);
   } catch (error) {

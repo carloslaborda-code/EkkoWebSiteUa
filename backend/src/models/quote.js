@@ -21,8 +21,8 @@ const quoteSchema = new mongoose.Schema(
       default: 0
     },
     views: {
-      type: Number,
-      default: 0
+      type: String,
+      default: '0'
     },
     image: {
       type: String,
