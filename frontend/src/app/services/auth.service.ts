@@ -15,6 +15,14 @@ export interface AuthResponse {
     id: string;
     username: string;
     email: string;
+    avatar?: string;
+    uploadsCount?: number;
+    downloads?: number;
+    settings?: {
+      colorFilter: string;
+      highContrast: boolean;
+      textSize: string;
+    };
     role: string;
   };
 }

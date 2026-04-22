@@ -1,0 +1,75 @@
+<div class="settings-shell" [class.settings-shell--contrast]="profile?.settings?.highContrast">
+  <div class="glow glow-left"></div>
+  <div class="glow glow-top"></div>
+  <div class="glow glow-right"></div>
+
+  <main class="settings-frame">
+    <header class="status-bar">
+      <p>9:30</p>
+    </header>
+
+    <section class="settings-body" *ngIf="profile; else loadingState">
+      <a routerLink="/profile" class="back-link" aria-label="Volver">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+
+      <section class="settings-group">
+        <h2>ACCOUNT</h2>
+        <button type="button" class="settings-item">
+          <span class="item-left">Account Settings</span>
+          <span class="item-arrow">›</span>
+        </button>
+        <button type="button" class="settings-item">
+          <span class="item-left">Privacy</span>
+          <span class="item-arrow">›</span>
+        </button>
+        <button type="button" class="settings-item" (click)="logout()">
+          <span class="item-left">Log Out</span>
+        </button>
+      </section>
+
+      <section class="settings-group">
+        <h2>ACCESIBILITY</h2>
+        <div class="settings-item settings-item--stack">
+          <div class="stack-top">
+            <span class="item-left">Filtros color</span>
+            <span class="item-arrow">›</span>
+          </div>
+          <div class="chips-row">
+            <button type="button" class="chip" *ngFor="let filter of colorFilters" [class.chip--active]="profile.settings.colorFilter === filter" (click)="updateFilter(filter)">
+              {{ filter }}
+            </button>
+          </div>
+        </div>
+
+        <label class="settings-item settings-item--toggle">
+          <span class="item-left">Alto contraste</span>
+          <span class="toggle">
+            <input type="checkbox" [(ngModel)]="profile.settings.highContrast" (change)="updateContrast()" />
+            <span class="toggle-slider"></span>
+          </span>
+        </label>
+
+        <div class="settings-item settings-item--stack">
+          <div class="stack-top">
+            <span class="item-left">Tamano del Texto</span>
+            <span class="item-arrow">›</span>
+          </div>
+          <div class="chips-row">
+            <button type="button" class="chip" *ngFor="let size of textSizes" [class.chip--active]="profile.settings.textSize === size" (click)="updateTextSize(size)">
+              {{ size }}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <p class="saving-message" *ngIf="saving">Guardando ajustes...</p>
+    </section>
+
+    <ng-template #loadingState>
+      <p class="empty-state">Cargando ajustes...</p>
+    </ng-template>
+  </main>
+</div>
