@@ -28,9 +28,13 @@
 .uploads-section h2 { margin: 0 0 16px; padding-bottom: 12px; border-bottom: 2px solid rgba(214,190,138,.7); color: #d6be8a; font-size: 1rem; font-weight: 600; }
 .uploads-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(10px, 3vw, 14px); }
 .upload-card { overflow: hidden; border-radius: 10px; background: #121314; text-align: left; }
+.upload-card--saved { cursor: pointer; }
 .upload-art { display: flex; align-items: center; justify-content: center; aspect-ratio: 1 / 1; min-height: 132px; background: linear-gradient(145deg, #111c1d, #090b0f); }
+.upload-art--saved { position: relative; padding: 0; overflow: hidden; background: #0e1118; }
 .upload-art--mic { background: linear-gradient(145deg, #2e2417, #0c0b0b); }
 .upload-art--console { background: linear-gradient(145deg, #f1f1f1, #bababa); }
+.saved-image { width: 100%; height: 100%; object-fit: cover; }
+.saved-badge { position: absolute; top: 10px; right: 10px; padding: 5px 9px; border-radius: 999px; background: rgba(15, 23, 42, 0.78); color: #fff; font-size: .7rem; font-weight: 700; }
 .wave-bars { display: flex; align-items: center; gap: 7px; }
 .wave-bars span { width: 6px; border-radius: 999px; background: rgba(227,241,255,.92); box-shadow: 0 0 18px rgba(201,228,255,.35); }
 .wave-bars span:nth-child(1), .wave-bars span:nth-child(5) { height: 36px; }

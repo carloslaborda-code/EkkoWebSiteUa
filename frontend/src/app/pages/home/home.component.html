@@ -74,6 +74,7 @@
         class="quote-card"
         [class.quote-card--image]="quote.image"
         [class.quote-card--placeholder]="!quote.image"
+        [routerLink]="['/quote', quote._id]"
       >
         <div
           class="quote-media"
@@ -81,6 +82,9 @@
           [class.quote-media--placeholder]="!quote.image"
         >
           <div *ngIf="!quote.image" class="placeholder-mark">{{ quote.workTitle | slice:0:1 }}</div>
+          <span class="media-badge" [class.media-badge--audio]="quote.mediaType === 'audio'">
+            {{ quote.mediaType === 'audio' ? 'Audio' : 'Video' }}
+          </span>
         </div>
 
         <div class="quote-content">

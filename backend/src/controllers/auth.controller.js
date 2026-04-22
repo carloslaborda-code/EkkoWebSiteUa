@@ -3,21 +3,44 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { defaultUploads, defaultUserSettings } = require('../data/defaultUserData');
 
+const hasLegacyMockUploads = (uploads = []) => {
+  const legacyTitles = ['Techno Echo 01', 'Vocal Snippet B', 'Mix Master Loop', 'Techno Echo 01'];
+
+  return (
+    Array.isArray(uploads) &&
+    uploads.length === legacyTitles.length &&
+    uploads.every((upload, index) => upload?.title === legacyTitles[index])
+  );
+};
+
 const ensureUserDefaults = async (user) => {
   let changed = false;
 
-  if (!Array.isArray(user.uploads) || !user.uploads.length) {
+  if (!Array.isArray(user.uploads)) {
     user.uploads = defaultUploads;
     changed = true;
   }
 
-  if (typeof user.uploadsCount !== 'number') {
-    user.uploadsCount = 12;
+  if (hasLegacyMockUploads(user.uploads) || user.uploadsCount === 12) {
+    user.uploads = [];
+    user.uploadsCount = 0;
+    changed = true;
+  }
+
+  const actualUploadsCount = Array.isArray(user.uploads) ? user.uploads.length : 0;
+  if (user.uploadsCount !== actualUploadsCount) {
+    user.uploadsCount = actualUploadsCount;
     changed = true;
   }
 
   if (typeof user.downloads !== 'number') {
-    user.downloads = 45;
+    user.downloads = 0;
+    changed = true;
+  } else if (user.downloads === 45) {
+    user.downloads = 0;
+    changed = true;
+  } else if (user.downloads > 45) {
+    user.downloads -= 45;
     changed = true;
   }
 
@@ -39,6 +62,11 @@ const ensureUserDefaults = async (user) => {
       user.settings.textSize = defaultUserSettings.textSize;
       changed = true;
     }
+  }
+
+  if (!Array.isArray(user.savedQuotes)) {
+    user.savedQuotes = [];
+    changed = true;
   }
 
   if (changed) {
@@ -69,7 +97,6 @@ const register = async (req, res) => {
       username: username.trim(),
       email: normalizedEmail,
       password: hashedPassword,
-      uploads: defaultUploads,
       settings: defaultUserSettings
     });
 
@@ -138,7 +165,7 @@ const login = async (req, res) => {
 
 const getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-password');
+    const user = await User.findById(req.user._id).select('-password').populate('savedQuotes');
     await ensureUserDefaults(user);
     res.json(user);
   } catch (error) {

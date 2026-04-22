@@ -1,0 +1,126 @@
+<div class="detail-shell">
+  <div class="glow glow-left"></div>
+  <div class="glow glow-top"></div>
+  <div class="glow glow-right"></div>
+
+  <main class="detail-frame" *ngIf="quote; else loadingState">
+    <header class="detail-header">
+      <button type="button" class="back-link" (click)="router.navigate(['/home'])" aria-label="Volver">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <img class="brand-logo-image" src="assets/images/ekko-logo.png" alt="Ekko" />
+      <div class="header-space"></div>
+    </header>
+
+    <section class="hero-card">
+      <video
+        *ngIf="quote.mediaType === 'video'"
+        class="metadata-probe"
+        [src]="quote.mediaUrl"
+        preload="metadata"
+        muted
+        playsinline
+        (loadedmetadata)="updateDuration($event)"
+      ></video>
+      <audio
+        *ngIf="quote.mediaType === 'audio'"
+        class="metadata-probe"
+        [src]="quote.mediaUrl"
+        preload="metadata"
+        (loadedmetadata)="updateDuration($event)"
+      ></audio>
+
+      <div class="media-frame" [class.media-frame--audio]="quote.mediaType === 'audio'">
+        <img *ngIf="!isPlaying" [src]="quote.image" [alt]="quote.workTitle" class="media-poster" />
+
+        <video
+          *ngIf="isPlaying && quote.mediaType === 'video'"
+          class="media-player"
+          [src]="quote.mediaUrl"
+          controls
+          autoplay
+          (loadedmetadata)="updateDuration($event)"
+        ></video>
+
+        <div *ngIf="isPlaying && quote.mediaType === 'audio'" class="audio-player-wrap">
+          <img [src]="quote.image" [alt]="quote.workTitle" class="audio-poster" />
+          <audio class="audio-player" [src]="quote.mediaUrl" controls autoplay (loadedmetadata)="updateDuration($event)"></audio>
+        </div>
+
+        <button *ngIf="!isPlaying" type="button" class="play-overlay" (click)="startPlayback()" [attr.aria-label]="'Reproducir ' + quote.workTitle">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6.5v11l9-5.5-9-5.5Z" fill="currentColor" /></svg>
+        </button>
+      </div>
+    </section>
+
+    <section class="detail-body">
+      <h1 class="detail-quote">"{{ quote.text }}"</h1>
+
+      <div class="action-card">
+        <button type="button" class="action-button" (click)="handleDownload()">
+          <span class="action-icon">↓</span>
+          <span>DOWNLOAD</span>
+        </button>
+        <button type="button" class="action-button" (click)="shareContent()">
+          <span class="action-icon">↗</span>
+          <span>SHARE</span>
+        </button>
+        <button type="button" class="action-button" (click)="toggleSave()">
+          <span class="action-icon">{{ isSaved ? '★' : '🔖' }}</span>
+          <span>{{ isSaved ? 'SAVED' : 'SAVE' }}</span>
+        </button>
+      </div>
+
+      <p *ngIf="message" class="detail-message">{{ message }}</p>
+
+      <section class="credits-row">
+        <div class="credit-avatar">AP</div>
+        <div class="credit-copy">
+          <h2>{{ quote.actorName }}</h2>
+          <p class="character-name">{{ quote.characterName }}</p>
+          <p class="meta-line">{{ quote.workTitle }} ({{ quote.year }})</p>
+        </div>
+        <span class="duration-pill">{{ displayDuration }}</span>
+      </section>
+
+      <section class="synopsis-block">
+        <div class="section-heading">
+          <h3>SYNOPSIS</h3>
+          <span></span>
+        </div>
+        <p>{{ quote.synopsis }}</p>
+        <div class="hashtags-row" *ngIf="quote.hashtags?.length">
+          <span class="hashtag-chip" *ngFor="let hashtag of quote.hashtags">#{{ hashtag }}</span>
+        </div>
+      </section>
+    </section>
+
+    <nav class="bottom-nav" aria-label="Navegacion principal">
+      <a class="nav-item" routerLink="/home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20h-5.5v-5h-5V20H4v-9.5Z" fill="currentColor" /></svg>
+        <span>Inicio</span>
+      </a>
+      <a class="nav-item" href="javascript:void(0)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.8a8.2 8.2 0 1 0 8.2 8.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /><path d="M20.2 3.8 13.5 10.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /><circle cx="12" cy="12" r="2.5" fill="currentColor" /></svg>
+        <span>Descubrir</span>
+      </a>
+      <a class="nav-item nav-item--accent" href="javascript:void(0)" aria-label="Publicar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" /></svg>
+      </a>
+      <a class="nav-item" href="javascript:void(0)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5h10a1.5 1.5 0 0 1 1.5 1.5v14l-6.5-3-6.5 3V6A1.5 1.5 0 0 1 7 4.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /></svg>
+        <span>Libreria</span>
+      </a>
+      <a class="nav-item" routerLink="/profile">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="M4.5 19.5a8.5 8.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+        <span>Perfil</span>
+      </a>
+    </nav>
+  </main>
+
+  <ng-template #loadingState>
+    <div class="loading-state">Cargando detalle...</div>
+  </ng-template>
+</div>

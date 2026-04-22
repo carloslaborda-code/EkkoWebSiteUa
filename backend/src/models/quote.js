@@ -28,6 +28,35 @@ const quoteSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
+    mediaType: {
+      type: String,
+      enum: ['video', 'audio'],
+      default: 'video'
+    },
+    mediaUrl: {
+      type: String,
+      default: ''
+    },
+    duration: {
+      type: String,
+      default: '00:00'
+    },
+    actorName: {
+      type: String,
+      default: ''
+    },
+    characterName: {
+      type: String,
+      default: ''
+    },
+    synopsis: {
+      type: String,
+      default: ''
+    },
+    hashtags: {
+      type: [String],
+      default: []
+    },
     category: {
       type: String,
       default: 'movie'

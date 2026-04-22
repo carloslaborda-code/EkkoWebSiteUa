@@ -178,13 +178,33 @@
   overflow: hidden;
   border-radius: 14px;
   background: #0c1119;
+  cursor: pointer;
 }
 
 .quote-media {
+  position: relative;
   height: clamp(180px, 52vw, 260px);
   background-color: #172033;
   background-position: center;
   background-size: cover;
+}
+
+.media-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.78);
+  color: #d9e1ef;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.media-badge--audio {
+  background: rgba(214, 190, 138, 0.18);
+  color: #f2dcae;
 }
 
 .quote-media--placeholder {

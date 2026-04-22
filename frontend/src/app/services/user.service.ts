@@ -16,6 +16,16 @@ export interface UserSettings {
   textSize: string;
 }
 
+export interface SavedQuote {
+  _id: string;
+  text: string;
+  workTitle: string;
+  year: number;
+  image: string;
+  mediaType: 'video' | 'audio';
+  duration: string;
+}
+
 export interface UserProfile {
   _id: string;
   username: string;
@@ -24,6 +34,7 @@ export interface UserProfile {
   uploadsCount: number;
   downloads: number;
   uploads: UserUpload[];
+  savedQuotes: SavedQuote[];
   settings: UserSettings;
   role: string;
 }
@@ -89,6 +100,7 @@ export class UserService {
         avatar: profile.avatar,
         uploadsCount: profile.uploadsCount,
         downloads: profile.downloads,
+        savedQuotes: profile.savedQuotes,
         settings: profile.settings,
         role: profile.role
       })

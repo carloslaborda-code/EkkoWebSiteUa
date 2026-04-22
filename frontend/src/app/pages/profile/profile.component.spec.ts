@@ -25,6 +25,7 @@ describe('ProfileComponent', () => {
                 uploadsCount: 12,
                 downloads: 45,
                 uploads: [],
+                savedQuotes: [],
                 settings: { colorFilter: 'default', highContrast: false, textSize: 'medium' },
                 role: 'user'
               })

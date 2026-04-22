@@ -62,16 +62,22 @@ const userSchema = new mongoose.Schema(
     },
     downloads: {
       type: Number,
-      default: 45
+      default: 0
     },
     uploadsCount: {
       type: Number,
-      default: 12
+      default: 0
     },
     uploads: {
       type: [uploadSchema],
       default: defaultUploads
     },
+    savedQuotes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Quote'
+      }
+    ],
     settings: {
       type: settingsSchema,
       default: defaultUserSettings

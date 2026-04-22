@@ -46,7 +46,7 @@
 
       <section class="uploads-section">
         <h2>Mis Subidas</h2>
-        <div class="uploads-grid">
+        <div class="uploads-grid" *ngIf="profile.uploads?.length; else emptyUploadsState">
           <article class="upload-card" *ngFor="let upload of profile.uploads">
             <div class="upload-art" [class.upload-art--wave]="upload.type === 'audio'" [class.upload-art--mic]="upload.type === 'voice'" [class.upload-art--console]="upload.type === 'sfx'">
               <div class="wave-bars" *ngIf="upload.type === 'audio'">
@@ -56,6 +56,22 @@
               <div class="console-shape" *ngIf="upload.type === 'sfx'"></div>
             </div>
             <p>{{ upload.title }}</p>
+          </article>
+        </div>
+        <ng-template #emptyUploadsState>
+          <p class="empty-state">Todavia no has subido contenido.</p>
+        </ng-template>
+      </section>
+
+      <section class="uploads-section" *ngIf="profile.savedQuotes?.length">
+        <h2>Guardados</h2>
+        <div class="uploads-grid">
+          <article class="upload-card upload-card--saved" *ngFor="let saved of profile.savedQuotes" (click)="router.navigate(['/quote', saved._id])">
+            <div class="upload-art upload-art--saved">
+              <img [src]="saved.image" [alt]="saved.workTitle" class="saved-image" />
+              <span class="saved-badge">{{ saved.mediaType === 'audio' ? 'Audio' : 'Video' }}</span>
+            </div>
+            <p>{{ saved.workTitle }}</p>
           </article>
         </div>
       </section>
