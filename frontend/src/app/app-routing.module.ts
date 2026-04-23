@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { DetailComponent } from './pages/detail/detail.component';
 import { LoginComponent } from './pages/login/login.component';
+import { PublishComponent } from './pages/publish/publish.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { SettingsComponent } from './pages/settings/settings.component';
@@ -13,6 +14,7 @@ const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'quote/:id', component: DetailComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'publish', component: PublishComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'profile', component: ProfileComponent },
   { path: 'settings', component: SettingsComponent }

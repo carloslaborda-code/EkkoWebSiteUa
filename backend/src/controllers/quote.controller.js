@@ -95,6 +95,12 @@ const getQuoteById = async (req, res) => {
 
 const createQuote = async (req, res) => {
   try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
     const {
       text,
       workTitle,
@@ -112,26 +118,45 @@ const createQuote = async (req, res) => {
       category
     } = req.body;
 
-    if (!text || !workTitle || !year) {
-      return res.status(400).json({ message: 'text, workTitle y year son obligatorios' });
+    if (!text || !workTitle || !year || !actorName || !characterName || !synopsis || !mediaType || !mediaUrl || !category) {
+      return res.status(400).json({
+        message: 'text, workTitle, year, actorName, characterName, synopsis, mediaType, mediaUrl y category son obligatorios'
+      });
     }
 
+    const normalizedHashtags = Array.isArray(hashtags)
+      ? hashtags.filter(Boolean)
+      : String(hashtags || '')
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean);
+
     const newQuote = await Quote.create({
-      text,
-      workTitle,
-      year,
-      rating,
-      views,
-      image,
+      text: String(text).trim(),
+      workTitle: String(workTitle).trim(),
+      year: Number(year),
+      rating: typeof rating === 'number' ? rating : 0,
+      views: typeof views === 'string' && views.trim() ? views.trim() : '0',
+      image: typeof image === 'string' ? image : '',
       mediaType,
       mediaUrl,
-      duration,
-      actorName,
-      characterName,
-      synopsis,
-      hashtags,
+      duration: typeof duration === 'string' && duration.trim() ? duration.trim() : '00:00',
+      actorName: String(actorName).trim(),
+      characterName: String(characterName).trim(),
+      synopsis: String(synopsis).trim(),
+      hashtags: normalizedHashtags,
       category
     });
+
+    const uploadType = mediaType === 'video' ? 'video' : 'audio';
+
+    user.uploads.push({
+      title: newQuote.workTitle,
+      image: newQuote.image,
+      type: uploadType
+    });
+    user.uploadsCount = user.uploads.length;
+    await user.save();
 
     res.status(201).json({
       message: 'Quote creada correctamente',

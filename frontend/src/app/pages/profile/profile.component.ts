@@ -43,4 +43,8 @@ export class ProfileComponent implements OnInit {
       .slice(0, 2)
       .toUpperCase();
   }
+
+  openPublish(): void {
+    this.router.navigate(['/publish']);
+  }
 }

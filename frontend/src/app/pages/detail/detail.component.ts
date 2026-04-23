@@ -152,4 +152,8 @@ export class DetailComponent implements OnInit {
   openProfile(): void {
     this.router.navigate([this.isLoggedIn ? '/profile' : '/login']);
   }
+
+  openPublish(): void {
+    this.router.navigate([this.isLoggedIn ? '/publish' : '/login']);
+  }
 }

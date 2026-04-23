@@ -49,11 +49,12 @@
         <div class="uploads-grid" *ngIf="profile.uploads?.length; else emptyUploadsState">
           <article class="upload-card" *ngFor="let upload of profile.uploads">
             <div class="upload-art" [class.upload-art--wave]="upload.type === 'audio'" [class.upload-art--mic]="upload.type === 'voice'" [class.upload-art--console]="upload.type === 'sfx'">
-              <div class="wave-bars" *ngIf="upload.type === 'audio'">
+              <img *ngIf="upload.image" [src]="upload.image" [alt]="upload.title" class="saved-image" />
+              <div class="wave-bars" *ngIf="upload.type === 'audio' && !upload.image">
                 <span></span><span></span><span></span><span></span><span></span>
               </div>
-              <div class="mic-shape" *ngIf="upload.type === 'voice'"></div>
-              <div class="console-shape" *ngIf="upload.type === 'sfx'"></div>
+              <div class="mic-shape" *ngIf="upload.type === 'voice' && !upload.image"></div>
+              <div class="console-shape" *ngIf="upload.type === 'sfx' && !upload.image"></div>
             </div>
             <p>{{ upload.title }}</p>
           </article>
@@ -90,9 +91,9 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.8a8.2 8.2 0 1 0 8.2 8.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /><path d="M20.2 3.8 13.5 10.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /><circle cx="12" cy="12" r="2.5" fill="currentColor" /></svg>
         <span>Descubrir</span>
       </a>
-      <a class="nav-item nav-item--accent" href="javascript:void(0)" aria-label="Publicar">
+      <button type="button" class="nav-item nav-item--accent nav-button-reset" aria-label="Publicar" (click)="openPublish()">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" /></svg>
-      </a>
+      </button>
       <a class="nav-item" href="javascript:void(0)">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5h10a1.5 1.5 0 0 1 1.5 1.5v14l-6.5-3-6.5 3V6A1.5 1.5 0 0 1 7 4.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /></svg>
         <span>Libreria</span>

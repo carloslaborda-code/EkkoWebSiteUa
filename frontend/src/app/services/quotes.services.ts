@@ -20,6 +20,23 @@ export interface Quote {
   category: string;
 }
 
+export interface CreateQuotePayload {
+  text: string;
+  workTitle: string;
+  year: number;
+  rating?: number;
+  views?: string;
+  image: string;
+  mediaType: 'video' | 'audio';
+  mediaUrl: string;
+  duration: string;
+  actorName: string;
+  characterName: string;
+  synopsis: string;
+  hashtags: string[];
+  category: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -34,6 +51,12 @@ export class QuoteService {
 
   getQuoteById(id: string): Observable<Quote> {
     return this.http.get<Quote>(`${this.apiUrl}/${id}`);
+  }
+
+  createQuote(payload: CreateQuotePayload): Observable<{ message: string; quote: Quote }> {
+    return this.http.post<{ message: string; quote: Quote }>(this.apiUrl, payload, {
+      headers: this.getHeaders()
+    });
   }
 
   toggleSave(id: string): Observable<{ message: string; saved: boolean; savedCount: number; savedQuoteIds: string[] }> {

@@ -8,6 +8,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { PublishComponent } from './pages/publish/publish.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { SettingsComponent } from './pages/settings/settings.component';
@@ -18,6 +19,7 @@ import { SettingsComponent } from './pages/settings/settings.component';
     DetailComponent,
     HomeComponent,
     LoginComponent,
+    PublishComponent,
     RegisterComponent,
     ProfileComponent,
     SettingsComponent

@@ -11,7 +11,7 @@ const {
 
 router.get('/', getQuotes);
 router.get('/:id', getQuoteById);
-router.post('/', createQuote);
+router.post('/', authMiddleware, createQuote);
 router.post('/:id/save', authMiddleware, toggleSaveQuote);
 router.post('/:id/download', authMiddleware, registerDownload);
 

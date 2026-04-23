@@ -49,6 +49,10 @@ export class HomeComponent implements OnInit {
     this.router.navigate([this.isLoggedIn ? '/profile' : '/login']);
   }
 
+  openPublish(): void {
+    this.router.navigate([this.isLoggedIn ? '/publish' : '/login']);
+  }
+
   get isLoggedIn(): boolean {
     return !!localStorage.getItem('token');
   }
