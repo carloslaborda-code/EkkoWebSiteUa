@@ -60,6 +60,11 @@ const quoteSchema = new mongoose.Schema(
     category: {
       type: String,
       default: 'movie'
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
     }
   },
   { timestamps: true }

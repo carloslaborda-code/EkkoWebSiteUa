@@ -34,6 +34,16 @@ describe('PublishComponent', () => {
           synopsis: 'synopsis',
           hashtags: [],
           category: 'movie'
+        },
+        user: {
+          uploadsCount: 1,
+          uploads: [
+            {
+              title: 'title',
+              image: '',
+              type: 'audio'
+            }
+          ]
         }
       })
     );

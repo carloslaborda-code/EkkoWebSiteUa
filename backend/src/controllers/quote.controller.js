@@ -145,7 +145,8 @@ const createQuote = async (req, res) => {
       characterName: String(characterName).trim(),
       synopsis: String(synopsis).trim(),
       hashtags: normalizedHashtags,
-      category
+      category,
+      createdBy: user._id
     });
 
     const uploadType = mediaType === 'video' ? 'video' : 'audio';
@@ -160,7 +161,11 @@ const createQuote = async (req, res) => {
 
     res.status(201).json({
       message: 'Quote creada correctamente',
-      quote: newQuote
+      quote: newQuote,
+      user: {
+        uploadsCount: user.uploadsCount,
+        uploads: user.uploads
+      }
     });
   } catch (error) {
     res.status(500).json({ message: 'Error al crear la quote', error: error.message });

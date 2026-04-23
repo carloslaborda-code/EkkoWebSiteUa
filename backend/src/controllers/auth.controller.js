@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const Quote = require('../models/quote');
 const { defaultUploads, defaultUserSettings } = require('../data/defaultUserData');
 
 const hasLegacyMockUploads = (uploads = []) => {
@@ -70,6 +71,36 @@ const ensureUserDefaults = async (user) => {
   }
 
   if (changed) {
+    await user.save();
+  }
+
+  return user;
+};
+
+const syncUploadsFromQuotes = async (user) => {
+  const createdQuotes = await Quote.find({ createdBy: user._id })
+    .sort({ createdAt: -1 })
+    .select('workTitle image mediaType');
+
+  const uploadsFromQuotes = createdQuotes.map((quote) => ({
+    title: quote.workTitle,
+    image: quote.image || '',
+    type: quote.mediaType === 'video' ? 'video' : 'audio'
+  }));
+
+  const currentUploads = Array.isArray(user.uploads) ? user.uploads.map((upload) => ({
+    title: upload.title,
+    image: upload.image || '',
+    type: upload.type || 'audio'
+  })) : [];
+
+  const hasChanged =
+    JSON.stringify(currentUploads) !== JSON.stringify(uploadsFromQuotes) ||
+    user.uploadsCount !== uploadsFromQuotes.length;
+
+  if (hasChanged) {
+    user.uploads = uploadsFromQuotes;
+    user.uploadsCount = uploadsFromQuotes.length;
     await user.save();
   }
 
@@ -167,6 +198,7 @@ const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password').populate('savedQuotes');
     await ensureUserDefaults(user);
+    await syncUploadsFromQuotes(user);
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener el perfil', error: error.message });

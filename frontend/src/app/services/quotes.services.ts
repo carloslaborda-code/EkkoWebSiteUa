@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { UserUpload } from './user.service';
 
 export interface Quote {
   _id: string;
@@ -53,8 +54,8 @@ export class QuoteService {
     return this.http.get<Quote>(`${this.apiUrl}/${id}`);
   }
 
-  createQuote(payload: CreateQuotePayload): Observable<{ message: string; quote: Quote }> {
-    return this.http.post<{ message: string; quote: Quote }>(this.apiUrl, payload, {
+  createQuote(payload: CreateQuotePayload): Observable<{ message: string; quote: Quote; user: { uploadsCount: number; uploads: UserUpload[] } }> {
+    return this.http.post<{ message: string; quote: Quote; user: { uploadsCount: number; uploads: UserUpload[] } }>(this.apiUrl, payload, {
       headers: this.getHeaders()
     });
   }

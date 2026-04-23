@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CreateQuotePayload, QuoteService } from '../../services/quotes.services';
+import { UserService } from '../../services/user.service';
 
 type MediaType = 'audio' | 'video';
 type Category = 'movie' | 'series' | 'game' | 'sfx';
@@ -33,7 +34,7 @@ export class PublishComponent implements OnInit {
     { label: 'SFX', value: 'sfx' }
   ];
 
-  constructor(private quoteService: QuoteService, public router: Router) {}
+  constructor(private quoteService: QuoteService, private userService: UserService, public router: Router) {}
 
   ngOnInit(): void {
     if (!localStorage.getItem('token')) {
@@ -121,8 +122,9 @@ export class PublishComponent implements OnInit {
     this.message = '';
 
     this.quoteService.createQuote(payload).subscribe({
-      next: ({ quote }) => {
+      next: ({ quote, user }) => {
         this.submitting = false;
+        this.userService.syncPublishedUpload(user);
         this.router.navigate(['/quote', quote._id]);
       },
       error: () => {

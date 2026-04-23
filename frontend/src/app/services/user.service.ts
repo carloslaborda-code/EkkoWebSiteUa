@@ -105,6 +105,23 @@ export class UserService {
     }
   }
 
+  syncPublishedUpload(payload: { uploadsCount: number; uploads: UserUpload[] }): void {
+    const savedUser = localStorage.getItem('user');
+
+    if (!savedUser) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(savedUser) as Record<string, unknown>;
+      parsed['uploadsCount'] = payload.uploadsCount;
+      parsed['uploads'] = payload.uploads;
+      localStorage.setItem('user', JSON.stringify(parsed));
+    } catch {
+      return;
+    }
+  }
+
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token') || '';
     return new HttpHeaders({
@@ -122,6 +139,7 @@ export class UserService {
         avatar: profile.avatar,
         uploadsCount: profile.uploadsCount,
         downloads: profile.downloads,
+        uploads: profile.uploads,
         savedQuotes: profile.savedQuotes,
         settings: profile.settings,
         role: profile.role
