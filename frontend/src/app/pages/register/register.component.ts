@@ -13,7 +13,7 @@ export class RegisterComponent {
   password = '';
   confirmPassword = '';
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, public router: Router) {}
 
   register() {
     if (this.password !== this.confirmPassword) {

@@ -14,7 +14,7 @@ export class LoginComponent {
   errorMessage = '';
   isSubmitting = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, public router: Router) {}
 
   login(): void {
     this.errorMessage = '';
