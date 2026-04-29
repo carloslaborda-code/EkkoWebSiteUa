@@ -1,29 +1,66 @@
 # EkkoWebSiteUa
 
-Proyecto de la asignatura **Usabilidad y Accesibilidad** de la Universidad de Alicante.
+## 1. Introduccion
 
-Ekko es una aplicacion web para descubrir, reproducir, valorar, guardar, descargar y publicar fragmentos de **audio** y **video** inspirados en **peliculas, series, videojuegos y efectos sonoros**. El proyecto nacio con enfoque mobile-first y durante esta iteracion se ha consolidado tambien una experiencia de escritorio con layout lateral, navegacion expandible y redistribucion especifica de contenido.
+**Ekko** es una aplicacion web orientada a la busqueda, reproduccion, valoracion, guardado, descarga y publicacion de fragmentos de **audio** y **video** extraidos de **peliculas, series, videojuegos y efectos sonoros**. El proyecto ha sido desarrollado en el contexto de la asignatura **Usabilidad y Accesibilidad** de la Universidad de Alicante y persigue una doble meta:
 
-## Stack
+- construir un producto funcional con una arquitectura web moderna;
+- aplicar criterios reales de usabilidad, claridad visual, navegacion intuitiva y adaptacion a distintos dispositivos.
 
-### Frontend
+La idea central de la aplicacion es ofrecer una experiencia en la que el usuario pueda localizar fragmentos memorables, acceder rapidamente a ellos, valorarlos y publicar nuevo contenido de forma guiada y comprensible.
 
-- Angular 16
-- TypeScript
-- RxJS
-- Tailwind CSS para parte del layout y componentes visuales
-- CSS por componente
+## 2. Objetivos del proyecto
 
-### Backend
+Los objetivos principales de Ekko son los siguientes:
 
-- Node.js
-- Express
-- MongoDB Atlas con Mongoose
-- JWT para autenticacion
-- bcryptjs para hash de contrasenas
-- Cloudinary para almacenamiento externo de medios
+- permitir la consulta publica de contenido multimedia breve sin necesidad de autenticacion;
+- ofrecer una experiencia de usuario clara tanto en **movil** como en **escritorio**;
+- gestionar usuarios autenticados con funciones de valoracion, guardado, descarga y publicacion;
+- almacenar metadatos en MongoDB y externalizar medios pesados para mejorar rendimiento y escalabilidad;
+- aplicar decisiones de diseño coherentes con un proyecto academico centrado en la usabilidad y la accesibilidad.
 
-## Arquitectura actual
+## 3. Vision general de la aplicacion
+
+Desde el punto de vista funcional, Ekko se apoya en tres ideas:
+
+- **Exploracion**: el usuario puede descubrir contenido destacado o filtrarlo por categoria, formato y produccion.
+- **Interaccion**: el usuario puede reproducir, valorar, compartir, guardar y descargar fragmentos.
+- **Contribucion**: el usuario autenticado puede publicar nuevos audios o videos y personalizar su portada.
+
+La aplicacion distingue entre usuario invitado y usuario autenticado. Esto permite mantener una entrada sencilla al sistema y reservar las acciones que modifican datos para usuarios con sesion iniciada.
+
+## 4. Tecnologias utilizadas
+
+### 4.1 Frontend
+
+- **Angular 16**: framework principal para la construccion de la interfaz.
+- **TypeScript**: tipado estatico y mejora del mantenimiento del codigo.
+- **RxJS**: gestion reactiva de peticiones y cache en servicios.
+- **Tailwind CSS**: apoyo para composicion rapida de ciertos layouts y componentes.
+- **CSS por componente**: personalizacion visual fina en cada pantalla.
+
+### 4.2 Backend
+
+- **Node.js**: entorno de ejecucion del servidor.
+- **Express**: framework para exponer la API REST.
+- **MongoDB Atlas**: almacenamiento persistente de usuarios, publicaciones y relaciones.
+- **Mongoose**: modelado de datos y acceso a MongoDB.
+- **JWT**: autenticacion basada en token.
+- **bcryptjs**: hash seguro de contrasenas.
+- **Cloudinary**: almacenamiento externo de archivos multimedia y portadas.
+
+## 5. Arquitectura general
+
+La arquitectura del sistema sigue una separacion clasica cliente-servidor:
+
+- el **frontend** Angular se encarga de la interfaz, navegacion, validaciones de cliente y experiencia de usuario;
+- el **backend** Express expone endpoints REST para autenticacion, publicaciones, valoraciones, guardados, descargas y ajustes;
+- **MongoDB** almacena usuarios y metadatos de publicaciones;
+- **Cloudinary** almacena los archivos multimedia y las imagenes de portada para evitar cargar MongoDB con datos binarios pesados.
+
+Esta separacion mejora la mantenibilidad, favorece la escalabilidad del proyecto y reduce los tiempos de carga en comparacion con un almacenamiento completo en base64 dentro de la base de datos.
+
+## 6. Estructura del proyecto
 
 ```text
 EkkoWebSiteUa/
@@ -32,11 +69,21 @@ EkkoWebSiteUa/
 |   |   `-- migrate-cloudinary-assets.js
 |   |-- src/
 |   |   |-- config/
+|   |   |   `-- db.js
 |   |   |-- controllers/
+|   |   |   |-- auth.controller.js
+|   |   |   `-- quote.controller.js
 |   |   |-- data/
+|   |   |   |-- defaultUserData.js
+|   |   |   `-- seedQuotes.js
 |   |   |-- middleware/
+|   |   |   `-- auth.middleware.js
 |   |   |-- models/
+|   |   |   |-- quote.js
+|   |   |   `-- user.js
 |   |   |-- routes/
+|   |   |   |-- auth.routes.js
+|   |   |   `-- quote.routes.js
 |   |   |-- services/
 |   |   |   `-- cloudinary.service.js
 |   |   |-- app.js
@@ -45,6 +92,26 @@ EkkoWebSiteUa/
 |-- frontend/
 |   |-- src/
 |   |   |-- app/
+|   |   |   |-- components/
+|   |   |   |   |-- icon/
+|   |   |   |   `-- navbar/
+|   |   |   |-- pages/
+|   |   |   |   |-- detail/
+|   |   |   |   |-- discover/
+|   |   |   |   |-- home/
+|   |   |   |   |-- login/
+|   |   |   |   |-- profile/
+|   |   |   |   |-- publish/
+|   |   |   |   |-- register/
+|   |   |   |   `-- settings/
+|   |   |   |-- services/
+|   |   |   |   |-- accessibility.service.ts
+|   |   |   |   |-- api-url.ts
+|   |   |   |   |-- auth.service.ts
+|   |   |   |   |-- quotes.services.ts
+|   |   |   |   `-- user.service.ts
+|   |   |   |-- app-routing.module.ts
+|   |   |   `-- app.module.ts
 |   |   |-- assets/
 |   |   |-- index.html
 |   |   `-- styles.css
@@ -52,208 +119,187 @@ EkkoWebSiteUa/
 `-- README.md
 ```
 
-## Funcionalidades actuales
+## 7. Descripcion funcional pagina por pagina
 
-- registro de usuarios
-- login con email o nombre de usuario
-- home publica con destacados
-- detalle publico con reproduccion de audio o video
-- valoracion por estrellas con media global
-- guardado de publicaciones por usuario
-- descarga de contenido solo con sesion iniciada
-- perfil con avatar, estadisticas, subidas y guardados
-- ajustes de accesibilidad base
-- publicacion de audio y video
-- subida de portada manual y portada extraida desde frame del video
-- anio de publicacion por desplegable
-- almacenamiento de medios y portadas en Cloudinary
-- migracion de publicaciones antiguas desde `data:` a Cloudinary
+### 7.1 Home
 
-## Cambios principales de esta sesion
+La pagina de inicio presenta una vista de acceso rapido al contenido destacado de la plataforma.
 
-### 1. Responsive real movil + escritorio
+#### Funciones implementadas
 
-- se revisaron breakpoints globales y estructura responsive
-- en movil se evito el zoom automatico al enfocar inputs subiendo el tamano minimo tipografico
-- en escritorio se paso a una navegacion lateral tipo app social
-- la sidebar de escritorio queda compacta y se expande al pasar por encima
-- se redistribuyeron `home`, `discover`, `detail`, `publish`, `profile`, `settings`, `login` y `register`
+- buscador por texto;
+- visualizacion de fragmentos destacados;
+- acceso al detalle de cada publicacion;
+- indicador visual de formato, valoracion y visualizaciones.
 
-### 2. Discover redisenado
+#### Criterio de destacados
 
-- nueva composicion con panel de filtros y resultados
-- reduccion del exceso de beige
-- mejor espaciado en desktop con separacion real respecto a la sidebar
-- eliminacion de textos de carga y copys sin valor
+No se muestran todas las publicaciones. En su lugar, `Home` selecciona un resultado destacado por cada categoria:
 
-### 3. Publish mejorado
+- pelicula
+- serie
+- videojuego
+- efectos
 
-- soporte para `audio` y `video`
-- subida opcional de portada para audio
-- placeholder por defecto para audio si no se elige imagen
-- portada manual para video
-- portada automatica a partir del propio video si no se sube una manual
-- selector de frame del video:
-  - previsualizacion del video
-  - slider de tiempo
-  - captura del frame como portada
-- limites de tamano para evitar sobrecargas innecesarias:
-  - audio: 8 MB
-  - video: 20 MB
-  - portada: 4 MB
+La eleccion se realiza segun:
 
-### 4. Persistencia y rendimiento
+1. mayor valoracion media;
+2. en caso de empate, mayor numero de visualizaciones.
 
-- la lista de publicaciones se sirve mas ligera desde backend
-- `home` y `discover` comparten cache de publicaciones
-- `detail` cachea cada publicacion por `id`
-- se actualiza cache al registrar visualizaciones y valoraciones
-- se elimino la carga anticipada de metadatos pesados en `detail`
-- el estado local del usuario se reaprovecha para evitar peticiones redundantes al entrar al detalle
+#### Consideraciones de usabilidad
 
-### 5. Home con destacados
+- acceso inmediato al contenido mas relevante;
+- reduccion de sobrecarga visual;
+- jerarquia clara entre buscador, resumen e items destacados.
 
-`home` ya no enseña todas las publicaciones. Ahora muestra un contenido destacado por categoria:
+### 7.2 Discover
 
-- `movie`
-- `series`
-- `game`
-- `sfx`
+La pantalla `Discover` se concibe como un espacio de exploracion avanzada.
 
-Criterios:
+#### Funciones implementadas
 
-1. mayor valoracion media
-2. si empatan, mayor numero de visualizaciones
+- filtro por categoria;
+- filtro por formato;
+- filtro por produccion concreta;
+- busqueda por texto;
+- visualizacion de resultados en lista o grid adaptada al ancho disponible.
 
-### 6. Valoraciones endurecidas
+#### Diseño
 
-- bloqueo de clicks repetidos mientras se envia la valoracion
-- mensaje de exito o error dentro del propio panel de valorar
-- mensaje mas claro cuando no hay sesion:
-  - `Debes iniciar sesion para valorar esta publicacion.`
-- normalizacion extra en backend para entradas antiguas o inconsistentes de `ratedQuotes`
+En escritorio se ha implementado un layout con:
 
-### 7. Cloudinary
+- panel lateral de filtros;
+- zona principal de resultados;
+- mejor separacion visual respecto a la barra lateral de navegacion.
 
-Las publicaciones nuevas ya no deben guardar medios pesados en MongoDB si Cloudinary esta configurado. El backend:
+En movil, los bloques se redistribuyen en columna priorizando el dedo y la lectura vertical.
 
-- recibe `data URI` desde frontend
-- sube portada y medio a Cloudinary
-- guarda en Mongo solo las URLs finales
+### 7.3 Detail
 
-Fallback:
+La pantalla `Detail` muestra la informacion completa de una publicacion.
 
-- si Cloudinary no esta configurado, el backend conserva el comportamiento anterior para no romper la app
+#### Funciones implementadas
 
-### 8. Migracion de publicaciones antiguas
+- reproduccion de audio o video;
+- visualizacion de cita, titulo, anio, actor, personaje, sinopsis y hashtags;
+- valoracion por estrellas;
+- guardado de contenido;
+- descarga;
+- copiado o comparticion de enlace;
+- registro de visualizacion.
 
-Se anadio un script para migrar publicaciones antiguas que todavia guardaban `image` o `mediaUrl` en `data:`.
+#### Mejoras tecnicas introducidas
 
-Script:
+- cache por `id` de cada publicacion;
+- actualizacion del cache al valorar o registrar visualizacion;
+- eliminacion de carga anticipada innecesaria del medio para mejorar tiempos de entrada;
+- control de clicks repetidos en valoraciones;
+- mensajes de exito o error dentro del propio panel de valoracion.
 
-- [backend/scripts/migrate-cloudinary-assets.js](backend/scripts/migrate-cloudinary-assets.js)
+### 7.4 Publish
 
-Comandos:
+La pantalla `Publish` es uno de los modulos mas avanzados del proyecto.
 
-```bash
-cd backend
-npm run migrate:cloudinary:dry
-npm run migrate:cloudinary
-```
+#### Funciones implementadas
 
-El script:
+- seleccion entre `audio` y `video`;
+- subida de archivo multimedia;
+- calculo automatico de duracion;
+- introduccion de cita, categoria, titulo, anio, actor, personaje, sinopsis y etiquetas;
+- portada opcional en audio;
+- portada manual en video;
+- portada automatica desde el propio video;
+- seleccion de un frame del video para usarlo como portada;
+- limites de tamano para proteger rendimiento.
 
-- localiza publicaciones con `data:`
-- sube portadas y medios a Cloudinary
-- actualiza Mongo con las nuevas URLs
-- resincroniza los `uploads` de usuario
+#### Logica de portada
 
-## Flujo de acceso
+Para video, el sistema permite tres caminos:
 
-### Usuario invitado
+- usar una portada manual;
+- capturar una portada desde un frame elegido del video;
+- dejar que el sistema genere una portada automatica si no se ha seleccionado ninguna.
 
-Puede:
+Para audio:
 
-- entrar en `Home`
-- abrir `Detalle`
-- reproducir audio o video
-- generar visualizaciones
+- se puede subir una portada opcional;
+- si no se selecciona ninguna, se usa un placeholder por defecto.
 
-Si intenta:
+### 7.5 Profile
 
-- guardar
-- descargar
-- valorar
-- abrir `Perfil`
-- abrir `Ajustes`
-- abrir `Publicar`
+La pantalla `Profile` centraliza la informacion de usuario.
 
-la aplicacion lo redirige a `Login`.
+#### Funciones implementadas
 
-### Usuario autenticado
+- visualizacion del avatar;
+- cambio de foto de perfil;
+- recuento de subidas;
+- recuento de descargas;
+- listado de publicaciones propias;
+- listado de guardados.
 
-Puede:
+#### Consideraciones de mantenimiento
 
-- guardar y quitar guardados
-- descargar contenido
-- valorar publicaciones
-- publicar audio y video
-- subir portada manual
-- elegir portada desde un frame del video
-- editar avatar
-- ver subidas y guardados
-- ajustar opciones base de accesibilidad
+El backend mantiene resincronizadas las subidas del usuario en base a las publicaciones realmente creadas.
 
-## Pantallas principales
+### 7.6 Settings
 
-### Home
+La pantalla `Settings` reune opciones basicas de accesibilidad y sesion.
 
-- resultados destacados por categoria
-- buscador sobre destacados
-- cards con portada, valoracion y visualizaciones
-- acceso rapido a detalle
+#### Funciones implementadas
 
-### Discover
+- ajuste de tamano de texto;
+- soporte base para alto contraste;
+- soporte base para filtros de color;
+- cierre de sesion.
 
-- filtros por categoria
-- filtros por formato
-- filtro por produccion
-- resultados en grid
-- layout de escritorio con panel lateral de filtros
+### 7.7 Login
 
-### Detail
+Pantalla para autenticacion del usuario.
 
-- reproduce audio o video
-- muestra cita, actor, personaje, titulo, anio, sinopsis y hashtags
-- valorar dentro del panel propio
-- compartir
-- guardar
-- descargar
+#### Funciones implementadas
 
-### Publish
+- login por correo o nombre de usuario;
+- almacenamiento de token;
+- persistencia del usuario en localStorage;
+- redireccion posterior al acceso.
 
-- seleccion de `audio` o `video`
-- subida de archivo
-- duracion automatica
-- portada manual
-- captura de frame desde el propio video
-- dropdown de anio
+### 7.8 Register
 
-### Profile
+Pantalla de registro de nuevos usuarios.
 
-- avatar editable
-- estadisticas
-- mis subidas
-- guardados
+#### Funciones implementadas
 
-### Settings
+- alta de usuario con nombre, correo y contrasena;
+- validacion basica del formulario;
+- conexion directa con backend.
 
-- tamano de texto
-- alto contraste base
-- filtros de color base
-- logout
+## 8. Componentes reutilizables
 
-## API actual
+### 8.1 Navbar
+
+Componente de navegacion comun para la aplicacion.
+
+#### Comportamiento actual
+
+- en movil actua como navegacion pensada para acceso rapido;
+- en escritorio se comporta como sidebar lateral;
+- en desktop puede expandirse para mostrar etiquetas de texto;
+- controla accesos a perfil y publicacion segun el estado de autenticacion.
+
+### 8.2 Icon
+
+Componente reutilizable para los SVG de la aplicacion.
+
+#### Ventajas
+
+- centraliza los iconos;
+- evita repeticion de markup;
+- mantiene consistencia visual.
+
+## 9. Backend y API
+
+## 9.1 Endpoints principales
 
 ### Auth
 
@@ -273,9 +319,11 @@ Puede:
 - `POST /api/quotes/:id/rate`
 - `POST /api/quotes/:id/download`
 
-## Modelos principales
+## 9.2 Modelos de datos
 
 ### User
+
+Campos principales:
 
 - `username`
 - `email`
@@ -290,6 +338,8 @@ Puede:
 - `role`
 
 ### Quote
+
+Campos principales:
 
 - `text`
 - `workTitle`
@@ -308,29 +358,67 @@ Puede:
 - `category`
 - `createdBy`
 
-## Variables de entorno
+## 10. Rendimiento y optimizacion
 
-Archivo:
+Durante el desarrollo se han introducido varias mejoras de rendimiento y mantenimiento:
 
-- [backend/.env](backend/.env)
+- respuestas de listado mas ligeras desde backend;
+- cache de coleccion en frontend para `home` y `discover`;
+- cache individual por publicacion en `detail`;
+- actualizacion de cache al registrar visualizaciones y valoraciones;
+- reduccion de carga inicial del detalle;
+- limites de tamano en publicacion;
+- externalizacion de medios en Cloudinary.
 
-Necesarias:
+## 11. Cloudinary y almacenamiento multimedia
 
-```env
-PORT=5000
-MONGO_URI=...
-JWT_SECRET=...
+Inicialmente parte del contenido se estaba almacenando en base64 dentro de MongoDB, lo que degradaba el rendimiento. Para resolverlo se ha integrado **Cloudinary** como almacenamiento de medios.
+
+### Flujo actual
+
+1. el frontend obtiene el archivo local;
+2. lo convierte temporalmente a `data URI`;
+3. el backend recibe esa informacion;
+4. el backend sube el contenido a Cloudinary;
+5. MongoDB guarda solo la URL final del medio y de la portada.
+
+### Ventajas
+
+- menor peso en documentos MongoDB;
+- mejor escalabilidad;
+- menor riesgo de degradacion en tiempos de carga.
+
+## 12. Migracion de contenido legado
+
+Se ha desarrollado un script para migrar publicaciones antiguas que todavia almacenaban `image` o `mediaUrl` en `data:`.
+
+Script:
+
+- `backend/scripts/migrate-cloudinary-assets.js`
+
+Comandos:
+
+```bash
+cd backend
+npm run migrate:cloudinary:dry
+npm run migrate:cloudinary
 ```
 
-Para Cloudinary:
+El modo `dry-run` permite verificar cuantas publicaciones se migrarian sin modificar la base de datos.
 
-```env
-CLOUDINARY_CLOUD_NAME=...
-CLOUDINARY_API_KEY=...
-CLOUDINARY_API_SECRET=...
-```
+## 13. Accesibilidad y usabilidad
 
-## Arranque del proyecto
+El proyecto no se limita a ser funcional, sino que incorpora decisiones orientadas a la asignatura:
+
+- diseño mobile-first;
+- adaptacion posterior a escritorio con redistribucion especifica;
+- tamano minimo tipografico en inputs moviles para evitar zoom automatico;
+- jerarquias visuales claras;
+- botones y controles amplios;
+- mensajes de error o confirmacion contextualizados;
+- separacion entre contenido exploratorio y acciones sensibles.
+
+## 14. Ejecucion del proyecto
 
 ### Backend
 
@@ -344,7 +432,6 @@ Modo desarrollo:
 
 ```bash
 cd backend
-npm install
 npm run dev
 ```
 
@@ -356,56 +443,62 @@ npm install
 npm start
 ```
 
-Para abrir desde movil en la misma red:
+### Prueba en movil
 
 ```bash
 cd frontend
 npm run start:mobile
 ```
 
-## Verificaciones utiles
+## 15. Variables de entorno
 
-Frontend:
+Archivo:
 
-```bash
-cd frontend
-node .\node_modules\typescript\bin\tsc -p tsconfig.app.json --noEmit
-node .\node_modules\typescript\bin\tsc -p tsconfig.spec.json --noEmit
+- `backend/.env`
+
+Variables principales:
+
+```env
+PORT=5000
+MONGO_URI=...
+JWT_SECRET=...
+CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
 ```
 
-Backend:
+## 16. Verificacion tecnica
+
+Comandos utilizados para validacion rapida:
+
+### Frontend
 
 ```bash
-node --check backend/src/app.js
+frontend\node_modules\.bin\tsc.cmd -p frontend/tsconfig.app.json --noEmit
+frontend\node_modules\.bin\tsc.cmd -p frontend/tsconfig.spec.json --noEmit
+```
+
+### Backend
+
+```bash
 node --check backend/src/controllers/auth.controller.js
 node --check backend/src/controllers/quote.controller.js
 node --check backend/scripts/migrate-cloudinary-assets.js
 ```
 
-## Mantenimiento y decisiones tecnicas
+## 17. Estado actual del desarrollo
 
-- MongoDB se usa para metadatos y relaciones
-- Cloudinary se usa para assets grandes
-- las caches del frontend reducen tiempos entre pantallas
-- `home` trabaja con destacados, no con el catalogo completo
-- `detail` evita cargar medios pesados hasta que el usuario reproduce
+En el momento actual, el proyecto presenta:
 
-## Siguientes mejoras razonables
+- una base funcional completa de autenticacion;
+- exploracion de contenido y detalle multimedia;
+- valoraciones persistentes;
+- guardados y descargas;
+- publicacion avanzada con gestion de portadas;
+- almacenamiento multimedia desacoplado de MongoDB;
+- experiencia responsive movil y escritorio;
+- documentacion y estructura suficientemente maduras para continuar el proyecto con claridad.
 
-- migrar por completo contenido legado si queda algo fuera de Cloudinary
-- introducir feedback visual mas rico para acciones de exito/error
-- ampliar ajustes de accesibilidad reales
-- tests de integracion de flujos clave
-- pulido visual fino frente a Figma
+## 18. Conclusion
 
-## Archivos clave para retomar el proyecto
-
-- [frontend/src/app/pages/home](frontend/src/app/pages/home)
-- [frontend/src/app/pages/discover](frontend/src/app/pages/discover)
-- [frontend/src/app/pages/detail](frontend/src/app/pages/detail)
-- [frontend/src/app/pages/publish](frontend/src/app/pages/publish)
-- [frontend/src/app/services](frontend/src/app/services)
-- [backend/src/controllers/auth.controller.js](backend/src/controllers/auth.controller.js)
-- [backend/src/controllers/quote.controller.js](backend/src/controllers/quote.controller.js)
-- [backend/src/services/cloudinary.service.js](backend/src/services/cloudinary.service.js)
-- [backend/scripts/migrate-cloudinary-assets.js](backend/scripts/migrate-cloudinary-assets.js)
+EkkoWebSiteUa representa una aplicacion web academica con una base tecnica realista y una atencion especial a la experiencia de uso. El sistema combina exploracion multimedia, autenticacion, interaccion social basica y publicacion de contenido con una arquitectura separada entre frontend, backend, base de datos y almacenamiento de medios. La evolucion del proyecto durante esta sesion ha reforzado especialmente la responsividad, el rendimiento, la mantenibilidad y la escalabilidad del sistema.

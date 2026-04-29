@@ -1,27 +1,60 @@
-# Client
+# Frontend de Ekko
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.16.
+Frontend Angular de Ekko, la aplicacion de usabilidad y accesibilidad para descubrir, reproducir, valorar, guardar y publicar fragmentos de audio y video.
 
-## Development server
+## Tecnologias
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- Angular 16
+- TypeScript
+- RxJS
+- Tailwind CSS
+- CSS por componente
 
-## Code scaffolding
+## Arranque
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+cd frontend
+npm install
+npm start
+```
 
-## Build
+## Uso en movil
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```bash
+cd frontend
+npm run start:mobile
+```
 
-## Running unit tests
+Despues abre en el movil la IP local del ordenador en el puerto `4200`.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Scripts
 
-## Running end-to-end tests
+- `npm start`: arranca Angular en local
+- `npm run start:mobile`: expone el servidor para pruebas en movil
+- `npm run build`: build de produccion
+- `npm run watch`: build en modo desarrollo con watch
+- `npm test`: tests con Karma
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Estructura util
 
-## Further help
+- `src/app/pages`: pantallas principales
+- `src/app/components`: componentes compartidos
+- `src/app/services`: comunicacion con backend y estado auxiliar
+- `src/assets`: imagenes, media y recursos estaticos
+- `src/styles.css`: variables y reglas globales responsive
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Verificacion rapida
+
+```bash
+frontend\node_modules\.bin\tsc.cmd -p tsconfig.app.json --noEmit
+frontend\node_modules\.bin\tsc.cmd -p tsconfig.spec.json --noEmit
+```
+
+## Notas del proyecto
+
+- la app esta preparada para movil y escritorio
+- `home` muestra destacados por categoria
+- `discover` usa filtros y layout adaptado a desktop
+- `publish` permite portada manual y captura de frame desde video
+- `detail` cachea contenido y evita cargas pesadas anticipadas
+- los medios nuevos se publican pensando en Cloudinary desde backend
