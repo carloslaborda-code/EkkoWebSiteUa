@@ -70,6 +70,11 @@ const ensureUserDefaults = async (user) => {
     changed = true;
   }
 
+  if (!Array.isArray(user.ratedQuotes)) {
+    user.ratedQuotes = [];
+    changed = true;
+  }
+
   if (changed) {
     await user.save();
   }
@@ -185,6 +190,10 @@ const login = async (req, res) => {
         avatar: user.avatar,
         downloads: user.downloads,
         uploadsCount: user.uploadsCount,
+        ratedQuotes: user.ratedQuotes.map((ratedQuote) => ({
+          quoteId: ratedQuote.quoteId.toString(),
+          value: ratedQuote.value
+        })),
         settings: user.settings,
         role: user.role
       }

@@ -63,12 +63,6 @@
   backdrop-filter: blur(6px);
 }
 
-.status-time {
-  margin: 0 0 14px 8px;
-  font-size: 0.88rem;
-  color: #e5e7eb;
-}
-
 .brand-row {
   display: flex;
   align-items: center;

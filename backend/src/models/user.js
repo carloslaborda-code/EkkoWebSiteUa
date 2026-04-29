@@ -20,6 +20,23 @@ const uploadSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const ratedQuoteSchema = new mongoose.Schema(
+  {
+    quoteId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Quote',
+      required: true
+    },
+    value: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5
+    }
+  },
+  { _id: false }
+);
+
 const settingsSchema = new mongoose.Schema(
   {
     colorFilter: {
@@ -78,6 +95,10 @@ const userSchema = new mongoose.Schema(
         ref: 'Quote'
       }
     ],
+    ratedQuotes: {
+      type: [ratedQuoteSchema],
+      default: []
+    },
     settings: {
       type: settingsSchema,
       default: defaultUserSettings

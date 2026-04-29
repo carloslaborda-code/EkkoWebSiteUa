@@ -13,6 +13,7 @@ export class DetailComponent implements OnInit {
   loading = true;
   message = '';
   isSaved = false;
+  userRating = 0;
   isPlaying = false;
   displayDuration = '00:00';
 
@@ -36,6 +37,7 @@ export class DetailComponent implements OnInit {
         this.quote = quote;
         this.displayDuration = quote.duration;
         this.loading = false;
+        this.registerView();
       },
       error: () => {
         this.loading = false;
@@ -46,6 +48,7 @@ export class DetailComponent implements OnInit {
       this.userService.getCurrentUser().subscribe({
         next: (profile) => {
           this.isSaved = profile.savedQuotes.some((savedQuote) => savedQuote._id === quoteId);
+          this.userRating = profile.ratedQuotes?.find((ratedQuote) => ratedQuote.quoteId === quoteId)?.value || 0;
         }
       });
     }
@@ -106,6 +109,33 @@ export class DetailComponent implements OnInit {
     });
   }
 
+  rateQuote(value: number): void {
+    if (!this.quote) {
+      return;
+    }
+
+    if (!this.isLoggedIn) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.quoteService.rateQuote(this.quote._id, value).subscribe({
+      next: ({ rating, ratingsCount, ratedQuotes, message }) => {
+        this.userRating = value;
+        this.message = message;
+        this.quote = {
+          ...this.quote!,
+          rating,
+          ratingsCount
+        };
+        this.userService.syncRatedQuotes(ratedQuotes);
+      },
+      error: () => {
+        this.message = 'No se pudo registrar la valoracion.';
+      }
+    });
+  }
+
   async shareContent(): Promise<void> {
     if (!this.quote) {
       return;
@@ -155,5 +185,26 @@ export class DetailComponent implements OnInit {
 
   openPublish(): void {
     this.router.navigate([this.isLoggedIn ? '/publish' : '/login']);
+  }
+
+  get ratingStars(): number[] {
+    return [1, 2, 3, 4, 5];
+  }
+
+  private registerView(): void {
+    if (!this.quote) {
+      return;
+    }
+
+    this.quoteService.registerView(this.quote._id).subscribe({
+      next: ({ views }) => {
+        if (this.quote) {
+          this.quote = {
+            ...this.quote,
+            views
+          };
+        }
+      }
+    });
   }
 }

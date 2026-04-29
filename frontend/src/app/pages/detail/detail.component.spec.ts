@@ -25,6 +25,7 @@ describe('DetailComponent', () => {
                 workTitle: 'Scarface',
                 year: 1983,
                 rating: 4.5,
+                ratingsCount: 12,
                 views: '1.2M',
                 image: '/assets/images/scarface.jpg',
                 mediaType: 'video',
@@ -33,16 +34,21 @@ describe('DetailComponent', () => {
                 actorName: 'Al Pacino',
                 characterName: 'Tony Montana',
                 synopsis: 'Synopsis',
+                hashtags: [],
                 category: 'movie'
               }),
-            toggleSave: () => of({ message: 'ok', saved: true }),
-            registerDownload: () => of({ message: 'ok', mediaUrl: '/assets/media/scarfacevideo.mp4' })
+            toggleSave: () => of({ message: 'ok', saved: true, savedCount: 1, savedQuoteIds: ['1'] }),
+            rateQuote: () => of({ message: 'ok', rating: 4.6, ratingsCount: 13, ratedQuotes: [{ quoteId: '1', value: 5 }] }),
+            registerDownload: () => of({ message: 'ok', mediaUrl: '/assets/media/scarfacevideo.mp4' }),
+            registerView: () => of({ message: 'ok', views: '1.2M' })
           }
         },
         {
           provide: UserService,
           useValue: {
-            getCurrentUser: () => of({ savedQuotes: [] })
+            getCurrentUser: () => of({ savedQuotes: [], ratedQuotes: [] }),
+            syncSavedQuotes: () => undefined,
+            syncRatedQuotes: () => undefined
           }
         },
         {

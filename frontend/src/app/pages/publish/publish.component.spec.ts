@@ -24,6 +24,7 @@ describe('PublishComponent', () => {
           workTitle: 'title',
           year: 1983,
           rating: 0,
+          ratingsCount: 0,
           views: '0',
           image: '',
           mediaType: 'audio',

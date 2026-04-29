@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UserUpload } from './user.service';
+import { API_BASE_URL } from './api-url';
 
 export interface Quote {
   _id: string;
@@ -9,6 +10,7 @@ export interface Quote {
   workTitle: string;
   year: number;
   rating: number;
+  ratingsCount: number;
   views: string;
   image: string;
   mediaType: 'video' | 'audio';
@@ -42,7 +44,7 @@ export interface CreateQuotePayload {
   providedIn: 'root'
 })
 export class QuoteService {
-  private apiUrl = 'http://localhost:5000/api/quotes';
+  private apiUrl = `${API_BASE_URL}/quotes`;
 
   constructor(private http: HttpClient) {}
 
@@ -64,6 +66,16 @@ export class QuoteService {
     return this.http.post<{ message: string; saved: boolean; savedCount: number; savedQuoteIds: string[] }>(`${this.apiUrl}/${id}/save`, {}, {
       headers: this.getHeaders()
     });
+  }
+
+  rateQuote(id: string, value: number): Observable<{ message: string; rating: number; ratingsCount: number; ratedQuotes: { quoteId: string; value: number }[] }> {
+    return this.http.post<{ message: string; rating: number; ratingsCount: number; ratedQuotes: { quoteId: string; value: number }[] }>(`${this.apiUrl}/${id}/rate`, { value }, {
+      headers: this.getHeaders()
+    });
+  }
+
+  registerView(id: string): Observable<{ message: string; views: string }> {
+    return this.http.post<{ message: string; views: string }>(`${this.apiUrl}/${id}/view`, {});
   }
 
   registerDownload(id: string): Observable<{ message: string; mediaUrl: string }> {

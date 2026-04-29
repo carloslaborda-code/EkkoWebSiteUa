@@ -50,13 +50,25 @@
         </div>
 
         <button *ngIf="!isPlaying" type="button" class="play-overlay" (click)="startPlayback()" [attr.aria-label]="'Reproducir ' + quote.workTitle">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6.5v11l9-5.5-9-5.5Z" fill="currentColor" /></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 6.5v11l9-5.5-9-5.5Z" fill="currentColor" />
+          </svg>
         </button>
       </div>
     </section>
 
     <section class="detail-body">
       <h1 class="detail-quote">"{{ quote.text }}"</h1>
+
+      <section class="rating-panel">
+        <p class="rating-label">RATE THIS CONTENT</p>
+        <div class="rating-stars" aria-label="Valorar contenido">
+          <button type="button" class="rating-star" *ngFor="let star of ratingStars" [class.rating-star--active]="star <= userRating" (click)="rateQuote(star)">
+            ★
+          </button>
+        </div>
+        <p class="rating-summary">{{ quote.rating.toFixed(1) }} / 5 · {{ quote.ratingsCount }} valoraciones</p>
+      </section>
 
       <div class="action-card">
         <button type="button" class="action-button" (click)="handleDownload()">
@@ -81,6 +93,10 @@
           <h2>{{ quote.actorName }}</h2>
           <p class="character-name">{{ quote.characterName }}</p>
           <p class="meta-line">{{ quote.workTitle }} ({{ quote.year }})</p>
+          <div class="detail-stats">
+            <span>{{ quote.rating.toFixed(1) }} puntuacion media</span>
+            <span>{{ quote.views }} visualizaciones</span>
+          </div>
         </div>
         <span class="duration-pill">{{ displayDuration }}</span>
       </section>

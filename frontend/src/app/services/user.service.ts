@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AccessibilityService } from './accessibility.service';
+import { API_BASE_URL } from './api-url';
 
 export interface UserUpload {
   title: string;
@@ -26,6 +27,11 @@ export interface SavedQuote {
   duration: string;
 }
 
+export interface RatedQuote {
+  quoteId: string;
+  value: number;
+}
+
 export interface UserProfile {
   _id: string;
   username: string;
@@ -35,6 +41,7 @@ export interface UserProfile {
   downloads: number;
   uploads: UserUpload[];
   savedQuotes: SavedQuote[];
+  ratedQuotes: RatedQuote[];
   settings: UserSettings;
   role: string;
 }
@@ -43,7 +50,7 @@ export interface UserProfile {
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:5000/api/auth';
+  private apiUrl = `${API_BASE_URL}/auth`;
 
   constructor(private http: HttpClient, private accessibilityService: AccessibilityService) {}
 
@@ -122,6 +129,22 @@ export class UserService {
     }
   }
 
+  syncRatedQuotes(ratedQuotes: RatedQuote[]): void {
+    const savedUser = localStorage.getItem('user');
+
+    if (!savedUser) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(savedUser) as Record<string, unknown>;
+      parsed['ratedQuotes'] = ratedQuotes;
+      localStorage.setItem('user', JSON.stringify(parsed));
+    } catch {
+      return;
+    }
+  }
+
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token') || '';
     return new HttpHeaders({
@@ -141,6 +164,7 @@ export class UserService {
         downloads: profile.downloads,
         uploads: profile.uploads,
         savedQuotes: profile.savedQuotes,
+        ratedQuotes: profile.ratedQuotes,
         settings: profile.settings,
         role: profile.role
       })

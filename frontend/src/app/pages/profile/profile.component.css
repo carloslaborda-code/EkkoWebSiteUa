@@ -6,8 +6,7 @@
 .glow-left { top: calc(var(--safe-top) + 38px); left: 12vw; width: clamp(40px, 12vw, 52px); height: clamp(40px, 12vw, 52px); }
 .glow-top { top: calc(var(--safe-top) + 12px); right: 4vw; width: clamp(44px, 13vw, 56px); height: clamp(44px, 13vw, 56px); }
 .glow-right { right: 4vw; bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 90px); width: clamp(44px, 14vw, 58px); height: clamp(44px, 14vw, 58px); }
-.profile-topbar { display: flex; justify-content: space-between; align-items: flex-start; padding: 18px var(--screen-padding-wide) 0; }
-.status-time { margin: 0; font-size: .9rem; }
+.profile-topbar { display: flex; justify-content: flex-end; align-items: flex-start; padding: 18px var(--screen-padding-wide) 0; }
 .settings-link { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; margin-top: clamp(26px, 8vw, 42px); color: #f4f4f4; }
 .settings-link svg { width: 20px; height: 20px; }
 .profile-body { padding: 8px var(--screen-padding-wide) 0; text-align: center; }
