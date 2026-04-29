@@ -14,7 +14,8 @@ const quoteSchema = new mongoose.Schema(
     },
     year: {
       type: Number,
-      required: true
+      required: true,
+      min: 0
     },
     rating: {
       type: Number,

@@ -1,6 +1,7 @@
 const Quote = require('../models/quote');
 const seedQuotes = require('../data/seedQuotes');
 const User = require('../models/user');
+const { uploadToCloudinary, isDataUri } = require('../services/cloudinary.service');
 
 const normalizeSavedQuotes = (savedQuotes = []) => {
   const seenIds = new Set();
@@ -32,6 +33,18 @@ const normalizeRatedQuotes = (ratedQuotes = []) => {
   });
 
   return Array.from(latestRatings.values());
+};
+
+const normalizeQuoteRatingState = (quote) => {
+  const safeRatingsCount = typeof quote.ratingsCount === 'number' && Number.isFinite(quote.ratingsCount) && quote.ratingsCount >= 0
+    ? quote.ratingsCount
+    : 0;
+  const safeRating = typeof quote.rating === 'number' && Number.isFinite(quote.rating) && quote.rating >= 0
+    ? quote.rating
+    : 0;
+
+  quote.ratingsCount = safeRatingsCount;
+  quote.rating = safeRatingsCount > 0 ? safeRating : 0;
 };
 
 const parseCount = (value) => {
@@ -73,58 +86,34 @@ const ensureSeedQuotes = async () => {
   }
 };
 
-const ensureQuoteDefaults = (quote) => {
-  let changed = false;
-
-  if (!quote.mediaType) {
-    quote.mediaType = quote.image ? 'video' : 'audio';
-    changed = true;
-  }
-
-  if (!quote.mediaUrl) {
-    quote.mediaUrl = '/assets/media/scarfacevideo.mp4';
-    changed = true;
-  }
-
-  if (!quote.duration) {
-    quote.duration = '00:00';
-    changed = true;
-  }
-
-  if (!quote.actorName) {
-    quote.actorName = '';
-    changed = true;
-  }
-
-  if (!quote.characterName) {
-    quote.characterName = '';
-    changed = true;
-  }
-
-  if (!quote.synopsis) {
-    quote.synopsis = '';
-    changed = true;
-  }
-
-  if (!Array.isArray(quote.hashtags)) {
-    quote.hashtags = [];
-    changed = true;
-  }
-
-  if (typeof quote.ratingsCount !== 'number') {
-    quote.ratingsCount = 0;
-    changed = true;
-  }
-
-  return changed ? quote.save() : Promise.resolve(quote);
-};
+const applyQuoteDefaults = (quote = {}) => ({
+  ...quote,
+  text: quote.text || '',
+  workTitle: quote.workTitle || '',
+  year: typeof quote.year === 'number' && Number.isFinite(quote.year) ? quote.year : 0,
+  rating: typeof quote.rating === 'number' && Number.isFinite(quote.rating) ? quote.rating : 0,
+  mediaType: quote.mediaType || (quote.image ? 'video' : 'audio'),
+  mediaUrl: quote.mediaUrl || '/assets/media/scarfacevideo.mp4',
+  duration: quote.duration || '00:00',
+  actorName: quote.actorName || '',
+  characterName: quote.characterName || '',
+  synopsis: quote.synopsis || '',
+  hashtags: Array.isArray(quote.hashtags) ? quote.hashtags : [],
+  ratingsCount: typeof quote.ratingsCount === 'number' ? quote.ratingsCount : 0,
+  views: quote.views || '0',
+  image: quote.image || '',
+  category: quote.category || 'movie'
+});
 
 const getQuotes = async (req, res) => {
   try {
     await ensureSeedQuotes();
-    const quotes = await Quote.find().sort({ createdAt: -1 });
-    await Promise.all(quotes.map((quote) => ensureQuoteDefaults(quote)));
-    res.status(200).json(quotes);
+    const quotes = await Quote.find()
+      .sort({ createdAt: -1 })
+      .select('text workTitle year rating ratingsCount views image mediaType duration actorName characterName synopsis hashtags category createdAt')
+      .lean();
+
+    res.status(200).json(quotes.map((quote) => applyQuoteDefaults(quote)));
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener las publicaciones', error: error.message });
   }
@@ -132,15 +121,13 @@ const getQuotes = async (req, res) => {
 
 const getQuoteById = async (req, res) => {
   try {
-    const quote = await Quote.findById(req.params.id);
+    const quote = await Quote.findById(req.params.id).lean();
 
     if (!quote) {
       return res.status(404).json({ message: 'Publicación no encontrada' });
     }
 
-    await ensureQuoteDefaults(quote);
-
-    res.status(200).json(quote);
+    res.status(200).json(applyQuoteDefaults(quote));
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener la publicación', error: error.message });
   }
@@ -183,16 +170,32 @@ const createQuote = async (req, res) => {
           .split(',')
           .map((tag) => tag.trim())
           .filter(Boolean);
+    const normalizedYear = Number(year);
+
+    if (!Number.isFinite(normalizedYear) || normalizedYear < 0) {
+      return res.status(400).json({ message: 'El ano debe ser un numero valido mayor o igual que 0' });
+    }
+
+    const normalizedMediaType = mediaType === 'audio' ? 'audio' : 'video';
+    const uploadedImage = typeof image === 'string' && isDataUri(image)
+      ? await uploadToCloudinary(image, { folder: 'ekko/covers', resourceType: 'image' })
+      : typeof image === 'string'
+        ? image
+        : '';
+    const uploadedMediaUrl = await uploadToCloudinary(mediaUrl, {
+      folder: normalizedMediaType === 'audio' ? 'ekko/audio' : 'ekko/video',
+      resourceType: 'video'
+    });
 
     const newQuote = await Quote.create({
       text: String(text).trim(),
       workTitle: String(workTitle).trim(),
-      year: Number(year),
+      year: normalizedYear,
       rating: typeof rating === 'number' ? rating : 0,
       views: typeof views === 'string' && views.trim() ? views.trim() : '0',
-      image: typeof image === 'string' ? image : '',
-      mediaType,
-      mediaUrl,
+      image: uploadedImage,
+      mediaType: normalizedMediaType,
+      mediaUrl: uploadedMediaUrl,
       duration: typeof duration === 'string' && duration.trim() ? duration.trim() : '00:00',
       actorName: String(actorName).trim(),
       characterName: String(characterName).trim(),
@@ -202,7 +205,7 @@ const createQuote = async (req, res) => {
       createdBy: user._id
     });
 
-    const uploadType = mediaType === 'video' ? 'video' : 'audio';
+    const uploadType = normalizedMediaType === 'video' ? 'video' : 'audio';
 
     user.uploads.push({
       title: newQuote.workTitle,
@@ -290,15 +293,19 @@ const rateQuote = async (req, res) => {
       user.ratedQuotes = normalizedRatedQuotes;
     }
 
+    normalizeQuoteRatingState(quote);
+
     const quoteId = quote._id.toString();
-    const existingRating = user.ratedQuotes.find((ratedQuote) => ratedQuote.quoteId.toString() === quoteId);
-    const currentRatingsCount = typeof quote.ratingsCount === 'number' ? quote.ratingsCount : 0;
-    const currentTotalRating = (quote.rating || 0) * currentRatingsCount;
+    const existingRating = user.ratedQuotes.find((ratedQuote) => ratedQuote?.quoteId?.toString?.() === quoteId);
+    const currentRatingsCount = quote.ratingsCount;
+    const currentTotalRating = quote.rating * currentRatingsCount;
 
     if (existingRating) {
+      const effectiveRatingsCount = currentRatingsCount > 0 ? currentRatingsCount : 1;
       const updatedTotalRating = currentTotalRating - existingRating.value + ratingValue;
       existingRating.value = ratingValue;
-      quote.rating = Number((updatedTotalRating / currentRatingsCount).toFixed(1));
+      quote.ratingsCount = effectiveRatingsCount;
+      quote.rating = Number((updatedTotalRating / effectiveRatingsCount).toFixed(1));
     } else {
       user.ratedQuotes.push({
         quoteId: quote._id,

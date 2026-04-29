@@ -9,6 +9,7 @@ import { Quote, QuoteService } from '../../services/quotes.services';
 })
 export class HomeComponent implements OnInit {
   allQuotes: Quote[] = [];
+  featuredQuotes: Quote[] = [];
   visibleQuotes: Quote[] = [];
   searchTerm = '';
   loading = true;
@@ -23,11 +24,11 @@ export class HomeComponent implements OnInit {
     const normalized = this.searchTerm.trim().toLowerCase();
 
     if (!normalized) {
-      this.visibleQuotes = [...this.allQuotes];
+      this.visibleQuotes = [...this.featuredQuotes];
       return;
     }
 
-    this.visibleQuotes = this.allQuotes.filter((quote) => {
+    this.visibleQuotes = this.featuredQuotes.filter((quote) => {
       return (
         quote.text.toLowerCase().includes(normalized) ||
         quote.workTitle.toLowerCase().includes(normalized) ||
@@ -49,6 +50,10 @@ export class HomeComponent implements OnInit {
     this.router.navigate([this.isLoggedIn ? '/profile' : '/login']);
   }
 
+  openDiscover(): void {
+    this.router.navigate(['/discover']);
+  }
+
   get isLoggedIn(): boolean {
     return !!localStorage.getItem('token');
   }
@@ -57,14 +62,49 @@ export class HomeComponent implements OnInit {
     this.quoteService.getQuotes().subscribe({
       next: (quotes) => {
         this.allQuotes = quotes;
-        this.visibleQuotes = [...quotes];
+        this.featuredQuotes = this.buildFeaturedQuotes(quotes);
+        this.visibleQuotes = [...this.featuredQuotes];
         this.loading = false;
       },
       error: () => {
         this.allQuotes = [];
+        this.featuredQuotes = [];
         this.visibleQuotes = [];
         this.loading = false;
       }
     });
+  }
+
+  private buildFeaturedQuotes(quotes: Quote[]): Quote[] {
+    const categoryOrder: Array<Quote['category']> = ['movie', 'series', 'game', 'sfx'];
+
+    return categoryOrder
+      .map((category) => {
+        const bestQuote = quotes
+          .filter((quote) => quote.category === category)
+          .sort((left, right) => {
+            if (right.rating !== left.rating) {
+              return right.rating - left.rating;
+            }
+
+            return this.parseViews(right.views) - this.parseViews(left.views);
+          })[0];
+
+        return bestQuote || null;
+      })
+      .filter((quote): quote is Quote => quote !== null);
+  }
+
+  private parseViews(views: string): number {
+    const normalized = String(views || '0').trim().toUpperCase().replace(',', '.');
+    const multiplier = normalized.endsWith('M') ? 1_000_000 : normalized.endsWith('K') ? 1_000 : 1;
+    const numericPart = multiplier === 1 ? normalized : normalized.slice(0, -1);
+    const parsed = Number.parseFloat(numericPart);
+
+    if (!Number.isFinite(parsed)) {
+      return 0;
+    }
+
+    return Math.round(parsed * multiplier);
   }
 }

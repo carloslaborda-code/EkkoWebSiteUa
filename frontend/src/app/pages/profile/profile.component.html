@@ -11,78 +11,82 @@
     </header>
 
     <section class="profile-body" *ngIf="profile; else loadingState">
-      <div class="avatar-wrap">
-        <input
-          #avatarInput
-          type="file"
-          accept="image/*"
-          class="avatar-input"
-          (change)="onAvatarChange($event)"
-        />
-        <div class="avatar-ring">
-          <img *ngIf="profile.avatar" [src]="profile.avatar" [alt]="profile.username" class="avatar-image" />
-          <div *ngIf="!profile.avatar" class="avatar-fallback">{{ initials }}</div>
+      <aside class="profile-overview">
+        <div class="avatar-wrap">
+          <input
+            #avatarInput
+            type="file"
+            accept="image/*"
+            class="avatar-input"
+            (change)="onAvatarChange($event)"
+          />
+          <div class="avatar-ring">
+            <img *ngIf="profile.avatar" [src]="profile.avatar" [alt]="profile.username" class="avatar-image" />
+            <div *ngIf="!profile.avatar" class="avatar-fallback">{{ initials }}</div>
+          </div>
+          <button
+            type="button"
+            class="avatar-edit"
+            aria-label="Editar foto de perfil"
+            [disabled]="avatarSaving"
+            (click)="avatarInput.click()"
+          >
+            <app-icon name="pencil-square" className="h-3.5 w-3.5"></app-icon>
+          </button>
         </div>
-        <button
-          type="button"
-          class="avatar-edit"
-          aria-label="Editar foto de perfil"
-          [disabled]="avatarSaving"
-          (click)="avatarInput.click()"
-        >
-          <app-icon name="pencil-square" className="h-3.5 w-3.5"></app-icon>
-        </button>
-      </div>
-      <p class="avatar-message" *ngIf="avatarMessage" [class.avatar-message--error]="avatarError">{{ avatarMessage }}</p>
+        <p class="avatar-message" *ngIf="avatarMessage" [class.avatar-message--error]="avatarError">{{ avatarMessage }}</p>
 
-      <div class="identity">
-        <h1>{{ profile.username }}</h1>
-        <p>@{{ profile.username.toLowerCase().replace(' ', '_') }}_ekko</p>
-      </div>
+        <div class="identity">
+          <h1>{{ profile.username }}</h1>
+          <p>@{{ profile.username.toLowerCase().replace(' ', '_') }}_ekko</p>
+        </div>
 
-      <section class="stats-grid">
-        <article class="stat-card">
-          <strong>{{ profile.uploadsCount }}</strong>
-          <span>SUBIDAS</span>
-        </article>
-        <article class="stat-card">
-          <strong>{{ profile.downloads }}</strong>
-          <span>DESCARGAS</span>
-        </article>
-      </section>
+        <section class="stats-grid">
+          <article class="stat-card">
+            <strong>{{ profile.uploadsCount }}</strong>
+            <span>SUBIDAS</span>
+          </article>
+          <article class="stat-card">
+            <strong>{{ profile.downloads }}</strong>
+            <span>DESCARGAS</span>
+          </article>
+        </section>
+      </aside>
 
-      <section class="uploads-section">
-        <h2>Mis Subidas</h2>
-        <div class="uploads-grid" *ngIf="profile.uploads?.length; else emptyUploadsState">
-          <article class="upload-card" *ngFor="let upload of profile.uploads">
-            <div class="upload-art" [class.upload-art--wave]="upload.type === 'audio'" [class.upload-art--mic]="upload.type === 'voice'" [class.upload-art--console]="upload.type === 'sfx'">
-              <img *ngIf="upload.image" [src]="upload.image" [alt]="upload.title" class="saved-image" />
-              <div class="wave-bars" *ngIf="upload.type === 'audio' && !upload.image">
-                <span></span><span></span><span></span><span></span><span></span>
+      <div class="profile-library">
+        <section class="uploads-section">
+          <h2>Mis Subidas</h2>
+          <div class="uploads-grid" *ngIf="profile.uploads?.length; else emptyUploadsState">
+            <article class="upload-card" *ngFor="let upload of profile.uploads">
+              <div class="upload-art" [class.upload-art--wave]="upload.type === 'audio'" [class.upload-art--mic]="upload.type === 'voice'" [class.upload-art--console]="upload.type === 'sfx'">
+                <img *ngIf="upload.image" [src]="upload.image" [alt]="upload.title" class="saved-image" />
+                <div class="wave-bars" *ngIf="upload.type === 'audio' && !upload.image">
+                  <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="mic-shape" *ngIf="upload.type === 'voice' && !upload.image"></div>
+                <div class="console-shape" *ngIf="upload.type === 'sfx' && !upload.image"></div>
               </div>
-              <div class="mic-shape" *ngIf="upload.type === 'voice' && !upload.image"></div>
-              <div class="console-shape" *ngIf="upload.type === 'sfx' && !upload.image"></div>
-            </div>
-            <p>{{ upload.title }}</p>
-          </article>
-        </div>
-        <ng-template #emptyUploadsState>
-          <p class="empty-state">Todav&iacute;a no has subido contenido.</p>
-        </ng-template>
-      </section>
+              <p>{{ upload.title }}</p>
+            </article>
+          </div>
+          <ng-template #emptyUploadsState>
+            <p class="empty-state">Todav&iacute;a no has subido contenido.</p>
+          </ng-template>
+        </section>
 
-      <section class="uploads-section" *ngIf="profile.savedQuotes?.length">
-        <h2>Guardados</h2>
-        <div class="uploads-grid">
-          <article class="upload-card upload-card--saved" *ngFor="let saved of profile.savedQuotes" (click)="router.navigate(['/quote', saved._id])">
-            <div class="upload-art upload-art--saved">
-              <img [src]="saved.image" [alt]="saved.workTitle" class="saved-image" />
-              <span class="saved-badge">{{ saved.mediaType === 'audio' ? 'Audio' : 'Video' }}</span>
-            </div>
-            <p>{{ saved.workTitle }}</p>
-          </article>
-        </div>
-      </section>
+        <section class="uploads-section" *ngIf="profile.savedQuotes?.length">
+          <h2>Guardados</h2>
+          <div class="uploads-grid">
+            <article class="upload-card upload-card--saved" *ngFor="let saved of profile.savedQuotes" (click)="router.navigate(['/quote', saved._id])">
+              <div class="upload-art upload-art--saved">
+                <img [src]="saved.image" [alt]="saved.workTitle" class="saved-image" />
+                <span class="saved-badge">{{ saved.mediaType === 'audio' ? 'Audio' : 'Video' }}</span>
+              </div>
+              <p>{{ saved.workTitle }}</p>
+            </article>
+          </div>
+        </section>
+      </div>
     </section>
 
     <ng-template #loadingState>

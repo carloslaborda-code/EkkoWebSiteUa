@@ -1,7 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, shareReplay, tap } from 'rxjs';
 import { AccessibilityService } from './accessibility.service';
 import { API_BASE_URL } from './api-url';
 
@@ -51,19 +50,25 @@ export interface UserProfile {
 })
 export class UserService {
   private apiUrl = `${API_BASE_URL}/auth`;
+  private currentUserCache$?: Observable<UserProfile>;
 
   constructor(private http: HttpClient, private accessibilityService: AccessibilityService) {}
 
-  getCurrentUser(): Observable<UserProfile> {
-    return this.http
-      .get<UserProfile>(`${this.apiUrl}/me`, {
-        headers: this.getHeaders()
-      })
-      .pipe(
-        tap((profile) => {
-          this.persistUser(profile);
+  getCurrentUser(forceRefresh = false): Observable<UserProfile> {
+    if (!this.currentUserCache$ || forceRefresh) {
+      this.currentUserCache$ = this.http
+        .get<UserProfile>(`${this.apiUrl}/me`, {
+          headers: this.getHeaders()
         })
-      );
+        .pipe(
+          tap((profile) => {
+            this.persistUser(profile);
+          }),
+          shareReplay(1)
+        );
+    }
+
+    return this.currentUserCache$;
   }
 
   updateProfile(payload: { username?: string; avatar?: string }): Observable<{ message: string; user: UserProfile }> {
@@ -74,6 +79,7 @@ export class UserService {
       .pipe(
         tap(({ user }) => {
           this.persistUser(user);
+          this.currentUserCache$ = undefined;
         })
       );
   }
@@ -86,6 +92,7 @@ export class UserService {
       .pipe(
         tap(({ settings }) => {
           this.accessibilityService.persistUserSettings(settings);
+          this.currentUserCache$ = undefined;
         })
       );
   }
@@ -107,6 +114,7 @@ export class UserService {
       });
 
       localStorage.setItem('user', JSON.stringify(parsed));
+      this.currentUserCache$ = undefined;
     } catch {
       return;
     }
@@ -124,6 +132,7 @@ export class UserService {
       parsed['uploadsCount'] = payload.uploadsCount;
       parsed['uploads'] = payload.uploads;
       localStorage.setItem('user', JSON.stringify(parsed));
+      this.currentUserCache$ = undefined;
     } catch {
       return;
     }
@@ -140,8 +149,23 @@ export class UserService {
       const parsed = JSON.parse(savedUser) as Record<string, unknown>;
       parsed['ratedQuotes'] = ratedQuotes;
       localStorage.setItem('user', JSON.stringify(parsed));
+      this.currentUserCache$ = undefined;
     } catch {
       return;
+    }
+  }
+
+  getStoredUser(): Partial<UserProfile> | null {
+    const savedUser = localStorage.getItem('user');
+
+    if (!savedUser) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(savedUser) as Partial<UserProfile>;
+    } catch {
+      return null;
     }
   }
 

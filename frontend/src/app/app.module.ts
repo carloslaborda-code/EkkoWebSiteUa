@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { IconComponent } from './components/icon/icon.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { DiscoverComponent } from './pages/discover/discover.component';
 import { DetailComponent } from './pages/detail/detail.component';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
@@ -20,6 +21,7 @@ import { SettingsComponent } from './pages/settings/settings.component';
     AppComponent,
     IconComponent,
     NavbarComponent,
+    DiscoverComponent,
     DetailComponent,
     HomeComponent,
     LoginComponent,

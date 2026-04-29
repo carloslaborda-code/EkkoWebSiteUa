@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Quote, QuoteService } from '../../services/quotes.services';
@@ -12,8 +13,10 @@ export class DetailComponent implements OnInit {
   quote: Quote | null = null;
   loading = true;
   message = '';
+  ratingMessage = '';
   isSaved = false;
   userRating = 0;
+  ratingSaving = false;
   isPlaying = false;
   displayDuration = '00:00';
 
@@ -45,12 +48,12 @@ export class DetailComponent implements OnInit {
     });
 
     if (this.isLoggedIn) {
-      this.userService.getCurrentUser().subscribe({
-        next: (profile) => {
-          this.isSaved = profile.savedQuotes.some((savedQuote) => savedQuote._id === quoteId);
-          this.userRating = profile.ratedQuotes?.find((ratedQuote) => ratedQuote.quoteId === quoteId)?.value || 0;
-        }
-      });
+      const storedUser = this.userService.getStoredUser();
+      const savedQuotes = Array.isArray(storedUser?.savedQuotes) ? storedUser?.savedQuotes ?? [] : [];
+      const ratedQuotes = Array.isArray(storedUser?.ratedQuotes) ? storedUser?.ratedQuotes ?? [] : [];
+
+      this.isSaved = savedQuotes.some((savedQuote) => savedQuote?._id === quoteId);
+      this.userRating = ratedQuotes.find((ratedQuote) => ratedQuote?.quoteId === quoteId)?.value || 0;
     }
   }
 
@@ -110,19 +113,24 @@ export class DetailComponent implements OnInit {
   }
 
   rateQuote(value: number): void {
-    if (!this.quote) {
+    if (!this.quote || this.ratingSaving) {
       return;
     }
 
     if (!this.isLoggedIn) {
+      this.ratingMessage = 'Debes iniciar sesion para valorar esta publicacion.';
       this.router.navigate(['/login']);
       return;
     }
 
+    this.ratingSaving = true;
+    this.ratingMessage = '';
+
     this.quoteService.rateQuote(this.quote._id, value).subscribe({
       next: ({ rating, ratingsCount, ratedQuotes, message }) => {
+        this.ratingSaving = false;
         this.userRating = value;
-        this.message = message;
+        this.ratingMessage = message;
         this.quote = {
           ...this.quote!,
           rating,
@@ -130,8 +138,9 @@ export class DetailComponent implements OnInit {
         };
         this.userService.syncRatedQuotes(ratedQuotes);
       },
-      error: () => {
-        this.message = 'No se pudo registrar la valoración.';
+      error: (error: HttpErrorResponse) => {
+        this.ratingSaving = false;
+        this.ratingMessage = error.error?.message || 'No se pudo registrar la valoracion.';
       }
     });
   }
@@ -166,6 +175,14 @@ export class DetailComponent implements OnInit {
     this.displayDuration = this.formatDuration(media.duration);
   }
 
+  openProfile(): void {
+    this.router.navigate([this.isLoggedIn ? '/profile' : '/login']);
+  }
+
+  get ratingStars(): number[] {
+    return [1, 2, 3, 4, 5];
+  }
+
   private formatDuration(durationInSeconds: number): string {
     const totalSeconds = Math.floor(durationInSeconds);
     const hours = Math.floor(totalSeconds / 3600);
@@ -177,14 +194,6 @@ export class DetailComponent implements OnInit {
     const ss = String(seconds).padStart(2, '0');
 
     return `${hh}:${mm}:${ss}`;
-  }
-
-  openProfile(): void {
-    this.router.navigate([this.isLoggedIn ? '/profile' : '/login']);
-  }
-
-  get ratingStars(): number[] {
-    return [1, 2, 3, 4, 5];
   }
 
   private registerView(): void {

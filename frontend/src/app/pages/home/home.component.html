@@ -48,7 +48,7 @@
         />
       </label>
 
-      <button type="button" class="icon-button filter-button" aria-label="Filtros">
+      <button type="button" class="icon-button filter-button" aria-label="Filtros" (click)="openDiscover()">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             d="M4 6h10M4 18h16M10 12h10"
@@ -64,8 +64,25 @@
       </button>
     </section>
 
+    <section class="desktop-hero" aria-label="Resumen de exploracion">
+      <div class="desktop-hero-copy">
+        <p class="desktop-kicker">Explorar contenido</p>
+        <h1>Ekko te ayuda a localizar frases, escenas y fragmentos de audio dentro de peliculas, series y videojuegos.</h1>
+        <p class="desktop-summary">La aplicacion esta pensada para descubrir contenido memorable, filtrarlo por formato o categoria y acceder rapido a cada fragmento para reproducirlo, guardarlo o compartirlo.</p>
+      </div>
+      <div class="desktop-hero-stats">
+        <article class="desktop-stat-card">
+          <span>Resultados</span>
+          <strong>{{ visibleQuotes.length }}</strong>
+        </article>
+        <article class="desktop-stat-card">
+          <span>Formatos</span>
+          <strong>Audio + Video</strong>
+        </article>
+      </div>
+    </section>
+
     <section class="feed-section" aria-live="polite">
-      <p *ngIf="loading" class="state-message">Cargando fragmentos destacados...</p>
       <p *ngIf="!loading && !visibleQuotes.length" class="state-message">No se han encontrado resultados para esa b&uacute;squeda.</p>
 
       <article

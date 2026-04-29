@@ -13,6 +13,10 @@ export class NavbarComponent {
 
   constructor(private router: Router) {}
 
+  openDiscover(): void {
+    this.router.navigate(['/discover']);
+  }
+
   get isLoggedIn(): boolean {
     return !!localStorage.getItem('token');
   }

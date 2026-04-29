@@ -205,9 +205,13 @@ const login = async (req, res) => {
 
 const getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-password').populate('savedQuotes');
+    const user = await User.findById(req.user._id)
+      .select('-password')
+      .populate({
+        path: 'savedQuotes',
+        select: 'text workTitle year image mediaType duration'
+      });
     await ensureUserDefaults(user);
-    await syncUploadsFromQuotes(user);
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener el perfil', error: error.message });

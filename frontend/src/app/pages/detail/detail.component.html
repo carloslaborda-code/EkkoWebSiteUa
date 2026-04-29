@@ -18,23 +18,6 @@
     </header>
 
     <section class="hero-card">
-      <video
-        *ngIf="quote.mediaType === 'video'"
-        class="metadata-probe"
-        [src]="quote.mediaUrl"
-        preload="metadata"
-        muted
-        playsinline
-        (loadedmetadata)="updateDuration($event)"
-      ></video>
-      <audio
-        *ngIf="quote.mediaType === 'audio'"
-        class="metadata-probe"
-        [src]="quote.mediaUrl"
-        preload="metadata"
-        (loadedmetadata)="updateDuration($event)"
-      ></audio>
-
       <div class="media-frame" [class.media-frame--audio]="quote.mediaType === 'audio'">
         <img *ngIf="!isPlaying" [src]="quote.image" [alt]="quote.workTitle" class="media-poster" />
 
@@ -64,11 +47,19 @@
       <section class="rating-panel">
         <p class="rating-label">VALORA ESTE CONTENIDO</p>
         <div class="rating-stars" aria-label="Valorar contenido">
-          <button type="button" class="rating-star" *ngFor="let star of ratingStars" [class.rating-star--active]="star <= userRating" (click)="rateQuote(star)">
+          <button
+            type="button"
+            class="rating-star"
+            *ngFor="let star of ratingStars"
+            [class.rating-star--active]="star <= userRating"
+            [disabled]="ratingSaving"
+            (click)="rateQuote(star)"
+          >
             <app-icon [name]="star <= userRating ? 'star-solid' : 'star'" className="h-7 w-7"></app-icon>
           </button>
         </div>
         <p class="rating-summary">{{ quote.rating.toFixed(1) }} / 5 - {{ quote.ratingsCount }} valoraciones</p>
+        <p *ngIf="ratingMessage" class="rating-feedback">{{ ratingMessage }}</p>
       </section>
 
       <div class="action-card">

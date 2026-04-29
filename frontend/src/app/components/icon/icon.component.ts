@@ -9,6 +9,13 @@ export type AppIconName =
   | 'bookmark-solid'
   | 'cog-6-tooth'
   | 'pencil-square'
+  | 'magnifying-glass'
+  | 'film'
+  | 'tv'
+  | 'gamepad'
+  | 'speaker-wave'
+  | 'chevron-down'
+  | 'sliders-horizontal'
   | 'star'
   | 'star-solid';
 

@@ -2,7 +2,7 @@
 
 Proyecto de la asignatura **Usabilidad y Accesibilidad** de la Universidad de Alicante.
 
-Ekko es una aplicacion web **mobile-first** para descubrir, reproducir, valorar, guardar, descargar y publicar fragmentos de **audio** y **video** inspirados en peliculas, series, videojuegos y efectos sonoros. El proyecto sigue como referencia visual el diseno definido en Figma y esta orientado a uso en telefono movil.
+Ekko es una aplicacion web para descubrir, reproducir, valorar, guardar, descargar y publicar fragmentos de **audio** y **video** inspirados en **peliculas, series, videojuegos y efectos sonoros**. El proyecto nacio con enfoque mobile-first y durante esta iteracion se ha consolidado tambien una experiencia de escritorio con layout lateral, navegacion expandible y redistribucion especifica de contenido.
 
 ## Stack
 
@@ -11,8 +11,8 @@ Ekko es una aplicacion web **mobile-first** para descubrir, reproducir, valorar,
 - Angular 16
 - TypeScript
 - RxJS
-- Tailwind CSS para parte de la interfaz y los iconos
-- CSS por componentes
+- Tailwind CSS para parte del layout y componentes visuales
+- CSS por componente
 
 ### Backend
 
@@ -21,12 +21,15 @@ Ekko es una aplicacion web **mobile-first** para descubrir, reproducir, valorar,
 - MongoDB Atlas con Mongoose
 - JWT para autenticacion
 - bcryptjs para hash de contrasenas
+- Cloudinary para almacenamiento externo de medios
 
-## Estructura general
+## Arquitectura actual
 
 ```text
 EkkoWebSiteUa/
 |-- backend/
+|   |-- scripts/
+|   |   `-- migrate-cloudinary-assets.js
 |   |-- src/
 |   |   |-- config/
 |   |   |-- controllers/
@@ -34,17 +37,14 @@ EkkoWebSiteUa/
 |   |   |-- middleware/
 |   |   |-- models/
 |   |   |-- routes/
+|   |   |-- services/
+|   |   |   `-- cloudinary.service.js
 |   |   |-- app.js
 |   |   `-- server.js
 |   `-- package.json
 |-- frontend/
 |   |-- src/
 |   |   |-- app/
-|   |   |   |-- components/
-|   |   |   |-- pages/
-|   |   |   |-- services/
-|   |   |   |-- app-routing.module.ts
-|   |   |   `-- app.module.ts
 |   |   |-- assets/
 |   |   |-- index.html
 |   |   `-- styles.css
@@ -52,124 +52,208 @@ EkkoWebSiteUa/
 `-- README.md
 ```
 
-## Estado actual del proyecto
-
-Actualmente el proyecto incluye:
+## Funcionalidades actuales
 
 - registro de usuarios
-- inicio de sesion con correo o nombre de usuario
-- `Home` publica
-- `Detalle` publico con reproduccion de audio o video
-- reproduccion sin necesidad de iniciar sesion
-- contador de visualizaciones por visita al detalle
+- login con email o nombre de usuario
+- home publica con destacados
+- detalle publico con reproduccion de audio o video
 - valoracion por estrellas con media global
 - guardado de publicaciones por usuario
 - descarga de contenido solo con sesion iniciada
-- `Perfil` con avatar, edicion de foto, estadisticas, guardados y subidas
-- `Ajustes` con tamano de texto funcional y base para accesibilidad
-- pantalla de `Publicar` para subir audio o video
-- barra de navegacion comun reutilizable
-- iconos comunes reutilizables en varias pantallas
-- interfaz traducida al castellano en las vistas principales
+- perfil con avatar, estadisticas, subidas y guardados
+- ajustes de accesibilidad base
+- publicacion de audio y video
+- subida de portada manual y portada extraida desde frame del video
+- anio de publicacion por desplegable
+- almacenamiento de medios y portadas en Cloudinary
+- migracion de publicaciones antiguas desde `data:` a Cloudinary
+
+## Cambios principales de esta sesion
+
+### 1. Responsive real movil + escritorio
+
+- se revisaron breakpoints globales y estructura responsive
+- en movil se evito el zoom automatico al enfocar inputs subiendo el tamano minimo tipografico
+- en escritorio se paso a una navegacion lateral tipo app social
+- la sidebar de escritorio queda compacta y se expande al pasar por encima
+- se redistribuyeron `home`, `discover`, `detail`, `publish`, `profile`, `settings`, `login` y `register`
+
+### 2. Discover redisenado
+
+- nueva composicion con panel de filtros y resultados
+- reduccion del exceso de beige
+- mejor espaciado en desktop con separacion real respecto a la sidebar
+- eliminacion de textos de carga y copys sin valor
+
+### 3. Publish mejorado
+
+- soporte para `audio` y `video`
+- subida opcional de portada para audio
+- placeholder por defecto para audio si no se elige imagen
+- portada manual para video
+- portada automatica a partir del propio video si no se sube una manual
+- selector de frame del video:
+  - previsualizacion del video
+  - slider de tiempo
+  - captura del frame como portada
+- limites de tamano para evitar sobrecargas innecesarias:
+  - audio: 8 MB
+  - video: 20 MB
+  - portada: 4 MB
+
+### 4. Persistencia y rendimiento
+
+- la lista de publicaciones se sirve mas ligera desde backend
+- `home` y `discover` comparten cache de publicaciones
+- `detail` cachea cada publicacion por `id`
+- se actualiza cache al registrar visualizaciones y valoraciones
+- se elimino la carga anticipada de metadatos pesados en `detail`
+- el estado local del usuario se reaprovecha para evitar peticiones redundantes al entrar al detalle
+
+### 5. Home con destacados
+
+`home` ya no enseña todas las publicaciones. Ahora muestra un contenido destacado por categoria:
+
+- `movie`
+- `series`
+- `game`
+- `sfx`
+
+Criterios:
+
+1. mayor valoracion media
+2. si empatan, mayor numero de visualizaciones
+
+### 6. Valoraciones endurecidas
+
+- bloqueo de clicks repetidos mientras se envia la valoracion
+- mensaje de exito o error dentro del propio panel de valorar
+- mensaje mas claro cuando no hay sesion:
+  - `Debes iniciar sesion para valorar esta publicacion.`
+- normalizacion extra en backend para entradas antiguas o inconsistentes de `ratedQuotes`
+
+### 7. Cloudinary
+
+Las publicaciones nuevas ya no deben guardar medios pesados en MongoDB si Cloudinary esta configurado. El backend:
+
+- recibe `data URI` desde frontend
+- sube portada y medio a Cloudinary
+- guarda en Mongo solo las URLs finales
+
+Fallback:
+
+- si Cloudinary no esta configurado, el backend conserva el comportamiento anterior para no romper la app
+
+### 8. Migracion de publicaciones antiguas
+
+Se anadio un script para migrar publicaciones antiguas que todavia guardaban `image` o `mediaUrl` en `data:`.
+
+Script:
+
+- [backend/scripts/migrate-cloudinary-assets.js](backend/scripts/migrate-cloudinary-assets.js)
+
+Comandos:
+
+```bash
+cd backend
+npm run migrate:cloudinary:dry
+npm run migrate:cloudinary
+```
+
+El script:
+
+- localiza publicaciones con `data:`
+- sube portadas y medios a Cloudinary
+- actualiza Mongo con las nuevas URLs
+- resincroniza los `uploads` de usuario
 
 ## Flujo de acceso
 
 ### Usuario invitado
 
-Sin iniciar sesion se puede:
+Puede:
 
 - entrar en `Home`
-- abrir una publicacion en `Detalle`
+- abrir `Detalle`
 - reproducir audio o video
-- aumentar las visualizaciones al visitar una publicacion
+- generar visualizaciones
 
-Si el usuario intenta:
+Si intenta:
 
 - guardar
 - descargar
 - valorar
-- entrar en `Perfil`
-- entrar en `Ajustes`
+- abrir `Perfil`
+- abrir `Ajustes`
 - abrir `Publicar`
 
 la aplicacion lo redirige a `Login`.
 
 ### Usuario autenticado
 
-Con sesion iniciada se puede:
+Puede:
 
-- guardar y eliminar de guardados
+- guardar y quitar guardados
 - descargar contenido
-- valorar publicaciones con estrellas
-- publicar nuevos fragmentos
-- ver subidas propias en `Perfil`
-- editar la foto de perfil
-- modificar ajustes de accesibilidad
+- valorar publicaciones
+- publicar audio y video
+- subir portada manual
+- elegir portada desde un frame del video
+- editar avatar
+- ver subidas y guardados
+- ajustar opciones base de accesibilidad
 
-## Pantallas implementadas
+## Pantallas principales
 
 ### Home
 
-- carga publicaciones reales desde backend
-- muestra portada o placeholder segun sea video o audio
-- muestra formato, valoracion media y visualizaciones
-- incluye buscador
-- permite navegar al detalle de cada publicacion
+- resultados destacados por categoria
+- buscador sobre destacados
+- cards con portada, valoracion y visualizaciones
+- acceso rapido a detalle
+
+### Discover
+
+- filtros por categoria
+- filtros por formato
+- filtro por produccion
+- resultados en grid
+- layout de escritorio con panel lateral de filtros
 
 ### Detail
 
 - reproduce audio o video
-- muestra cita, actor, personaje, titulo, ano, duracion, sinopsis y hashtags
-- permite valorar por estrellas
-- permite guardar
-- permite compartir
-- permite descargar si el usuario esta autenticado
-- registra una visualizacion por visita
+- muestra cita, actor, personaje, titulo, anio, sinopsis y hashtags
+- valorar dentro del panel propio
+- compartir
+- guardar
+- descargar
 
 ### Publish
 
-- permite elegir `audio` o `video`
-- permite subir un archivo local
-- recoge cita, categoria, titulo, ano, actor, personaje, sinopsis y etiquetas
-- calcula la duracion del archivo automaticamente
-- crea una publicacion real en backend
-- actualiza las subidas del usuario
+- seleccion de `audio` o `video`
+- subida de archivo
+- duracion automatica
+- portada manual
+- captura de frame desde el propio video
+- dropdown de anio
 
 ### Profile
 
-- muestra avatar y nombre de usuario
-- permite cambiar la foto de perfil
-- muestra contador real de subidas
-- muestra contador real de descargas
-- muestra `Mis Subidas`
-- muestra `Guardados`
+- avatar editable
+- estadisticas
+- mis subidas
+- guardados
 
 ### Settings
 
-- control de tamano de texto
-- alto contraste preparado
-- filtros de color preparados
-- cierre de sesion
+- tamano de texto
+- alto contraste base
+- filtros de color base
+- logout
 
-### Login y Register
-
-- formularios conectados con backend
-- redireccion a `Home` tras login correcto
-- validaciones basicas y mensajes de error
-
-## Componentes compartidos
-
-### Navbar
-
-Barra inferior comun para las paginas principales. Mantiene una navegacion consistente en movil y controla accesos a `Publicar` y `Perfil`.
-
-### Icon
-
-Componente reutilizable para iconos SVG. Se usa para unificar el estilo visual de acciones y navegacion.
-
-## Backend
-
-## API disponible
+## API actual
 
 ### Auth
 
@@ -193,8 +277,6 @@ Componente reutilizable para iconos SVG. Se usa para unificar el estilo visual d
 
 ### User
 
-Campos relevantes:
-
 - `username`
 - `email`
 - `password`
@@ -208,8 +290,6 @@ Campos relevantes:
 - `role`
 
 ### Quote
-
-Campos relevantes:
 
 - `text`
 - `workTitle`
@@ -228,59 +308,29 @@ Campos relevantes:
 - `category`
 - `createdBy`
 
-## Logica importante ya implementada
+## Variables de entorno
 
-- sembrado automatico de publicaciones iniciales si la coleccion esta vacia
-- sincronizacion real de `uploads` del usuario a partir de las publicaciones creadas
-- sincronizacion de guardados para evitar duplicados
-- sincronizacion de valoraciones por usuario
-- incremento de descargas en perfil
-- incremento de visualizaciones en detalle
-- valoracion media acumulada por publicacion
-- soporte para avatar en base64
-- aumento del limite de `express.json()` para soportar subida de foto de perfil
+Archivo:
 
-## Frontend importante
+- [backend/.env](backend/.env)
 
-### Rutas actuales
+Necesarias:
 
-- `/`
-- `/home`
-- `/quote/:id`
-- `/login`
-- `/register`
-- `/profile`
-- `/settings`
-- `/publish`
+```env
+PORT=5000
+MONGO_URI=...
+JWT_SECRET=...
+```
 
-### Servicios importantes
+Para Cloudinary:
 
-- `auth.service.ts`
-- `user.service.ts`
-- `quotes.services.ts`
-- `accessibility.service.ts`
-- `api-url.ts`
+```env
+CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
+```
 
-### Paginas principales
-
-- `pages/home`
-- `pages/detail`
-- `pages/publish`
-- `pages/profile`
-- `pages/settings`
-- `pages/login`
-- `pages/register`
-
-## Accesibilidad y responsive
-
-- enfoque mobile-first real
-- uso de `100dvh`, `safe-area-inset-*` y espaciados fluidos
-- tamano de texto persistente por usuario
-- base preparada para alto contraste
-- base preparada para filtros de color
-- estructura pensada para distintos anchos de pantalla movil sin marcos laterales raros
-
-## Como arrancar el proyecto
+## Arranque del proyecto
 
 ### Backend
 
@@ -290,7 +340,7 @@ npm install
 npm start
 ```
 
-Modo desarrollo con recarga:
+Modo desarrollo:
 
 ```bash
 cd backend
@@ -306,14 +356,14 @@ npm install
 npm start
 ```
 
-Para probar desde un movil en la misma red:
+Para abrir desde movil en la misma red:
 
 ```bash
 cd frontend
 npm run start:mobile
 ```
 
-## Verificaciones que usamos durante el desarrollo
+## Verificaciones utiles
 
 Frontend:
 
@@ -329,26 +379,33 @@ Backend:
 node --check backend/src/app.js
 node --check backend/src/controllers/auth.controller.js
 node --check backend/src/controllers/quote.controller.js
+node --check backend/scripts/migrate-cloudinary-assets.js
 ```
 
-## Pendiente o preparado para futuro
+## Mantenimiento y decisiones tecnicas
 
-- pagina de libreria funcional completa
-- filtros reales por categoria, hashtags y formato
-- portada personalizada al publicar
-- edicion adicional del perfil aparte del avatar
-- mas opciones reales en ajustes
-- refinado visual final al pixel respecto a Figma
-- mas pruebas de integracion
+- MongoDB se usa para metadatos y relaciones
+- Cloudinary se usa para assets grandes
+- las caches del frontend reducen tiempos entre pantallas
+- `home` trabaja con destacados, no con el catalogo completo
+- `detail` evita cargar medios pesados hasta que el usuario reproduce
 
-## Resumen rapido para el equipo
+## Siguientes mejoras razonables
 
-Si alguien del grupo retoma el proyecto, las piezas mas importantes a entender primero son:
+- migrar por completo contenido legado si queda algo fuera de Cloudinary
+- introducir feedback visual mas rico para acciones de exito/error
+- ampliar ajustes de accesibilidad reales
+- tests de integracion de flujos clave
+- pulido visual fino frente a Figma
 
-- `frontend/src/app/pages/` para ver cada pantalla
-- `frontend/src/app/components/` para navbar e iconos compartidos
-- `frontend/src/app/services/` para comunicacion con backend
-- `backend/src/controllers/auth.controller.js` para login, perfil y ajustes
-- `backend/src/controllers/quote.controller.js` para publicaciones, detalle, guardados, valoraciones, vistas y descargas
+## Archivos clave para retomar el proyecto
 
-Con eso se puede seguir trabajando sobre casi cualquier parte del proyecto sin empezar de cero.
+- [frontend/src/app/pages/home](frontend/src/app/pages/home)
+- [frontend/src/app/pages/discover](frontend/src/app/pages/discover)
+- [frontend/src/app/pages/detail](frontend/src/app/pages/detail)
+- [frontend/src/app/pages/publish](frontend/src/app/pages/publish)
+- [frontend/src/app/services](frontend/src/app/services)
+- [backend/src/controllers/auth.controller.js](backend/src/controllers/auth.controller.js)
+- [backend/src/controllers/quote.controller.js](backend/src/controllers/quote.controller.js)
+- [backend/src/services/cloudinary.service.js](backend/src/services/cloudinary.service.js)
+- [backend/scripts/migrate-cloudinary-assets.js](backend/scripts/migrate-cloudinary-assets.js)
