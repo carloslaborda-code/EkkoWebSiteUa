@@ -155,7 +155,7 @@ const login = async (req, res) => {
     const identifier = email?.trim();
 
     if (!identifier || !password) {
-      return res.status(400).json({ message: 'Email o usuario y contrasena obligatorios' });
+      return res.status(400).json({ message: 'Correo o usuario y contraseña obligatorios' });
     }
 
     const normalizedEmail = identifier.toLowerCase();
@@ -234,17 +234,23 @@ const updateProfile = async (req, res) => {
     }
 
     await user.save();
+    await user.populate('savedQuotes');
 
     res.json({
       message: 'Perfil actualizado correctamente',
       user: {
-        id: user._id,
+        _id: user._id,
         username: user.username,
         email: user.email,
         avatar: user.avatar,
         downloads: user.downloads,
         uploadsCount: user.uploadsCount,
         uploads: user.uploads,
+        savedQuotes: user.savedQuotes,
+        ratedQuotes: user.ratedQuotes.map((ratedQuote) => ({
+          quoteId: ratedQuote.quoteId.toString(),
+          value: ratedQuote.value
+        })),
         settings: user.settings,
         role: user.role
       }

@@ -3,6 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { IconComponent } from './components/icon/icon.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
 import { DetailComponent } from './pages/detail/detail.component';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
@@ -16,6 +18,8 @@ import { SettingsComponent } from './pages/settings/settings.component';
 @NgModule({
   declarations: [
     AppComponent,
+    IconComponent,
+    NavbarComponent,
     DetailComponent,
     HomeComponent,
     LoginComponent,

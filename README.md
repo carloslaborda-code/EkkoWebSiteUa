@@ -2,137 +2,174 @@
 
 Proyecto de la asignatura **Usabilidad y Accesibilidad** de la Universidad de Alicante.
 
-Ekko es una web mobile-first para descubrir, reproducir, guardar, descargar y publicar fragmentos de **audio** y **vídeo** inspirados en películas, series, videojuegos y efectos sonoros.
+Ekko es una aplicacion web **mobile-first** para descubrir, reproducir, valorar, guardar, descargar y publicar fragmentos de **audio** y **video** inspirados en peliculas, series, videojuegos y efectos sonoros. El proyecto sigue como referencia visual el diseno definido en Figma y esta orientado a uso en telefono movil.
 
 ## Stack
 
 ### Frontend
 
-- Angular
+- Angular 16
 - TypeScript
 - RxJS
+- Tailwind CSS para parte de la interfaz y los iconos
 - CSS por componentes
 
 ### Backend
 
 - Node.js
 - Express
-- MongoDB con Mongoose
-- JWT
-- bcryptjs
+- MongoDB Atlas con Mongoose
+- JWT para autenticacion
+- bcryptjs para hash de contrasenas
 
-## Estructura
+## Estructura general
 
 ```text
 EkkoWebSiteUa/
-├─ backend/
-│  └─ src/
-│     ├─ config/
-│     ├─ controllers/
-│     ├─ data/
-│     ├─ middleware/
-│     ├─ models/
-│     ├─ routes/
-│     ├─ app.js
-│     └─ server.js
-├─ frontend/
-│  └─ src/
-│     ├─ app/
-│     │  ├─ pages/
-│     │  ├─ services/
-│     │  ├─ app-routing.module.ts
-│     │  └─ app.module.ts
-│     ├─ assets/
-│     └─ styles.css
-└─ README.md
+|-- backend/
+|   |-- src/
+|   |   |-- config/
+|   |   |-- controllers/
+|   |   |-- data/
+|   |   |-- middleware/
+|   |   |-- models/
+|   |   |-- routes/
+|   |   |-- app.js
+|   |   `-- server.js
+|   `-- package.json
+|-- frontend/
+|   |-- src/
+|   |   |-- app/
+|   |   |   |-- components/
+|   |   |   |-- pages/
+|   |   |   |-- services/
+|   |   |   |-- app-routing.module.ts
+|   |   |   `-- app.module.ts
+|   |   |-- assets/
+|   |   |-- index.html
+|   |   `-- styles.css
+|   `-- package.json
+`-- README.md
 ```
 
-## Estado actual
+## Estado actual del proyecto
 
-Actualmente el proyecto ya incluye:
+Actualmente el proyecto incluye:
 
-- registro e inicio de sesión
-- login por email o nombre de usuario
-- `Home` pública con tarjetas de contenido reales
-- `Detalle` público con reproducción de audio o vídeo
-- visualizaciones automáticas por visita al detalle
-- valoración por estrellas con media global por publicación
+- registro de usuarios
+- inicio de sesion con correo o nombre de usuario
+- `Home` publica
+- `Detalle` publico con reproduccion de audio o video
+- reproduccion sin necesidad de iniciar sesion
+- contador de visualizaciones por visita al detalle
+- valoracion por estrellas con media global
 - guardado de publicaciones por usuario
-- descarga de contenido solo con sesión iniciada
-- `Perfil` con guardados, subidas, contador de descargas y contador de subidas
-- `Ajustes` con tamaño de texto funcional
-- pantalla de `Publicar` con subida de audio o vídeo
-- navegación móvil coherente con el diseño de Figma
+- descarga de contenido solo con sesion iniciada
+- `Perfil` con avatar, edicion de foto, estadisticas, guardados y subidas
+- `Ajustes` con tamano de texto funcional y base para accesibilidad
+- pantalla de `Publicar` para subir audio o video
+- barra de navegacion comun reutilizable
+- iconos comunes reutilizables en varias pantallas
+- interfaz traducida al castellano en las vistas principales
 
 ## Flujo de acceso
 
-### Sin iniciar sesión
+### Usuario invitado
 
-Un usuario invitado puede:
+Sin iniciar sesion se puede:
 
 - entrar en `Home`
-- abrir `Detalle`
-- reproducir contenido
-- aumentar visualizaciones al visitar una publicación
+- abrir una publicacion en `Detalle`
+- reproducir audio o video
+- aumentar las visualizaciones al visitar una publicacion
 
-Si intenta:
+Si el usuario intenta:
 
 - guardar
 - descargar
 - valorar
-- entrar en perfil
-- entrar en ajustes
-- abrir publicar
+- entrar en `Perfil`
+- entrar en `Ajustes`
+- abrir `Publicar`
 
-la aplicación lo redirige al login.
+la aplicacion lo redirige a `Login`.
 
-### Con sesión iniciada
+### Usuario autenticado
 
-Un usuario autenticado puede:
+Con sesion iniciada se puede:
 
-- guardar y quitar de guardados
+- guardar y eliminar de guardados
 - descargar contenido
 - valorar publicaciones con estrellas
-- publicar nuevos audios o vídeos
-- ver sus subidas en perfil
+- publicar nuevos fragmentos
+- ver subidas propias en `Perfil`
+- editar la foto de perfil
+- modificar ajustes de accesibilidad
 
 ## Pantallas implementadas
 
 ### Home
 
-- lista las publicaciones del backend
-- muestra formato, valoración media y visualizaciones
-- navegación a detalle
+- carga publicaciones reales desde backend
+- muestra portada o placeholder segun sea video o audio
+- muestra formato, valoracion media y visualizaciones
+- incluye buscador
+- permite navegar al detalle de cada publicacion
 
 ### Detail
 
-- reproduce audio o vídeo
-- muestra cita, actor, personaje, año, duración, sinopsis y hashtags
+- reproduce audio o video
+- muestra cita, actor, personaje, titulo, ano, duracion, sinopsis y hashtags
 - permite valorar por estrellas
-- permite guardar, compartir y descargar
-- registra una visualización por visita
+- permite guardar
+- permite compartir
+- permite descargar si el usuario esta autenticado
+- registra una visualizacion por visita
 
 ### Publish
 
-- permite elegir formato `audio` o `video`
-- permite subir archivo
-- recoge cita, categoría, título, año, actor, personaje, sinopsis y hashtags
-- calcula duración automáticamente
-- crea una publicación real en backend
-- suma la publicación a `uploads` del usuario
+- permite elegir `audio` o `video`
+- permite subir un archivo local
+- recoge cita, categoria, titulo, ano, actor, personaje, sinopsis y etiquetas
+- calcula la duracion del archivo automaticamente
+- crea una publicacion real en backend
+- actualiza las subidas del usuario
 
 ### Profile
 
-- muestra avatar, nombre, estadísticas y guardados
-- reconstruye `uploads` a partir de las publicaciones creadas por ese usuario
+- muestra avatar y nombre de usuario
+- permite cambiar la foto de perfil
+- muestra contador real de subidas
+- muestra contador real de descargas
+- muestra `Mis Subidas`
+- muestra `Guardados`
 
 ### Settings
 
-- tamaño de texto pequeño, medio y grande
+- control de tamano de texto
 - alto contraste preparado
 - filtros de color preparados
+- cierre de sesion
 
-## API actual
+### Login y Register
+
+- formularios conectados con backend
+- redireccion a `Home` tras login correcto
+- validaciones basicas y mensajes de error
+
+## Componentes compartidos
+
+### Navbar
+
+Barra inferior comun para las paginas principales. Mantiene una navegacion consistente en movil y controla accesos a `Publicar` y `Perfil`.
+
+### Icon
+
+Componente reutilizable para iconos SVG. Se usa para unificar el estilo visual de acciones y navegacion.
+
+## Backend
+
+## API disponible
 
 ### Auth
 
@@ -191,9 +228,21 @@ Campos relevantes:
 - `category`
 - `createdBy`
 
+## Logica importante ya implementada
+
+- sembrado automatico de publicaciones iniciales si la coleccion esta vacia
+- sincronizacion real de `uploads` del usuario a partir de las publicaciones creadas
+- sincronizacion de guardados para evitar duplicados
+- sincronizacion de valoraciones por usuario
+- incremento de descargas en perfil
+- incremento de visualizaciones en detalle
+- valoracion media acumulada por publicacion
+- soporte para avatar en base64
+- aumento del limite de `express.json()` para soportar subida de foto de perfil
+
 ## Frontend importante
 
-Rutas actuales:
+### Rutas actuales
 
 - `/`
 - `/home`
@@ -204,7 +253,7 @@ Rutas actuales:
 - `/settings`
 - `/publish`
 
-Servicios importantes:
+### Servicios importantes
 
 - `auth.service.ts`
 - `user.service.ts`
@@ -212,7 +261,26 @@ Servicios importantes:
 - `accessibility.service.ts`
 - `api-url.ts`
 
-## Cómo arrancar el proyecto
+### Paginas principales
+
+- `pages/home`
+- `pages/detail`
+- `pages/publish`
+- `pages/profile`
+- `pages/settings`
+- `pages/login`
+- `pages/register`
+
+## Accesibilidad y responsive
+
+- enfoque mobile-first real
+- uso de `100dvh`, `safe-area-inset-*` y espaciados fluidos
+- tamano de texto persistente por usuario
+- base preparada para alto contraste
+- base preparada para filtros de color
+- estructura pensada para distintos anchos de pantalla movil sin marcos laterales raros
+
+## Como arrancar el proyecto
 
 ### Backend
 
@@ -220,6 +288,14 @@ Servicios importantes:
 cd backend
 npm install
 npm start
+```
+
+Modo desarrollo con recarga:
+
+```bash
+cd backend
+npm install
+npm run dev
 ```
 
 ### Frontend
@@ -230,18 +306,49 @@ npm install
 npm start
 ```
 
-Opcional para probar desde móvil en la misma red:
+Para probar desde un movil en la misma red:
 
 ```bash
 cd frontend
 npm run start:mobile
 ```
 
+## Verificaciones que usamos durante el desarrollo
+
+Frontend:
+
+```bash
+cd frontend
+node .\node_modules\typescript\bin\tsc -p tsconfig.app.json --noEmit
+node .\node_modules\typescript\bin\tsc -p tsconfig.spec.json --noEmit
+```
+
+Backend:
+
+```bash
+node --check backend/src/app.js
+node --check backend/src/controllers/auth.controller.js
+node --check backend/src/controllers/quote.controller.js
+```
+
 ## Pendiente o preparado para futuro
 
-- librería funcional completa
-- filtros reales por categoría, hashtags y formato
+- pagina de libreria funcional completa
+- filtros reales por categoria, hashtags y formato
 - portada personalizada al publicar
-- mejoras visuales finas de detalle y ajustes
-- sistema más completo de accesibilidad
-- más testing de integración
+- edicion adicional del perfil aparte del avatar
+- mas opciones reales en ajustes
+- refinado visual final al pixel respecto a Figma
+- mas pruebas de integracion
+
+## Resumen rapido para el equipo
+
+Si alguien del grupo retoma el proyecto, las piezas mas importantes a entender primero son:
+
+- `frontend/src/app/pages/` para ver cada pantalla
+- `frontend/src/app/components/` para navbar e iconos compartidos
+- `frontend/src/app/services/` para comunicacion con backend
+- `backend/src/controllers/auth.controller.js` para login, perfil y ajustes
+- `backend/src/controllers/quote.controller.js` para publicaciones, detalle, guardados, valoraciones, vistas y descargas
+
+Con eso se puede seguir trabajando sobre casi cualquier parte del proyecto sin empezar de cero.

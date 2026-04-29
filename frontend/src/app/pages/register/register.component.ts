@@ -28,13 +28,12 @@ export class RegisterComponent {
     };
 
     this.auth.register(data).subscribe({
-      next: (res) => {
-        console.log('Registro correcto', res);
+      next: () => {
         this.router.navigate(['/login']);
       },
       error: (err) => {
         console.error('Error en registro', err);
-        alert(err.error?.message || 'Error al registrar usuario');
+        alert(err.error?.message || 'Error al registrar el usuario');
       }
     });
   }

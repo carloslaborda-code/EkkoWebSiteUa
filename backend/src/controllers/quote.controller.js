@@ -126,7 +126,7 @@ const getQuotes = async (req, res) => {
     await Promise.all(quotes.map((quote) => ensureQuoteDefaults(quote)));
     res.status(200).json(quotes);
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener quotes', error: error.message });
+    res.status(500).json({ message: 'Error al obtener las publicaciones', error: error.message });
   }
 };
 
@@ -135,14 +135,14 @@ const getQuoteById = async (req, res) => {
     const quote = await Quote.findById(req.params.id);
 
     if (!quote) {
-      return res.status(404).json({ message: 'Quote no encontrada' });
+      return res.status(404).json({ message: 'Publicación no encontrada' });
     }
 
     await ensureQuoteDefaults(quote);
 
     res.status(200).json(quote);
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener la quote', error: error.message });
+    res.status(500).json({ message: 'Error al obtener la publicación', error: error.message });
   }
 };
 
@@ -213,7 +213,7 @@ const createQuote = async (req, res) => {
     await user.save();
 
     res.status(201).json({
-      message: 'Quote creada correctamente',
+      message: 'Publicación creada correctamente',
       quote: newQuote,
       user: {
         uploadsCount: user.uploadsCount,
@@ -221,7 +221,7 @@ const createQuote = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error al crear la quote', error: error.message });
+    res.status(500).json({ message: 'Error al crear la publicación', error: error.message });
   }
 };
 

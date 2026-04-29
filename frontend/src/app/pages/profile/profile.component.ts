@@ -10,6 +10,9 @@ import { UserProfile, UserService } from '../../services/user.service';
 export class ProfileComponent implements OnInit {
   profile: UserProfile | null = null;
   loading = true;
+  avatarSaving = false;
+  avatarMessage = '';
+  avatarError = false;
 
   constructor(private userService: UserService, public router: Router) {}
 
@@ -44,7 +47,62 @@ export class ProfileComponent implements OnInit {
       .toUpperCase();
   }
 
-  openPublish(): void {
-    this.router.navigate(['/publish']);
+  onAvatarChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.avatarError = true;
+      this.avatarMessage = 'Selecciona una imagen valida para el perfil.';
+      input.value = '';
+      return;
+    }
+
+    this.avatarSaving = true;
+    this.avatarError = false;
+    this.avatarMessage = 'Actualizando foto de perfil...';
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const avatar = typeof reader.result === 'string' ? reader.result : '';
+
+      if (!avatar) {
+        this.avatarSaving = false;
+        this.avatarError = true;
+        this.avatarMessage = 'No se pudo leer la imagen seleccionada.';
+        input.value = '';
+        return;
+      }
+
+      this.userService.updateProfile({ avatar }).subscribe({
+        next: ({ user }) => {
+          this.profile = user;
+          this.avatarSaving = false;
+          this.avatarError = false;
+          this.avatarMessage = 'Foto de perfil actualizada correctamente.';
+          input.value = '';
+        },
+        error: () => {
+          this.avatarSaving = false;
+          this.avatarError = true;
+          this.avatarMessage = 'No se pudo actualizar la foto de perfil.';
+          input.value = '';
+        }
+      });
+    };
+
+    reader.onerror = () => {
+      this.avatarSaving = false;
+      this.avatarError = true;
+      this.avatarMessage = 'No se pudo leer la imagen seleccionada.';
+      input.value = '';
+    };
+
+    reader.readAsDataURL(file);
   }
 }

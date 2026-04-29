@@ -12,30 +12,30 @@
       </a>
 
       <section class="settings-group">
-        <h2>ACCOUNT</h2>
+        <h2>CUENTA</h2>
         <button type="button" class="settings-item">
-          <span class="item-left">Account Settings</span>
+          <span class="item-left">Configuraci&oacute;n de la cuenta</span>
           <span class="item-arrow">›</span>
         </button>
         <button type="button" class="settings-item">
-          <span class="item-left">Privacy</span>
+          <span class="item-left">Privacidad</span>
           <span class="item-arrow">›</span>
         </button>
         <button type="button" class="settings-item" (click)="logout()">
-          <span class="item-left">Log Out</span>
+          <span class="item-left">Cerrar sesi&oacute;n</span>
         </button>
       </section>
 
       <section class="settings-group">
-        <h2>ACCESIBILITY</h2>
+        <h2>ACCESIBILIDAD</h2>
         <div class="settings-item settings-item--stack">
           <div class="stack-top">
-            <span class="item-left">Filtros color</span>
+            <span class="item-left">Filtros de color</span>
             <span class="item-arrow">›</span>
           </div>
           <div class="chips-row">
             <button type="button" class="chip" *ngFor="let filter of colorFilters" [class.chip--active]="profile.settings.colorFilter === filter" (click)="updateFilter(filter)">
-              {{ filter }}
+              {{ getColorFilterLabel(filter) }}
             </button>
           </div>
         </div>
@@ -50,12 +50,12 @@
 
         <div class="settings-item settings-item--stack">
           <div class="stack-top">
-            <span class="item-left">Tamano del Texto</span>
+            <span class="item-left">Tama&ntilde;o del texto</span>
             <span class="item-arrow">›</span>
           </div>
           <div class="chips-row">
             <button type="button" class="chip" *ngFor="let size of textSizes" [class.chip--active]="profile.settings.textSize === size" (click)="updateTextSize(size)">
-              {{ size }}
+              {{ getTextSizeLabel(size) }}
             </button>
           </div>
         </div>

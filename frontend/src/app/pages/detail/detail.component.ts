@@ -131,7 +131,7 @@ export class DetailComponent implements OnInit {
         this.userService.syncRatedQuotes(ratedQuotes);
       },
       error: () => {
-        this.message = 'No se pudo registrar la valoracion.';
+        this.message = 'No se pudo registrar la valoración.';
       }
     });
   }
@@ -181,10 +181,6 @@ export class DetailComponent implements OnInit {
 
   openProfile(): void {
     this.router.navigate([this.isLoggedIn ? '/profile' : '/login']);
-  }
-
-  openPublish(): void {
-    this.router.navigate([this.isLoggedIn ? '/publish' : '/login']);
   }
 
   get ratingStars(): number[] {

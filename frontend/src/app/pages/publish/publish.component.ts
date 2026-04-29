@@ -28,10 +28,10 @@ export class PublishComponent implements OnInit {
   message = '';
 
   readonly categories: Array<{ label: string; value: Category }> = [
-    { label: 'Movie', value: 'movie' },
-    { label: 'Series', value: 'series' },
-    { label: 'Game', value: 'game' },
-    { label: 'SFX', value: 'sfx' }
+    { label: 'Pelicula', value: 'movie' },
+    { label: 'Serie', value: 'series' },
+    { label: 'Videojuego', value: 'game' },
+    { label: 'Efectos', value: 'sfx' }
   ];
 
   constructor(private quoteService: QuoteService, private userService: UserService, public router: Router) {}

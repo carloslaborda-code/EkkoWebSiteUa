@@ -16,7 +16,7 @@
 
     <section class="publish-body">
       <div class="section-head">
-        <h2>FORMAT</h2>
+        <h2>FORMATO</h2>
       </div>
 
       <div class="format-switch">
@@ -30,20 +30,20 @@
 
       <label class="upload-dropzone">
         <input type="file" [accept]="acceptTypes" (change)="onFileChange($event)" hidden />
-        <span class="upload-icon">⇪</span>
-        <strong>Upload Fragment</strong>
+        <span class="upload-icon">&#8679;</span>
+        <strong>Subir fragmento</strong>
         <span>{{ mediaType === 'audio' ? 'MP3 hasta 50MB' : 'MP4 o MOV hasta 50MB' }}</span>
-        <span class="upload-button">Browse Files</span>
+        <span class="upload-button">Buscar archivo</span>
         <small *ngIf="selectedFileName">{{ selectedFileName }}</small>
       </label>
 
       <div class="section-head">
-        <h2>THE QUOTE / FRAGMENT</h2>
+        <h2>LA CITA / FRAGMENTO</h2>
       </div>
-      <textarea [(ngModel)]="quoteText" rows="4" placeholder='e.g., "The eyes, chico. They never lie."'></textarea>
+      <textarea [(ngModel)]="quoteText" rows="4" placeholder='Ej.: "Los ojos, chico. Nunca mienten."'></textarea>
 
       <div class="section-head">
-        <h2>CATEGORY</h2>
+        <h2>CATEGOR&Iacute;A</h2>
       </div>
       <div class="category-row">
         <button
@@ -59,11 +59,11 @@
 
       <div class="form-grid">
         <label class="field">
-          <span>PRODUCTION TITLE</span>
+          <span>T&Iacute;TULO DE LA PRODUCCI&Oacute;N</span>
           <input type="text" [(ngModel)]="workTitle" />
         </label>
         <label class="field field--small">
-          <span>YEAR</span>
+          <span>A&Ntilde;O</span>
           <input type="number" [(ngModel)]="year" />
         </label>
       </div>
@@ -74,59 +74,39 @@
           <input type="text" [(ngModel)]="actorName" />
         </label>
         <label class="field">
-          <span>CHARACTER</span>
+          <span>PERSONAJE</span>
           <input type="text" [(ngModel)]="characterName" />
         </label>
       </div>
 
       <label class="field">
-        <span>SYNOPSIS</span>
+        <span>SINOPSIS</span>
         <textarea [(ngModel)]="synopsis" rows="5" placeholder="Describe brevemente el contexto del fragmento..."></textarea>
       </label>
 
       <label class="field">
-        <span>HASHTAGS</span>
-        <input type="text" [(ngModel)]="hashtagsText" placeholder="crime, drama, iconic, 80sCinema" />
+        <span>ETIQUETAS</span>
+        <input type="text" [(ngModel)]="hashtagsText" placeholder="crimen, drama, iconico, cine80s" />
       </label>
 
       <div class="meta-row">
         <div class="meta-pill">
-          <span>DURATION</span>
+          <span>DURACI&Oacute;N</span>
           <strong>{{ duration }}</strong>
         </div>
         <div class="meta-pill">
-          <span>TYPE</span>
-          <strong>{{ mediaType | uppercase }}</strong>
+          <span>TIPO</span>
+          <strong>{{ mediaType === 'audio' ? 'AUDIO' : 'VIDEO' }}</strong>
         </div>
       </div>
 
       <p *ngIf="message" class="publish-message">{{ message }}</p>
 
       <button type="button" class="publish-button" (click)="publish()" [disabled]="submitting">
-        {{ submitting ? 'Publicando...' : 'PUBLISH CONTENT' }}
+        {{ submitting ? 'Publicando...' : 'PUBLICAR CONTENIDO' }}
       </button>
     </section>
 
-    <nav class="bottom-nav" aria-label="Navegacion principal">
-      <a class="nav-item" routerLink="/home">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20h-5.5v-5h-5V20H4v-9.5Z" fill="currentColor" /></svg>
-        <span>Inicio</span>
-      </a>
-      <a class="nav-item" href="javascript:void(0)">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.8a8.2 8.2 0 1 0 8.2 8.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /><path d="M20.2 3.8 13.5 10.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /><circle cx="12" cy="12" r="2.5" fill="currentColor" /></svg>
-        <span>Descubrir</span>
-      </a>
-      <a class="nav-item nav-item--accent nav-item--active" routerLink="/publish" aria-label="Publicar">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" /></svg>
-      </a>
-      <a class="nav-item" href="javascript:void(0)">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5h10a1.5 1.5 0 0 1 1.5 1.5v14l-6.5-3-6.5 3V6A1.5 1.5 0 0 1 7 4.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /></svg>
-        <span>Libreria</span>
-      </a>
-      <a class="nav-item" routerLink="/profile">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="M4.5 19.5a8.5 8.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
-        <span>Perfil</span>
-      </a>
-    </nav>
+    <app-navbar activeTab="publish"></app-navbar>
   </main>
 </div>
