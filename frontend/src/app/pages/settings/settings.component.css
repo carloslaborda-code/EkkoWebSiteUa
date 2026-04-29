@@ -6,9 +6,7 @@
 .glow-left { top: calc(var(--safe-top) + 48px); left: 12vw; width: clamp(40px, 12vw, 46px); height: clamp(40px, 12vw, 46px); }
 .glow-top { top: calc(var(--safe-top) + 12px); right: 4vw; width: clamp(44px, 13vw, 56px); height: clamp(44px, 13vw, 56px); }
 .glow-right { right: 4vw; bottom: 14vh; width: clamp(46px, 14vw, 60px); height: clamp(46px, 14vw, 60px); }
-.status-bar { padding: 18px var(--screen-padding-wide) 6px; }
-.status-bar p { margin: 0; font-size: .9rem; }
-.settings-body { padding: 0 var(--screen-padding-wide); }
+.settings-body { padding: 18px var(--screen-padding-wide) 0; }
 .back-link { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; margin: 10px 0 18px; color: #fff; }
 .back-link svg { width: 24px; height: 24px; }
 .settings-group { margin-bottom: 22px; }
@@ -30,8 +28,22 @@
 .chip--active { background: #d6be8a; color: #17120f; }
 .saving-message, .empty-state { padding-top: 18px; color: #94a3b8; text-align: center; }
 
-@media (min-width: 520px) {
+@media (min-width: 768px) {
   .settings-frame {
-    max-width: 520px;
+    max-width: var(--app-tablet-width);
+  }
+}
+
+@media (min-width: 1100px) {
+  .settings-frame {
+    max-width: none;
+  }
+
+  .settings-body {
+    width: calc(100% - var(--desktop-sidebar-width) - (var(--desktop-content-gap) * 2));
+    max-width: none;
+    margin-left: calc(var(--desktop-sidebar-width) + var(--desktop-content-gap));
+    margin-right: var(--desktop-content-gap);
+    padding-top: 28px;
   }
 }

@@ -1,0 +1,186 @@
+<div class="publish-shell">
+  <div class="glow glow-left"></div>
+  <div class="glow glow-top"></div>
+  <div class="glow glow-right"></div>
+
+  <main class="publish-frame">
+    <header class="publish-header">
+      <button type="button" class="back-link" (click)="router.navigate(['/home'])" aria-label="Volver">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <img class="brand-logo-image" src="assets/images/ekko-logo.png" alt="Ekko" />
+      <div class="header-space"></div>
+    </header>
+
+    <section class="publish-body">
+      <aside class="publish-media-column">
+        <div class="publish-desktop-head">
+          <p class="publish-kicker">Nuevo contenido</p>
+          <h1>Prepara el fragmento antes de publicarlo</h1>
+          <p>En escritorio separamos el archivo multimedia de los metadatos para que el proceso sea mas claro y facil de revisar.</p>
+        </div>
+
+        <div class="section-head">
+          <h2>FORMATO</h2>
+        </div>
+
+        <div class="format-switch">
+          <button type="button" class="format-option" [class.format-option--active]="mediaType === 'audio'" (click)="setMediaType('audio')">
+            Audio
+          </button>
+          <button type="button" class="format-option" [class.format-option--active]="mediaType === 'video'" (click)="setMediaType('video')">
+            Video
+          </button>
+        </div>
+
+        <label class="upload-dropzone">
+          <input type="file" [accept]="acceptTypes" (change)="onFileChange($event)" hidden />
+          <span class="upload-icon">&#8679;</span>
+          <strong>Subir fragmento</strong>
+          <span>{{ mediaType === 'audio' ? 'MP3 hasta 8MB' : 'MP4 o MOV hasta 20MB' }}</span>
+          <span class="upload-button">Buscar archivo</span>
+          <small *ngIf="selectedFileName">{{ selectedFileName }}</small>
+        </label>
+
+        <section class="cover-panel">
+          <div class="section-head">
+            <h2>PORTADA</h2>
+          </div>
+
+          <section *ngIf="mediaType === 'video' && videoPreviewUrl" class="video-cover-tools">
+            <div class="video-cover-preview">
+              <video
+                #videoCoverPreview
+                [src]="videoPreviewUrl"
+                controls
+                preload="metadata"
+                playsinline
+                (loadedmetadata)="onVideoPreviewLoaded($event)"
+              ></video>
+            </div>
+
+            <label class="cover-timeline">
+              <span>Elegir frame del video</span>
+              <div class="cover-timeline-row">
+                <input
+                  type="range"
+                  min="0"
+                  [max]="videoDurationSeconds || 0"
+                  step="0.1"
+                  [(ngModel)]="selectedCoverTimeSeconds"
+                />
+                <strong>{{ formatTimestamp(selectedCoverTimeSeconds) }}</strong>
+              </div>
+            </label>
+
+            <button
+              type="button"
+              class="cover-action"
+              [disabled]="!videoDurationSeconds || capturingCover"
+              (click)="captureCoverFromSelectedFrame()"
+            >
+              {{ capturingCover ? 'Capturando frame...' : 'Usar este frame como portada' }}
+            </button>
+          </section>
+
+          <div class="cover-preview" *ngIf="coverPreview; else emptyCoverState">
+            <img [src]="coverPreview" alt="Vista previa de la portada" />
+          </div>
+
+          <ng-template #emptyCoverState>
+            <div class="cover-preview cover-preview--empty">
+              <span>{{ mediaType === 'audio' ? 'Si no eliges una imagen se usara el placeholder de audio.' : 'La portada se generara automaticamente desde el video.' }}</span>
+            </div>
+          </ng-template>
+
+          <label class="cover-picker">
+            <input type="file" accept="image/*" (change)="onCoverChange($event)" hidden />
+            <span>{{ coverFileName || (mediaType === 'audio' ? 'Elegir portada opcional' : 'Elegir imagen de portada') }}</span>
+          </label>
+
+          <button *ngIf="coverFileName" type="button" class="cover-reset" (click)="clearSelectedCover()">
+            {{ mediaType === 'audio' ? 'Usar placeholder de audio' : 'Usar portada automatica del video' }}
+          </button>
+        </section>
+
+        <div class="meta-row">
+          <div class="meta-pill">
+            <span>DURACI&Oacute;N</span>
+            <strong>{{ duration }}</strong>
+          </div>
+          <div class="meta-pill">
+            <span>TIPO</span>
+            <strong>{{ mediaType === 'audio' ? 'AUDIO' : 'VIDEO' }}</strong>
+          </div>
+        </div>
+      </aside>
+
+      <div class="publish-form-column">
+        <div class="section-head">
+          <h2>LA CITA / FRAGMENTO</h2>
+        </div>
+        <textarea [(ngModel)]="quoteText" rows="4" placeholder='Ej.: "Los ojos, chico. Nunca mienten."'></textarea>
+
+        <div class="section-head">
+          <h2>CATEGOR&Iacute;A</h2>
+        </div>
+        <div class="category-row">
+          <button
+            type="button"
+            class="category-chip"
+            *ngFor="let option of categories"
+            [class.category-chip--active]="category === option.value"
+            (click)="category = option.value"
+          >
+            {{ option.label }}
+          </button>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>T&Iacute;TULO DE LA PRODUCCI&Oacute;N</span>
+            <input type="text" [(ngModel)]="workTitle" />
+          </label>
+          <label class="field field--small">
+            <span>A&Ntilde;O</span>
+            <select [(ngModel)]="year">
+              <option value="">Selecciona</option>
+              <option *ngFor="let option of yearOptions" [value]="option">{{ option }}</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>ACTOR</span>
+            <input type="text" [(ngModel)]="actorName" />
+          </label>
+          <label class="field">
+            <span>PERSONAJE</span>
+            <input type="text" [(ngModel)]="characterName" />
+          </label>
+        </div>
+
+        <label class="field">
+          <span>SINOPSIS</span>
+          <textarea [(ngModel)]="synopsis" rows="5" placeholder="Describe brevemente el contexto del fragmento..."></textarea>
+        </label>
+
+        <label class="field">
+          <span>ETIQUETAS</span>
+          <input type="text" [(ngModel)]="hashtagsText" placeholder="crimen, drama, iconico, cine80s" />
+        </label>
+
+        <p *ngIf="message" class="publish-message">{{ message }}</p>
+
+        <button type="button" class="publish-button" (click)="publish()" [disabled]="submitting">
+          {{ submitting ? 'Publicando...' : 'PUBLICAR CONTENIDO' }}
+        </button>
+      </div>
+    </section>
+
+    <app-navbar activeTab="publish"></app-navbar>
+  </main>
+</div>

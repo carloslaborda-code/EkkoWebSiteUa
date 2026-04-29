@@ -14,9 +14,14 @@ const quoteSchema = new mongoose.Schema(
     },
     year: {
       type: Number,
-      required: true
+      required: true,
+      min: 0
     },
     rating: {
+      type: Number,
+      default: 0
+    },
+    ratingsCount: {
       type: Number,
       default: 0
     },
@@ -60,6 +65,11 @@ const quoteSchema = new mongoose.Schema(
     category: {
       type: String,
       default: 'movie'
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
     }
   },
   { timestamps: true }

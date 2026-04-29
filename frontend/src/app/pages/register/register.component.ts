@@ -13,7 +13,7 @@ export class RegisterComponent {
   password = '';
   confirmPassword = '';
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, public router: Router) {}
 
   register() {
     if (this.password !== this.confirmPassword) {
@@ -28,13 +28,12 @@ export class RegisterComponent {
     };
 
     this.auth.register(data).subscribe({
-      next: (res) => {
-        console.log('Registro correcto', res);
+      next: () => {
         this.router.navigate(['/login']);
       },
       error: (err) => {
         console.error('Error en registro', err);
-        alert(err.error?.message || 'Error al registrar usuario');
+        alert(err.error?.message || 'Error al registrar el usuario');
       }
     });
   }

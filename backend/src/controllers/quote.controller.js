@@ -1,6 +1,7 @@
 const Quote = require('../models/quote');
 const seedQuotes = require('../data/seedQuotes');
 const User = require('../models/user');
+const { uploadToCloudinary, isDataUri } = require('../services/cloudinary.service');
 
 const normalizeSavedQuotes = (savedQuotes = []) => {
   const seenIds = new Set();
@@ -17,6 +18,66 @@ const normalizeSavedQuotes = (savedQuotes = []) => {
   });
 };
 
+const normalizeRatedQuotes = (ratedQuotes = []) => {
+  const latestRatings = new Map();
+
+  ratedQuotes.forEach((ratedQuote) => {
+    const quoteId = ratedQuote?.quoteId?.toString?.();
+    const value = Number(ratedQuote?.value);
+
+    if (!quoteId || !Number.isFinite(value) || value < 1 || value > 5) {
+      return;
+    }
+
+    latestRatings.set(quoteId, { quoteId: ratedQuote.quoteId, value });
+  });
+
+  return Array.from(latestRatings.values());
+};
+
+const normalizeQuoteRatingState = (quote) => {
+  const safeRatingsCount = typeof quote.ratingsCount === 'number' && Number.isFinite(quote.ratingsCount) && quote.ratingsCount >= 0
+    ? quote.ratingsCount
+    : 0;
+  const safeRating = typeof quote.rating === 'number' && Number.isFinite(quote.rating) && quote.rating >= 0
+    ? quote.rating
+    : 0;
+
+  quote.ratingsCount = safeRatingsCount;
+  quote.rating = safeRatingsCount > 0 ? safeRating : 0;
+};
+
+const parseCount = (value) => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  const normalized = String(value || '0').trim().toUpperCase().replace(',', '.');
+  const multiplier = normalized.endsWith('M') ? 1_000_000 : normalized.endsWith('K') ? 1_000 : 1;
+  const numericPart = multiplier === 1 ? normalized : normalized.slice(0, -1);
+  const parsed = Number.parseFloat(numericPart);
+
+  if (!Number.isFinite(parsed)) {
+    return 0;
+  }
+
+  return Math.round(parsed * multiplier);
+};
+
+const formatCount = (value) => {
+  if (value >= 1_000_000) {
+    const formatted = (value / 1_000_000).toFixed(value % 1_000_000 === 0 ? 0 : 1);
+    return `${formatted.replace('.0', '')}M`;
+  }
+
+  if (value >= 1_000) {
+    const formatted = (value / 1_000).toFixed(value % 1_000 === 0 ? 0 : 1);
+    return `${formatted.replace('.0', '')}K`;
+  }
+
+  return String(value);
+};
+
 const ensureSeedQuotes = async () => {
   const totalQuotes = await Quote.countDocuments();
 
@@ -25,76 +86,61 @@ const ensureSeedQuotes = async () => {
   }
 };
 
-const ensureQuoteDefaults = (quote) => {
-  let changed = false;
-
-  if (!quote.mediaType) {
-    quote.mediaType = quote.image ? 'video' : 'audio';
-    changed = true;
-  }
-
-  if (!quote.mediaUrl) {
-    quote.mediaUrl = '/assets/media/scarfacevideo.mp4';
-    changed = true;
-  }
-
-  if (!quote.duration) {
-    quote.duration = '00:00';
-    changed = true;
-  }
-
-  if (!quote.actorName) {
-    quote.actorName = '';
-    changed = true;
-  }
-
-  if (!quote.characterName) {
-    quote.characterName = '';
-    changed = true;
-  }
-
-  if (!quote.synopsis) {
-    quote.synopsis = '';
-    changed = true;
-  }
-
-  if (!Array.isArray(quote.hashtags)) {
-    quote.hashtags = [];
-    changed = true;
-  }
-
-  return changed ? quote.save() : Promise.resolve(quote);
-};
+const applyQuoteDefaults = (quote = {}) => ({
+  ...quote,
+  text: quote.text || '',
+  workTitle: quote.workTitle || '',
+  year: typeof quote.year === 'number' && Number.isFinite(quote.year) ? quote.year : 0,
+  rating: typeof quote.rating === 'number' && Number.isFinite(quote.rating) ? quote.rating : 0,
+  mediaType: quote.mediaType || (quote.image ? 'video' : 'audio'),
+  mediaUrl: quote.mediaUrl || '/assets/media/scarfacevideo.mp4',
+  duration: quote.duration || '00:00',
+  actorName: quote.actorName || '',
+  characterName: quote.characterName || '',
+  synopsis: quote.synopsis || '',
+  hashtags: Array.isArray(quote.hashtags) ? quote.hashtags : [],
+  ratingsCount: typeof quote.ratingsCount === 'number' ? quote.ratingsCount : 0,
+  views: quote.views || '0',
+  image: quote.image || '',
+  category: quote.category || 'movie'
+});
 
 const getQuotes = async (req, res) => {
   try {
     await ensureSeedQuotes();
-    const quotes = await Quote.find().sort({ createdAt: -1 });
-    await Promise.all(quotes.map((quote) => ensureQuoteDefaults(quote)));
-    res.status(200).json(quotes);
+    const quotes = await Quote.find()
+      .sort({ createdAt: -1 })
+      .select('text workTitle year rating ratingsCount views image mediaType duration actorName characterName synopsis hashtags category createdAt')
+      .lean();
+
+    res.status(200).json(quotes.map((quote) => applyQuoteDefaults(quote)));
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener quotes', error: error.message });
+    res.status(500).json({ message: 'Error al obtener las publicaciones', error: error.message });
   }
 };
 
 const getQuoteById = async (req, res) => {
   try {
-    const quote = await Quote.findById(req.params.id);
+    const quote = await Quote.findById(req.params.id).lean();
 
     if (!quote) {
-      return res.status(404).json({ message: 'Quote no encontrada' });
+      return res.status(404).json({ message: 'Publicación no encontrada' });
     }
 
-    await ensureQuoteDefaults(quote);
-
-    res.status(200).json(quote);
+    res.status(200).json(applyQuoteDefaults(quote));
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener la quote', error: error.message });
+    res.status(500).json({ message: 'Error al obtener la publicación', error: error.message });
   }
 };
 
 const createQuote = async (req, res) => {
   try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
     const {
       text,
       workTitle,
@@ -112,33 +158,73 @@ const createQuote = async (req, res) => {
       category
     } = req.body;
 
-    if (!text || !workTitle || !year) {
-      return res.status(400).json({ message: 'text, workTitle y year son obligatorios' });
+    if (!text || !workTitle || !year || !actorName || !characterName || !synopsis || !mediaType || !mediaUrl || !category) {
+      return res.status(400).json({
+        message: 'text, workTitle, year, actorName, characterName, synopsis, mediaType, mediaUrl y category son obligatorios'
+      });
     }
 
-    const newQuote = await Quote.create({
-      text,
-      workTitle,
-      year,
-      rating,
-      views,
-      image,
-      mediaType,
-      mediaUrl,
-      duration,
-      actorName,
-      characterName,
-      synopsis,
-      hashtags,
-      category
+    const normalizedHashtags = Array.isArray(hashtags)
+      ? hashtags.filter(Boolean)
+      : String(hashtags || '')
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean);
+    const normalizedYear = Number(year);
+
+    if (!Number.isFinite(normalizedYear) || normalizedYear < 0) {
+      return res.status(400).json({ message: 'El ano debe ser un numero valido mayor o igual que 0' });
+    }
+
+    const normalizedMediaType = mediaType === 'audio' ? 'audio' : 'video';
+    const uploadedImage = typeof image === 'string' && isDataUri(image)
+      ? await uploadToCloudinary(image, { folder: 'ekko/covers', resourceType: 'image' })
+      : typeof image === 'string'
+        ? image
+        : '';
+    const uploadedMediaUrl = await uploadToCloudinary(mediaUrl, {
+      folder: normalizedMediaType === 'audio' ? 'ekko/audio' : 'ekko/video',
+      resourceType: 'video'
     });
 
+    const newQuote = await Quote.create({
+      text: String(text).trim(),
+      workTitle: String(workTitle).trim(),
+      year: normalizedYear,
+      rating: typeof rating === 'number' ? rating : 0,
+      views: typeof views === 'string' && views.trim() ? views.trim() : '0',
+      image: uploadedImage,
+      mediaType: normalizedMediaType,
+      mediaUrl: uploadedMediaUrl,
+      duration: typeof duration === 'string' && duration.trim() ? duration.trim() : '00:00',
+      actorName: String(actorName).trim(),
+      characterName: String(characterName).trim(),
+      synopsis: String(synopsis).trim(),
+      hashtags: normalizedHashtags,
+      category,
+      createdBy: user._id
+    });
+
+    const uploadType = normalizedMediaType === 'video' ? 'video' : 'audio';
+
+    user.uploads.push({
+      title: newQuote.workTitle,
+      image: newQuote.image,
+      type: uploadType
+    });
+    user.uploadsCount = user.uploads.length;
+    await user.save();
+
     res.status(201).json({
-      message: 'Quote creada correctamente',
-      quote: newQuote
+      message: 'Publicación creada correctamente',
+      quote: newQuote,
+      user: {
+        uploadsCount: user.uploadsCount,
+        uploads: user.uploads
+      }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error al crear la quote', error: error.message });
+    res.status(500).json({ message: 'Error al crear la publicación', error: error.message });
   }
 };
 
@@ -183,6 +269,90 @@ const toggleSaveQuote = async (req, res) => {
   }
 };
 
+const rateQuote = async (req, res) => {
+  try {
+    const quote = await Quote.findById(req.params.id);
+
+    if (!quote) {
+      return res.status(404).json({ message: 'Publicacion no encontrada' });
+    }
+
+    const user = await User.findById(req.user._id);
+    const ratingValue = Number(req.body?.value);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    if (!Number.isInteger(ratingValue) || ratingValue < 1 || ratingValue > 5) {
+      return res.status(400).json({ message: 'La valoracion debe ser un numero entre 1 y 5' });
+    }
+
+    const normalizedRatedQuotes = normalizeRatedQuotes(user.ratedQuotes);
+    if (normalizedRatedQuotes.length !== user.ratedQuotes.length) {
+      user.ratedQuotes = normalizedRatedQuotes;
+    }
+
+    normalizeQuoteRatingState(quote);
+
+    const quoteId = quote._id.toString();
+    const existingRating = user.ratedQuotes.find((ratedQuote) => ratedQuote?.quoteId?.toString?.() === quoteId);
+    const currentRatingsCount = quote.ratingsCount;
+    const currentTotalRating = quote.rating * currentRatingsCount;
+
+    if (existingRating) {
+      const effectiveRatingsCount = currentRatingsCount > 0 ? currentRatingsCount : 1;
+      const updatedTotalRating = currentTotalRating - existingRating.value + ratingValue;
+      existingRating.value = ratingValue;
+      quote.ratingsCount = effectiveRatingsCount;
+      quote.rating = Number((updatedTotalRating / effectiveRatingsCount).toFixed(1));
+    } else {
+      user.ratedQuotes.push({
+        quoteId: quote._id,
+        value: ratingValue
+      });
+      quote.ratingsCount = currentRatingsCount + 1;
+      const updatedTotalRating = currentTotalRating + ratingValue;
+      quote.rating = Number((updatedTotalRating / quote.ratingsCount).toFixed(1));
+    }
+
+    await Promise.all([user.save(), quote.save()]);
+
+    res.json({
+      message: 'Valoracion registrada correctamente',
+      rating: quote.rating,
+      ratingsCount: quote.ratingsCount,
+      ratedQuotes: user.ratedQuotes.map((ratedQuote) => ({
+        quoteId: ratedQuote.quoteId.toString(),
+        value: ratedQuote.value
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al registrar la valoracion', error: error.message });
+  }
+};
+
+const registerView = async (req, res) => {
+  try {
+    const quote = await Quote.findById(req.params.id);
+
+    if (!quote) {
+      return res.status(404).json({ message: 'Publicacion no encontrada' });
+    }
+
+    const currentViews = parseCount(quote.views);
+    quote.views = formatCount(currentViews + 1);
+    await quote.save();
+
+    res.json({
+      message: 'Visualizacion registrada correctamente',
+      views: quote.views
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al registrar la visualizacion', error: error.message });
+  }
+};
+
 const registerDownload = async (req, res) => {
   try {
     const quote = await Quote.findById(req.params.id);
@@ -209,5 +379,7 @@ module.exports = {
   getQuoteById,
   createQuote,
   toggleSaveQuote,
-  registerDownload
+  rateQuote,
+  registerDownload,
+  registerView
 };

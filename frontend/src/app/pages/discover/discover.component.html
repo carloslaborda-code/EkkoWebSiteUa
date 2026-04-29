@@ -1,0 +1,166 @@
+<div class="discover-shell">
+  <div class="glow glow-left"></div>
+  <div class="glow glow-top"></div>
+  <div class="glow glow-right"></div>
+
+  <main class="discover-frame">
+    <header class="mx-auto grid w-full max-w-[var(--app-tablet-width)] grid-cols-[40px_1fr_40px] items-center border-b border-white/10 px-4 pb-3 pt-4 lg:mx-0 lg:max-w-none lg:px-8">
+      <button
+        type="button"
+        class="inline-flex h-10 w-10 items-center justify-center border-0 bg-transparent text-white transition-transform duration-200 hover:-translate-x-0.5"
+        (click)="router.navigate(['/home'])"
+        aria-label="Volver"
+      >
+        <app-icon name="chevron-left" className="h-6 w-6"></app-icon>
+      </button>
+      <img class="mx-auto w-[92px] max-w-full" src="assets/images/ekko-logo.png" alt="Ekko" />
+      <div class="h-10 w-10"></div>
+    </header>
+
+    <section class="discover-content mx-auto flex w-full max-w-[var(--app-tablet-width)] flex-col gap-7 px-4 pb-28 pt-7 lg:mx-0 lg:max-w-none lg:px-8">
+      <aside class="discover-filters-panel">
+        <div class="discover-panel-head">
+          <p class="discover-panel-kicker">Panel de filtros</p>
+          <h1>Encuentra el fragmento exacto</h1>
+        </div>
+
+        <label
+          for="discover-search"
+          class="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#131313] px-4 py-4 text-slate-400 shadow-[0_18px_34px_rgba(0,0,0,0.26)]"
+        >
+          <app-icon name="magnifying-glass" className="h-5 w-5 text-slate-500"></app-icon>
+          <input
+            id="discover-search"
+            type="search"
+            name="discoverSearch"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="applyFilters()"
+            class="w-full border-0 bg-transparent text-base text-white placeholder:text-slate-500 focus:outline-none"
+            placeholder="Busca citas, sonidos o escenas..."
+          />
+        </label>
+
+        <section class="space-y-3">
+          <h2 class="text-[0.95rem] font-extrabold uppercase tracking-[0.12em] text-[#d4bc8e]">I am looking for...</h2>
+          <div class="flex flex-wrap gap-3">
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-full border px-5 py-3 text-[0.95rem] font-semibold transition-all duration-200 hover:-translate-y-0.5"
+              *ngFor="let option of visibleCategoryOptions"
+              [ngClass]="selectedCategory === option.value
+                ? 'border-[#d7c29d] bg-[#c4ae88] text-[#1d1a15] shadow-[0_10px_24px_rgba(0,0,0,0.24)]'
+                : 'border-white/10 bg-[#151515] text-slate-200 hover:border-white/20 hover:bg-[#1a1a1a]'"
+              (click)="setCategory(option.value)"
+            >
+              <app-icon [name]="option.icon" className="h-4 w-4"></app-icon>
+              <span>{{ option.label }}</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="space-y-3">
+          <h2 class="text-[0.95rem] font-extrabold uppercase tracking-[0.12em] text-[#d4bc8e]">Formato</h2>
+          <div class="grid grid-cols-2 gap-1 rounded-2xl border border-white/10 bg-[#151515] p-1.5 shadow-[0_18px_34px_rgba(0,0,0,0.18)]">
+            <button
+              type="button"
+              class="inline-flex items-center justify-center gap-2 rounded-[14px] px-4 py-4 text-base font-semibold transition-all duration-200"
+              [ngClass]="selectedFormat === 'video' ? 'bg-[#efe4d0] text-[#1d1b17] shadow-[0_10px_24px_rgba(0,0,0,0.18)]' : 'bg-transparent text-[#8ea6d2]'"
+              (click)="setFormat('video')"
+            >
+              <app-icon name="play-solid" className="h-4 w-4"></app-icon>
+              <span>Video</span>
+            </button>
+            <button
+              type="button"
+              class="inline-flex items-center justify-center gap-2 rounded-[14px] px-4 py-4 text-base font-semibold transition-all duration-200"
+              [ngClass]="selectedFormat === 'audio' ? 'bg-[#efe4d0] text-[#1d1b17] shadow-[0_10px_24px_rgba(0,0,0,0.18)]' : 'bg-transparent text-[#8ea6d2]'"
+              (click)="setFormat('audio')"
+            >
+              <app-icon name="speaker-wave" className="h-4 w-4"></app-icon>
+              <span>Audio</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="space-y-3">
+          <h2 class="text-[0.95rem] font-extrabold uppercase tracking-[0.12em] text-[#d4bc8e]">De...</h2>
+          <div class="relative">
+            <button
+              type="button"
+              class="flex w-full items-center justify-between rounded-t-2xl border border-[#2e5cff] bg-[#151515] px-4 py-4 text-left font-semibold text-white shadow-[0_12px_26px_rgba(0,0,0,0.18)]"
+              [ngClass]="!dropdownOpen ? 'rounded-b-2xl' : ''"
+              (click)="dropdownOpen = !dropdownOpen"
+            >
+              <span>{{ currentDropdownLabel }}</span>
+              <app-icon name="chevron-down" className="h-5 w-5" [className]="'h-5 w-5 transition-transform duration-200 ' + (dropdownOpen ? 'rotate-180' : '')"></app-icon>
+            </button>
+
+            <div *ngIf="dropdownOpen" class="overflow-hidden rounded-b-2xl border-x border-b border-[#2e5cff] bg-[#171717] shadow-[0_22px_36px_rgba(0,0,0,0.22)]">
+              <button
+                type="button"
+                class="block w-full bg-transparent px-4 py-3 text-left font-semibold text-slate-200 transition-colors duration-150 hover:bg-white/5"
+                (click)="clearWorkTitle(); applyFilters()"
+              >
+                Todas las producciones
+              </button>
+              <button
+                type="button"
+                class="block w-full bg-transparent px-4 py-3 text-left font-semibold text-white transition-colors duration-150 hover:bg-white/5"
+                *ngFor="let title of availableWorkTitles"
+                [ngClass]="title === selectedWorkTitle ? 'bg-[#c4ae88] text-[#1d1a15]' : ''"
+                (click)="selectWorkTitle(title); applyFilters()"
+              >
+                {{ title }}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <button
+          type="button"
+          class="rounded-2xl border border-[#ceb993] bg-[#c4ae88] px-5 py-4 text-base font-extrabold uppercase tracking-[0.16em] text-[#17140f] shadow-[0_18px_32px_rgba(0,0,0,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105"
+          (click)="applyFilters()"
+        >
+          Aplicar filtros
+        </button>
+      </aside>
+
+      <section class="discover-results-panel">
+        <div class="discover-results-head">
+          <div>
+            <p class="discover-panel-kicker">Resultados</p>
+            <h2>{{ filteredQuotes.length }} fragmentos disponibles</h2>
+          </div>
+        </div>
+
+        <section aria-live="polite" class="grid gap-4 lg:grid-cols-2 lg:gap-5">
+          <p *ngIf="!loading && !filteredQuotes.length" class="mx-1 text-center text-sm text-slate-400 lg:col-span-2">No hay publicaciones que coincidan con estos filtros.</p>
+
+          <article
+            *ngFor="let quote of filteredQuotes"
+            class="grid cursor-pointer grid-cols-[110px_1fr] gap-4 overflow-hidden rounded-[20px] border border-white/6 bg-[#10141b] shadow-[0_18px_34px_rgba(0,0,0,0.28)] transition-transform duration-200 hover:-translate-y-0.5"
+            (click)="openQuote(quote._id)"
+          >
+            <div class="relative min-h-[120px] bg-[#161b24]">
+              <img class="h-full w-full object-cover" [src]="quote.image" [alt]="quote.workTitle" />
+              <span class="absolute bottom-2.5 right-2.5 rounded-full bg-black/60 px-2.5 py-1 text-[0.72rem] font-bold text-white">
+                {{ quote.mediaType === 'audio' ? 'Audio' : 'Video' }}
+              </span>
+            </div>
+
+            <div class="flex min-w-0 flex-col justify-center py-4 pr-4">
+              <p class="max-h-[3.9rem] overflow-hidden text-[1rem] font-bold leading-5 text-white">"{{ quote.text }}"</p>
+              <p class="mt-2 text-[0.92rem] font-semibold text-[#cdb58c]">{{ quote.workTitle }} ({{ quote.year }})</p>
+              <div class="mt-2 flex justify-between gap-3 text-[0.78rem] text-slate-400">
+                <span>{{ quote.actorName }}</span>
+                <span>{{ quote.rating.toFixed(1) }}/5</span>
+              </div>
+            </div>
+          </article>
+        </section>
+      </section>
+    </section>
+
+    <app-navbar activeTab="discover"></app-navbar>
+  </main>
+</div>

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { API_BASE_URL } from './api-url';
 
 interface AuthPayload {
   email: string;
@@ -31,7 +32,7 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private API = 'http://localhost:5000/api/auth';
+  private API = `${API_BASE_URL}/auth`;
 
   constructor(private http: HttpClient) {}
 

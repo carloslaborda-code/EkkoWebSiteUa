@@ -1,308 +1,329 @@
-# PROYECTO EKKO
+# EkkoWebSiteUa
 
-## 1. Resumen del proyecto
+## 1. Introduccion
 
-**Ekko** es una aplicación web desarrollada para la asignatura de **Usabilidad y Accesibilidad** de la Universidad de Alicante.
+**Ekko** es una aplicacion web orientada a la busqueda, reproduccion, valoracion, guardado, descarga y publicacion de fragmentos de **audio** y **video** extraidos de **peliculas, series, videojuegos y efectos sonoros**. El proyecto ha sido desarrollado en el contexto de la asignatura **Usabilidad y Accesibilidad** de la Universidad de Alicante y persigue una doble meta:
 
-La idea principal de la aplicación es permitir a los usuarios:
+- construir un producto funcional con una arquitectura web moderna;
+- aplicar criterios reales de usabilidad, claridad visual, navegacion intuitiva y adaptacion a distintos dispositivos.
 
-- buscar fragmentos de películas, series o videojuegos
-- visualizar publicaciones en formato **vídeo** o **audio**
-- reproducir el contenido desde una pantalla de detalle
-- descargar contenido si han iniciado sesión
-- guardar publicaciones para revisarlas después desde su perfil
-- gestionar ajustes de accesibilidad
+La idea central de la aplicacion es ofrecer una experiencia en la que el usuario pueda localizar fragmentos memorables, acceder rapidamente a ellos, valorarlos y publicar nuevo contenido de forma guiada y comprensible.
 
-El diseño visual sigue las pantallas definidas en Figma y las referencias PNG del proyecto. La app está planteada con enfoque **mobile-first**, es decir, diseñada principalmente para **teléfono móvil**.
+## 2. Objetivos del proyecto
 
----
+Los objetivos principales de Ekko son los siguientes:
 
-## 2. Arquitectura general
+- permitir la consulta publica de contenido multimedia breve sin necesidad de autenticacion;
+- ofrecer una experiencia de usuario clara tanto en **movil** como en **escritorio**;
+- gestionar usuarios autenticados con funciones de valoracion, guardado, descarga y publicacion;
+- almacenar metadatos en MongoDB y externalizar medios pesados para mejorar rendimiento y escalabilidad;
+- aplicar decisiones de diseño coherentes con un proyecto academico centrado en la usabilidad y la accesibilidad.
 
-El proyecto está dividido en dos partes:
+## 3. Vision general de la aplicacion
 
-- `frontend/`: aplicación Angular
-- `backend/`: API REST con Node.js, Express y MongoDB
+Desde el punto de vista funcional, Ekko se apoya en tres ideas:
 
-### Tecnologías principales
+- **Exploracion**: el usuario puede descubrir contenido destacado o filtrarlo por categoria, formato y produccion.
+- **Interaccion**: el usuario puede reproducir, valorar, compartir, guardar y descargar fragmentos.
+- **Contribucion**: el usuario autenticado puede publicar nuevos audios o videos y personalizar su portada.
 
-**Frontend**
+La aplicacion distingue entre usuario invitado y usuario autenticado. Esto permite mantener una entrada sencilla al sistema y reservar las acciones que modifican datos para usuarios con sesion iniciada.
 
-- Angular
-- TypeScript
-- RxJS
-- CSS por componentes
+## 4. Tecnologias utilizadas
 
-**Backend**
+### 4.1 Frontend
 
-- Node.js
-- Express
-- MongoDB + Mongoose
-- JWT para autenticación
-- bcryptjs para hash de contraseñas
+- **Angular 16**: framework principal para la construccion de la interfaz.
+- **TypeScript**: tipado estatico y mejora del mantenimiento del codigo.
+- **RxJS**: gestion reactiva de peticiones y cache en servicios.
+- **Tailwind CSS**: apoyo para composicion rapida de ciertos layouts y componentes.
+- **CSS por componente**: personalizacion visual fina en cada pantalla.
 
----
+### 4.2 Backend
 
-## 3. Estructura del repositorio
+- **Node.js**: entorno de ejecucion del servidor.
+- **Express**: framework para exponer la API REST.
+- **MongoDB Atlas**: almacenamiento persistente de usuarios, publicaciones y relaciones.
+- **Mongoose**: modelado de datos y acceso a MongoDB.
+- **JWT**: autenticacion basada en token.
+- **bcryptjs**: hash seguro de contrasenas.
+- **Cloudinary**: almacenamiento externo de archivos multimedia y portadas.
+
+## 5. Arquitectura general
+
+La arquitectura del sistema sigue una separacion clasica cliente-servidor:
+
+- el **frontend** Angular se encarga de la interfaz, navegacion, validaciones de cliente y experiencia de usuario;
+- el **backend** Express expone endpoints REST para autenticacion, publicaciones, valoraciones, guardados, descargas y ajustes;
+- **MongoDB** almacena usuarios y metadatos de publicaciones;
+- **Cloudinary** almacena los archivos multimedia y las imagenes de portada para evitar cargar MongoDB con datos binarios pesados.
+
+Esta separacion mejora la mantenibilidad, favorece la escalabilidad del proyecto y reduce los tiempos de carga en comparacion con un almacenamiento completo en base64 dentro de la base de datos.
+
+## 6. Estructura del proyecto
 
 ```text
 EkkoWebSiteUa/
-├─ backend/
-│  └─ src/
-│     ├─ config/
-│     ├─ controllers/
-│     ├─ data/
-│     ├─ middleware/
-│     ├─ models/
-│     ├─ routes/
-│     ├─ app.js
-│     └─ server.js
-├─ frontend/
-│  └─ src/
-│     ├─ app/
-│     │  ├─ pages/
-│     │  ├─ services/
-│     │  ├─ app-routing.module.ts
-│     │  └─ app.module.ts
-│     ├─ assets/
-│     └─ styles.css
-├─ README.md
-└─ package.json
+|-- backend/
+|   |-- scripts/
+|   |   `-- migrate-cloudinary-assets.js
+|   |-- src/
+|   |   |-- config/
+|   |   |   `-- db.js
+|   |   |-- controllers/
+|   |   |   |-- auth.controller.js
+|   |   |   `-- quote.controller.js
+|   |   |-- data/
+|   |   |   |-- defaultUserData.js
+|   |   |   `-- seedQuotes.js
+|   |   |-- middleware/
+|   |   |   `-- auth.middleware.js
+|   |   |-- models/
+|   |   |   |-- quote.js
+|   |   |   `-- user.js
+|   |   |-- routes/
+|   |   |   |-- auth.routes.js
+|   |   |   `-- quote.routes.js
+|   |   |-- services/
+|   |   |   `-- cloudinary.service.js
+|   |   |-- app.js
+|   |   `-- server.js
+|   `-- package.json
+|-- frontend/
+|   |-- src/
+|   |   |-- app/
+|   |   |   |-- components/
+|   |   |   |   |-- icon/
+|   |   |   |   `-- navbar/
+|   |   |   |-- pages/
+|   |   |   |   |-- detail/
+|   |   |   |   |-- discover/
+|   |   |   |   |-- home/
+|   |   |   |   |-- login/
+|   |   |   |   |-- profile/
+|   |   |   |   |-- publish/
+|   |   |   |   |-- register/
+|   |   |   |   `-- settings/
+|   |   |   |-- services/
+|   |   |   |   |-- accessibility.service.ts
+|   |   |   |   |-- api-url.ts
+|   |   |   |   |-- auth.service.ts
+|   |   |   |   |-- quotes.services.ts
+|   |   |   |   `-- user.service.ts
+|   |   |   |-- app-routing.module.ts
+|   |   |   `-- app.module.ts
+|   |   |-- assets/
+|   |   |-- index.html
+|   |   `-- styles.css
+|   `-- package.json
+`-- README.md
 ```
 
----
+## 7. Descripcion funcional pagina por pagina
 
-## 4. Estado actual del desarrollo
+### 7.1 Home
 
-Actualmente el proyecto ya incluye:
+La pagina de inicio presenta una vista de acceso rapido al contenido destacado de la plataforma.
 
-- registro de usuarios
-- login con JWT
-- navegación entre pantallas principales
-- `Home` conectada a publicaciones reales del backend
-- `Detalle` de publicación para audio o vídeo
-- guardado de publicaciones por usuario
-- conteo real de descargas del usuario
-- sincronización correcta de guardados sin duplicados
-- `Perfil` con datos del usuario y elementos guardados
-- `Ajustes` de accesibilidad
-- tamaño de texto funcional en toda la app
-- diseño adaptado a móvil
-- flujo mixto de invitado y usuario autenticado
+#### Funciones implementadas
 
----
+- buscador por texto;
+- visualizacion de fragmentos destacados;
+- acceso al detalle de cada publicacion;
+- indicador visual de formato, valoracion y visualizaciones.
 
-## 5. Frontend implementado
+#### Criterio de destacados
 
-### 5.1 Rutas actuales
+No se muestran todas las publicaciones. En su lugar, `Home` selecciona un resultado destacado por cada categoria:
 
-Archivo: [frontend/src/app/app-routing.module.ts](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/app-routing.module.ts:1)
+- pelicula
+- serie
+- videojuego
+- efectos
 
-Rutas disponibles:
+La eleccion se realiza segun:
 
-- `/` y `/home` -> Home
-- `/quote/:id` -> Detalle de publicación
-- `/login` -> Inicio de sesión
-- `/register` -> Registro
-- `/profile` -> Perfil de usuario
-- `/settings` -> Ajustes
+1. mayor valoracion media;
+2. en caso de empate, mayor numero de visualizaciones.
 
-### 5.2 Páginas implementadas
+#### Consideraciones de usabilidad
 
-#### Home
+- acceso inmediato al contenido mas relevante;
+- reduccion de sobrecarga visual;
+- jerarquia clara entre buscador, resumen e items destacados.
 
-Archivos:
+### 7.2 Discover
 
-- [frontend/src/app/pages/home/home.component.ts](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/home/home.component.ts:1)
-- [frontend/src/app/pages/home/home.component.html](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/home/home.component.html:1)
-- [frontend/src/app/pages/home/home.component.css](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/home/home.component.css:1)
+La pantalla `Discover` se concibe como un espacio de exploracion avanzada.
 
-Funcionalidad actual:
+#### Funciones implementadas
 
-- carga publicaciones desde el backend
-- muestra tarjetas con imagen o placeholder según el tipo de contenido
-- permite navegar al detalle de cada publicación
-- usa diseño móvil basado en Figma
-- incluye navegación inferior
-- está disponible tanto para invitados como para usuarios autenticados
-- si un invitado intenta entrar al perfil desde la navegación, se le redirige al login
+- filtro por categoria;
+- filtro por formato;
+- filtro por produccion concreta;
+- busqueda por texto;
+- visualizacion de resultados en lista o grid adaptada al ancho disponible.
 
-#### Login
+#### Diseño
 
-Archivos:
+En escritorio se ha implementado un layout con:
 
-- [frontend/src/app/pages/login/login.component.ts](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/login/login.component.ts:1)
-- [frontend/src/app/pages/login/login.component.html](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/login/login.component.html:1)
+- panel lateral de filtros;
+- zona principal de resultados;
+- mejor separacion visual respecto a la barra lateral de navegacion.
 
-Funcionalidad actual:
+En movil, los bloques se redistribuyen en columna priorizando el dedo y la lectura vertical.
 
-- login por email o nombre de usuario
-- muestra errores de credenciales
-- guarda token y usuario en `localStorage`
-- redirige a `Home` al iniciar sesión
+### 7.3 Detail
 
-#### Register
+La pantalla `Detail` muestra la informacion completa de una publicacion.
 
-Archivos:
+#### Funciones implementadas
 
-- [frontend/src/app/pages/register/register.component.ts](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/register/register.component.ts:1)
-- [frontend/src/app/pages/register/register.component.html](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/register/register.component.html:1)
+- reproduccion de audio o video;
+- visualizacion de cita, titulo, anio, actor, personaje, sinopsis y hashtags;
+- valoracion por estrellas;
+- guardado de contenido;
+- descarga;
+- copiado o comparticion de enlace;
+- registro de visualizacion.
 
-Funcionalidad actual:
+#### Mejoras tecnicas introducidas
 
-- registro de usuario nuevo
-- comunicación directa con el backend
+- cache por `id` de cada publicacion;
+- actualizacion del cache al valorar o registrar visualizacion;
+- eliminacion de carga anticipada innecesaria del medio para mejorar tiempos de entrada;
+- control de clicks repetidos en valoraciones;
+- mensajes de exito o error dentro del propio panel de valoracion.
 
-#### Detail
+### 7.4 Publish
 
-Archivos:
+La pantalla `Publish` es uno de los modulos mas avanzados del proyecto.
 
-- [frontend/src/app/pages/detail/detail.component.ts](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/detail/detail.component.ts:1)
-- [frontend/src/app/pages/detail/detail.component.html](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/detail/detail.component.html:1)
-- [frontend/src/app/pages/detail/detail.component.css](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/detail/detail.component.css:1)
+#### Funciones implementadas
 
-Es una de las pantallas más importantes del proyecto.
+- seleccion entre `audio` y `video`;
+- subida de archivo multimedia;
+- calculo automatico de duracion;
+- introduccion de cita, categoria, titulo, anio, actor, personaje, sinopsis y etiquetas;
+- portada opcional en audio;
+- portada manual en video;
+- portada automatica desde el propio video;
+- seleccion de un frame del video para usarlo como portada;
+- limites de tamano para proteger rendimiento.
 
-Funcionalidad actual:
+#### Logica de portada
 
-- carga una publicación concreta por `id`
-- si la publicación es de vídeo, permite reproducir vídeo
-- si la publicación es de audio, permite reproducir audio
-- muestra actor, personaje, duración, año, sinopsis y hashtags
-- muestra la duración real del archivo cuando los metadatos están disponibles
-- la reproducción está disponible sin necesidad de login
-- si un invitado intenta guardar o descargar, se le redirige al login
-- si el usuario está autenticado, puede guardar o quitar de guardados
+Para video, el sistema permite tres caminos:
 
-#### Profile
+- usar una portada manual;
+- capturar una portada desde un frame elegido del video;
+- dejar que el sistema genere una portada automatica si no se ha seleccionado ninguna.
 
-Archivos:
+Para audio:
 
-- [frontend/src/app/pages/profile/profile.component.ts](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/profile/profile.component.ts:1)
-- [frontend/src/app/pages/profile/profile.component.html](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/profile/profile.component.html:1)
-- [frontend/src/app/pages/profile/profile.component.css](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/profile/profile.component.css:1)
+- se puede subir una portada opcional;
+- si no se selecciona ninguna, se usa un placeholder por defecto.
 
-Funcionalidad actual:
+### 7.5 Profile
 
-- muestra datos del usuario autenticado
-- muestra contador de subidas y descargas
-- muestra guardados del usuario
-- muestra estado vacío si aún no hay subidas
-- enlaza a ajustes
-- si se intenta acceder sin sesión, redirige al login
+La pantalla `Profile` centraliza la informacion de usuario.
 
-Nota importante:
+#### Funciones implementadas
 
-- el contador de descargas ahora es **real**
-- el contador de subidas está preparado pero actualmente será `0` mientras no exista la funcionalidad de publicar contenido
+- visualizacion del avatar;
+- cambio de foto de perfil;
+- recuento de subidas;
+- recuento de descargas;
+- listado de publicaciones propias;
+- listado de guardados.
 
-#### Settings
+#### Consideraciones de mantenimiento
 
-Archivos:
+El backend mantiene resincronizadas las subidas del usuario en base a las publicaciones realmente creadas.
 
-- [frontend/src/app/pages/settings/settings.component.ts](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/settings/settings.component.ts:1)
-- [frontend/src/app/pages/settings/settings.component.html](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/settings/settings.component.html:1)
-- [frontend/src/app/pages/settings/settings.component.css](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/pages/settings/settings.component.css:1)
+### 7.6 Settings
 
-Funcionalidad actual:
+La pantalla `Settings` reune opciones basicas de accesibilidad y sesion.
 
-- cambio de tamaño de texto
-- guardado de preferencias del usuario
-- opción de alto contraste preparada
-- opción de filtros de color preparada
-- logout
-- si se intenta acceder sin sesión, redirige al login
+#### Funciones implementadas
 
-### 5.3 Servicios del frontend
+- ajuste de tamano de texto;
+- soporte base para alto contraste;
+- soporte base para filtros de color;
+- cierre de sesion.
 
-#### AuthService
+### 7.7 Login
 
-Archivo: [frontend/src/app/services/auth.service.ts](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/services/auth.service.ts:1)
+Pantalla para autenticacion del usuario.
 
-Responsabilidad:
+#### Funciones implementadas
 
-- login
-- registro
-- comunicación con `/api/auth`
+- login por correo o nombre de usuario;
+- almacenamiento de token;
+- persistencia del usuario en localStorage;
+- redireccion posterior al acceso.
 
-#### UserService
+### 7.8 Register
 
-Archivo: [frontend/src/app/services/user.service.ts](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/services/user.service.ts:1)
+Pantalla de registro de nuevos usuarios.
 
-Responsabilidad:
+#### Funciones implementadas
 
-- obtener usuario actual
-- actualizar perfil
-- actualizar ajustes
-- persistir datos del usuario en `localStorage`
-- sincronizar guardados del usuario tras guardar o desguardar publicaciones
+- alta de usuario con nombre, correo y contrasena;
+- validacion basica del formulario;
+- conexion directa con backend.
 
-#### QuoteService
+## 8. Componentes reutilizables
 
-Archivo: [frontend/src/app/services/quotes.services.ts](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/services/quotes.services.ts:1)
+### 8.1 Navbar
 
-Responsabilidad:
+Componente de navegacion comun para la aplicacion.
 
-- obtener todas las publicaciones
-- obtener publicación por `id`
-- guardar o quitar de guardados
-- registrar descargas
+#### Comportamiento actual
 
-#### AccessibilityService
+- en movil actua como navegacion pensada para acceso rapido;
+- en escritorio se comporta como sidebar lateral;
+- en desktop puede expandirse para mostrar etiquetas de texto;
+- controla accesos a perfil y publicacion segun el estado de autenticacion.
 
-Archivo: [frontend/src/app/services/accessibility.service.ts](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/app/services/accessibility.service.ts:1)
+### 8.2 Icon
 
-Responsabilidad:
+Componente reutilizable para los SVG de la aplicacion.
 
-- aplicar el tamaño de texto global
-- recuperar ajustes guardados
-- sincronizar accesibilidad con `localStorage`
+#### Ventajas
 
-### 5.4 Diseño responsive
+- centraliza los iconos;
+- evita repeticion de markup;
+- mantiene consistencia visual.
 
-El frontend se ha ido adaptando con enfoque **solo móvil**.
+## 9. Backend y API
 
-Objetivo de este ajuste:
+## 9.1 Endpoints principales
 
-- que la interfaz use el ancho real del teléfono
-- evitar marcos o espacios vacíos tipo maqueta de escritorio
-- mantener barra inferior y espaciados consistentes
+### Auth
 
-Se han ajustado especialmente:
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+- `PUT /api/auth/profile`
+- `PUT /api/auth/settings`
 
-- `Home`
-- `Profile`
-- `Settings`
-- `Detail`
-- estilos globales en [frontend/src/styles.css](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/frontend/src/styles.css:1)
+### Quotes
 
----
+- `GET /api/quotes`
+- `GET /api/quotes/:id`
+- `POST /api/quotes`
+- `POST /api/quotes/:id/view`
+- `POST /api/quotes/:id/save`
+- `POST /api/quotes/:id/rate`
+- `POST /api/quotes/:id/download`
 
-## 6. Backend implementado
+## 9.2 Modelos de datos
 
-### 6.1 Servidor y app
+### User
 
-Archivos:
-
-- [backend/src/server.js](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/backend/src/server.js:1)
-- [backend/src/app.js](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/backend/src/app.js:1)
-
-Funcionalidad:
-
-- carga variables de entorno
-- conecta con MongoDB
-- arranca Express
-- activa CORS
-- parsea JSON
-- registra rutas `/api/auth` y `/api/quotes`
-
-### 6.2 Modelos
-
-#### User
-
-Archivo: [backend/src/models/user.js](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/backend/src/models/user.js:1)
-
-Campos relevantes:
+Campos principales:
 
 - `username`
 - `email`
@@ -312,25 +333,19 @@ Campos relevantes:
 - `uploadsCount`
 - `uploads`
 - `savedQuotes`
+- `ratedQuotes`
 - `settings`
 - `role`
 
-`settings` incluye:
+### Quote
 
-- `colorFilter`
-- `highContrast`
-- `textSize`
-
-#### Quote
-
-Archivo: [backend/src/models/quote.js](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/backend/src/models/quote.js:1)
-
-Campos relevantes:
+Campos principales:
 
 - `text`
 - `workTitle`
 - `year`
 - `rating`
+- `ratingsCount`
 - `views`
 - `image`
 - `mediaType`
@@ -341,239 +356,69 @@ Campos relevantes:
 - `synopsis`
 - `hashtags`
 - `category`
+- `createdBy`
 
-Esto permite que una publicación soporte tanto **audio** como **vídeo**.
+## 10. Rendimiento y optimizacion
 
-### 6.3 Controladores y rutas
+Durante el desarrollo se han introducido varias mejoras de rendimiento y mantenimiento:
 
-#### Auth
+- respuestas de listado mas ligeras desde backend;
+- cache de coleccion en frontend para `home` y `discover`;
+- cache individual por publicacion en `detail`;
+- actualizacion de cache al registrar visualizaciones y valoraciones;
+- reduccion de carga inicial del detalle;
+- limites de tamano en publicacion;
+- externalizacion de medios en Cloudinary.
 
-Archivos:
+## 11. Cloudinary y almacenamiento multimedia
 
-- [backend/src/controllers/auth.controller.js](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/backend/src/controllers/auth.controller.js:1)
-- [backend/src/routes/auth.routes.js](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/backend/src/routes/auth.routes.js:1)
+Inicialmente parte del contenido se estaba almacenando en base64 dentro de MongoDB, lo que degradaba el rendimiento. Para resolverlo se ha integrado **Cloudinary** como almacenamiento de medios.
 
-Endpoints actuales:
+### Flujo actual
 
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `GET /api/auth/me`
-- `PUT /api/auth/profile`
-- `PUT /api/auth/settings`
+1. el frontend obtiene el archivo local;
+2. lo convierte temporalmente a `data URI`;
+3. el backend recibe esa informacion;
+4. el backend sube el contenido a Cloudinary;
+5. MongoDB guarda solo la URL final del medio y de la portada.
 
-Funcionalidad implementada:
+### Ventajas
 
-- registro de usuario
-- login con JWT
-- login por email o username
-- carga del perfil autenticado
-- actualización de perfil
-- actualización de ajustes
-- normalización de datos antiguos del usuario
+- menor peso en documentos MongoDB;
+- mejor escalabilidad;
+- menor riesgo de degradacion en tiempos de carga.
 
-Importante:
+## 12. Migracion de contenido legado
 
-- se corrigieron contadores falsos que antes venían de valores mock
-- ahora las descargas se contabilizan de forma real
+Se ha desarrollado un script para migrar publicaciones antiguas que todavia almacenaban `image` o `mediaUrl` en `data:`.
 
-#### Quotes
+Script:
 
-Archivos:
+- `backend/scripts/migrate-cloudinary-assets.js`
 
-- [backend/src/controllers/quote.controller.js](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/backend/src/controllers/quote.controller.js:1)
-- [backend/src/routes/quote.routes.js](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/backend/src/routes/quote.routes.js:1)
+Comandos:
 
-Endpoints actuales:
+```bash
+cd backend
+npm run migrate:cloudinary:dry
+npm run migrate:cloudinary
+```
 
-- `GET /api/quotes`
-- `GET /api/quotes/:id`
-- `POST /api/quotes`
-- `POST /api/quotes/:id/save`
-- `POST /api/quotes/:id/download`
+El modo `dry-run` permite verificar cuantas publicaciones se migrarian sin modificar la base de datos.
 
-Funcionalidad implementada:
+## 13. Accesibilidad y usabilidad
 
-- listar publicaciones
-- ver detalle de una publicación
-- crear publicaciones desde backend
-- guardar y desguardar publicaciones
-- registrar descargas del usuario autenticado
-- normalizar guardados para evitar duplicados en `savedQuotes`
+El proyecto no se limita a ser funcional, sino que incorpora decisiones orientadas a la asignatura:
 
-### 6.4 Middleware
+- diseño mobile-first;
+- adaptacion posterior a escritorio con redistribucion especifica;
+- tamano minimo tipografico en inputs moviles para evitar zoom automatico;
+- jerarquias visuales claras;
+- botones y controles amplios;
+- mensajes de error o confirmacion contextualizados;
+- separacion entre contenido exploratorio y acciones sensibles.
 
-Archivo: [backend/src/middleware/auth.middleware.js](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/backend/src/middleware/auth.middleware.js:1)
-
-Responsabilidad:
-
-- validar token JWT
-- proteger rutas privadas
-
-### 6.5 Datos auxiliares
-
-Archivos:
-
-- [backend/src/data/defaultUserData.js](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/backend/src/data/defaultUserData.js:1)
-- [backend/src/data/seedQuotes.js](C:/Users/carl0/Desktop/Ua/3º/2ºCuatri/UA/EkkoWebSiteUa/backend/src/data/seedQuotes.js:1)
-
-Uso:
-
-- `defaultUserData.js` define valores por defecto del usuario
-- `seedQuotes.js` contiene publicaciones iniciales para poblar la aplicación
-
----
-
-## 7. Flujo de autenticación
-
-### Registro
-
-1. El usuario completa nombre, email y contraseña.
-2. Angular envía la petición a `POST /api/auth/register`.
-3. El backend valida y guarda el usuario con contraseña encriptada.
-
-### Login
-
-1. El usuario introduce email o username y contraseña.
-2. Angular llama a `POST /api/auth/login`.
-3. El backend valida las credenciales.
-4. Si son correctas, devuelve:
-   - token JWT
-   - datos del usuario
-5. El frontend guarda esta información en `localStorage`.
-6. El usuario es redirigido a `Home`.
-
-### Sesión
-
-Las rutas protegidas usan el token almacenado para:
-
-- cargar perfil
-- guardar publicaciones
-- registrar descargas
-- actualizar ajustes
-
-### Flujo de invitado
-
-La aplicación permite una experiencia parcial sin autenticación:
-
-- un invitado puede entrar en `Home`
-- un invitado puede abrir `Detalle`
-- un invitado puede reproducir audio o vídeo
-
-Las siguientes acciones requieren login:
-
-- guardar publicaciones
-- descargar contenido
-- acceder a `Perfil`
-- acceder a `Ajustes`
-
-Si un invitado intenta realizar alguna de esas acciones, la app lo redirige al login.
-
----
-
-## 8. Flujo de publicaciones
-
-### Home
-
-- obtiene todas las publicaciones desde `GET /api/quotes`
-- pinta tarjetas visuales
-- distingue entre contenido de audio y vídeo
-
-### Detail
-
-- recibe el `id` de la publicación desde la URL
-- consulta `GET /api/quotes/:id`
-- renderiza media y metadatos
-
-### Guardado
-
-- el usuario autenticado pulsa guardar
-- Angular llama a `POST /api/quotes/:id/save`
-- el backend añade o elimina la publicación de `savedQuotes`
-- el frontend sincroniza el estado local del usuario para evitar contadores desfasados
-
-### Descarga
-
-- el usuario autenticado pulsa descargar
-- Angular llama a `POST /api/quotes/:id/download`
-- el backend incrementa el contador `downloads`
-
----
-
-## 9. Accesibilidad implementada
-
-Se ha trabajado especialmente la parte de accesibilidad por ser una asignatura centrada en ello.
-
-Actualmente está implementado:
-
-- ajuste real del tamaño de texto
-- persistencia de esa preferencia
-- estructura preparada para alto contraste
-- estructura preparada para filtros de color
-
-El tamaño de texto se aplica a nivel global usando el `documentElement`.
-
----
-
-## 10. Assets y recursos multimedia
-
-Actualmente el proyecto usa recursos visuales y multimedia cargados en `frontend/src/assets/`.
-
-Ejemplos:
-
-- logo de Ekko
-- placeholder para audio
-- vídeo de prueba de Scarface
-
-Estos assets se usan sobre todo en:
-
-- `Home`
-- `Detail`
-- `Profile`
-
----
-
-## 11. Cambios importantes realizados hasta ahora
-
-Resumen de hitos ya implementados:
-
-- maquetación inicial de login y registro
-- corrección del arranque del backend
-- corrección del login para aceptar email o username
-- redirección correcta a `Home` tras login
-- implementación de `Home`
-- incorporación del logo real de Ekko
-- adaptación del diseño a móvil real
-- implementación de `Profile`
-- implementación de `Settings`
-- activación real del tamaño de texto
-- implementación de `Detail`
-- soporte para publicaciones de audio y vídeo
-- guardado de publicaciones por usuario
-- descargas registradas por usuario
-- corrección de contadores mock en perfil
-- corrección del flujo de guardado para evitar duplicados
-- apertura pública de `Home` y `Detalle` sin login
-- redirección al login para acciones privadas
-
----
-
-## 12. Qué queda pendiente o preparado para futuro
-
-Estas partes aún pueden desarrollarse más:
-
-- pantalla de `Publicar`
-- subida real de contenido por usuario
-- contador real de `uploads` en función de publicaciones creadas por cada usuario
-- sistema de filtros por hashtags y categorías
-- filtro por audio/vídeo
-- funcionalidad completa de `Librería`
-- edición real de avatar y perfil
-- mejoras visuales finales para igualar aún más Figma
-- validaciones extra y tests más amplios
-
----
-
-## 13. Cómo arrancar el proyecto
+## 14. Ejecucion del proyecto
 
 ### Backend
 
@@ -581,6 +426,13 @@ Estas partes aún pueden desarrollarse más:
 cd backend
 npm install
 npm start
+```
+
+Modo desarrollo:
+
+```bash
+cd backend
+npm run dev
 ```
 
 ### Frontend
@@ -591,36 +443,62 @@ npm install
 npm start
 ```
 
-Por defecto:
+### Prueba en movil
 
-- backend en `http://localhost:5000`
-- frontend en `http://localhost:4200`
+```bash
+cd frontend
+npm run start:mobile
+```
 
----
+## 15. Variables de entorno
 
-## 14. Recomendaciones para el equipo
+Archivo:
 
-Para que el trabajo en grupo sea más claro:
+- `backend/.env`
 
-- revisar este archivo antes de tocar una parte nueva
-- comprobar primero si la funcionalidad ya existe en frontend, backend o ambos
-- mantener coherencia con el diseño móvil del proyecto
-- evitar reintroducir datos mock en producción
-- documentar aquí cualquier cambio grande que afecte a estructura, rutas o flujo de datos
+Variables principales:
 
----
+```env
+PORT=5000
+MONGO_URI=...
+JWT_SECRET=...
+CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
+```
 
-## 15. Archivo de referencia para el equipo
+## 16. Verificacion tecnica
 
-Este documento está pensado como guía de trabajo compartida. Si alguien del equipo necesita entender rápidamente el proyecto, debería empezar por:
+Comandos utilizados para validacion rapida:
 
-1. este archivo
-2. las rutas del frontend
-3. los controladores del backend
+### Frontend
 
-De esta forma todos los integrantes pueden saber:
+```bash
+frontend\node_modules\.bin\tsc.cmd -p frontend/tsconfig.app.json --noEmit
+frontend\node_modules\.bin\tsc.cmd -p frontend/tsconfig.spec.json --noEmit
+```
 
-- qué está implementado
-- qué archivos tocar según cada funcionalidad
-- cómo se comunican frontend y backend
-- qué partes siguen pendientes
+### Backend
+
+```bash
+node --check backend/src/controllers/auth.controller.js
+node --check backend/src/controllers/quote.controller.js
+node --check backend/scripts/migrate-cloudinary-assets.js
+```
+
+## 17. Estado actual del desarrollo
+
+En el momento actual, el proyecto presenta:
+
+- una base funcional completa de autenticacion;
+- exploracion de contenido y detalle multimedia;
+- valoraciones persistentes;
+- guardados y descargas;
+- publicacion avanzada con gestion de portadas;
+- almacenamiento multimedia desacoplado de MongoDB;
+- experiencia responsive movil y escritorio;
+- documentacion y estructura suficientemente maduras para continuar el proyecto con claridad.
+
+## 18. Conclusion
+
+EkkoWebSiteUa representa una aplicacion web academica con una base tecnica realista y una atencion especial a la experiencia de uso. El sistema combina exploracion multimedia, autenticacion, interaccion social basica y publicacion de contenido con una arquitectura separada entre frontend, backend, base de datos y almacenamiento de medios. La evolucion del proyecto durante esta sesion ha reforzado especialmente la responsividad, el rendimiento, la mantenibilidad y la escalabilidad del sistema.

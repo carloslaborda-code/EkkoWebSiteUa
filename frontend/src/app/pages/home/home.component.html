@@ -6,7 +6,6 @@
   <main class="home-frame">
     <header class="home-header">
       <div class="brand-block">
-        <p class="status-time">9:30</p>
         <div class="brand-row">
           <img class="brand-logo-image" src="assets/images/ekko-logo.png" alt="Ekko" />
         </div>
@@ -45,11 +44,11 @@
           name="search"
           [(ngModel)]="searchTerm"
           (ngModelChange)="onSearchChange()"
-          placeholder="Search for iconic lines..."
+          placeholder="Busca frases ic&oacute;nicas..."
         />
       </label>
 
-      <button type="button" class="icon-button filter-button" aria-label="Filtros">
+      <button type="button" class="icon-button filter-button" aria-label="Filtros" (click)="openDiscover()">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             d="M4 6h10M4 18h16M10 12h10"
@@ -65,9 +64,26 @@
       </button>
     </section>
 
+    <section class="desktop-hero" aria-label="Resumen de exploracion">
+      <div class="desktop-hero-copy">
+        <p class="desktop-kicker">Explorar contenido</p>
+        <h1>Ekko te ayuda a localizar frases, escenas y fragmentos de audio dentro de peliculas, series y videojuegos.</h1>
+        <p class="desktop-summary">La aplicacion esta pensada para descubrir contenido memorable, filtrarlo por formato o categoria y acceder rapido a cada fragmento para reproducirlo, guardarlo o compartirlo.</p>
+      </div>
+      <div class="desktop-hero-stats">
+        <article class="desktop-stat-card">
+          <span>Resultados</span>
+          <strong>{{ visibleQuotes.length }}</strong>
+        </article>
+        <article class="desktop-stat-card">
+          <span>Formatos</span>
+          <strong>Audio + Video</strong>
+        </article>
+      </div>
+    </section>
+
     <section class="feed-section" aria-live="polite">
-      <p *ngIf="loading" class="state-message">Loading featured lines...</p>
-      <p *ngIf="!loading && !visibleQuotes.length" class="state-message">No lines found for that search.</p>
+      <p *ngIf="!loading && !visibleQuotes.length" class="state-message">No se han encontrado resultados para esa b&uacute;squeda.</p>
 
       <article
         *ngFor="let quote of visibleQuotes; trackBy: trackByQuoteId"
@@ -120,7 +136,7 @@
               </div>
             </div>
 
-            <button type="button" class="play-button" [attr.aria-label]="'Play ' + quote.workTitle">
+            <button type="button" class="play-button" [attr.aria-label]="'Reproducir ' + quote.workTitle">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M8 6.5v11l9-5.5-9-5.5Z" fill="currentColor" />
               </svg>
@@ -130,63 +146,6 @@
       </article>
     </section>
 
-    <nav class="bottom-nav" aria-label="Navegacion principal">
-      <a class="nav-item nav-item--active" routerLink="/home">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 10.5 12 4l8 6.5V20h-5.5v-5h-5V20H4v-9.5Z" fill="currentColor" />
-        </svg>
-        <span>Inicio</span>
-      </a>
-      <a class="nav-item" href="javascript:void(0)">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M12 3.8a8.2 8.2 0 1 0 8.2 8.2"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
-          <path
-            d="M20.2 3.8 13.5 10.5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
-          <circle cx="12" cy="12" r="2.5" fill="currentColor" />
-        </svg>
-        <span>Descubrir</span>
-      </a>
-      <a class="nav-item nav-item--accent" href="javascript:void(0)" aria-label="Publicar">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
-        </svg>
-      </a>
-      <a class="nav-item" href="javascript:void(0)">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M7 4.5h10a1.5 1.5 0 0 1 1.5 1.5v14l-6.5-3-6.5 3V6A1.5 1.5 0 0 1 7 4.5Z"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linejoin="round"
-          />
-        </svg>
-        <span>Libreria</span>
-      </a>
-      <button type="button" class="nav-item nav-button-reset" (click)="openProfile()">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
-          <path
-            d="M4.5 19.5a8.5 8.5 0 0 1 15 0"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
-        </svg>
-        <span>Perfil</span>
-      </button>
-    </nav>
+    <app-navbar activeTab="home"></app-navbar>
   </main>
 </div>

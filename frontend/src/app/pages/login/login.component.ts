@@ -14,13 +14,13 @@ export class LoginComponent {
   errorMessage = '';
   isSubmitting = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, public router: Router) {}
 
   login(): void {
     this.errorMessage = '';
 
     if (!this.email.trim() || !this.password.trim()) {
-      this.errorMessage = 'Introduce tu email y tu contrasena.';
+      this.errorMessage = 'Introduce tu correo o usuario y tu contraseña.';
       return;
     }
 
@@ -40,7 +40,7 @@ export class LoginComponent {
       },
       error: (err: HttpErrorResponse) => {
         this.isSubmitting = false;
-        this.errorMessage = err.error?.message || 'No se pudo iniciar sesion. Revisa que el backend este arrancado.';
+        this.errorMessage = err.error?.message || 'No se pudo iniciar sesión. Revisa que el backend esté arrancado.';
       }
     });
   }

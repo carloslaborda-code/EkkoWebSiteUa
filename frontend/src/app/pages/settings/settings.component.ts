@@ -53,6 +53,28 @@ export class SettingsComponent implements OnInit {
     this.persistSettings({ textSize: size });
   }
 
+  getColorFilterLabel(filter: string): string {
+    switch (filter) {
+      case 'warm':
+        return 'Cálido';
+      case 'cool':
+        return 'Frío';
+      default:
+        return 'Normal';
+    }
+  }
+
+  getTextSizeLabel(size: string): string {
+    switch (size) {
+      case 'small':
+        return 'Pequeño';
+      case 'large':
+        return 'Grande';
+      default:
+        return 'Mediano';
+    }
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');

@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-black text-white relative overflow-hidden flex items-center justify-center px-6 py-10">
+<div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-6 py-10 text-white md:px-10 lg:px-16">
   <div class="pointer-events-none absolute inset-0">
     <div class="absolute top-8 left-8 h-14 w-14 rounded-full bg-white/30 blur-xl"></div>
     <div class="absolute top-12 right-6 h-10 w-10 rounded-full bg-white/40 blur-xl"></div>
@@ -8,23 +8,52 @@
     <div class="absolute bottom-20 right-8 h-12 w-12 rounded-full bg-white/30 blur-xl"></div>
   </div>
 
-  <div class="relative w-full max-w-sm">
-    <button type="button" aria-label="Volver" class="mb-10 text-white">
+  <div class="relative w-full max-w-sm md:max-w-md lg:max-w-5xl">
+    <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_440px] lg:items-center lg:gap-20">
+    <div class="hidden lg:block">
+      <p class="mb-4 text-sm uppercase tracking-[0.28em] text-[#FFE8B7]/70">Ekko</p>
+      <h2 class="max-w-[12ch] text-5xl font-semibold leading-tight text-white">Accede a tu cuenta y sigue explorando fragmentos.</h2>
+    </div>
+
+    <div>
+    <button type="button" aria-label="Volver" class="mb-10 text-white lg:mb-8" (click)="router.navigate(['/home'])">
       <span class="text-4xl leading-none">&lsaquo;</span>
     </button>
 
-    <div class="text-center mb-10">
-      <h1 class="text-5xl font-light tracking-tight mb-2 transition-all duration-300 hover:-translate-y-0.5">
+    <div class="mb-10 text-center lg:text-left">
+      <h1 class="text-5xl font-light tracking-tight mb-2 transition-all duration-300 hover:-translate-y-0.5"
+        (click)="router.navigate(['/home'])">
         ekko
       </h1>
 
       <h2 class="text-4xl font-semibold transition-all duration-300 hover:-translate-y-0.5">
-        Iniciar sesion
+        Iniciar sesi&oacute;n
       </h2>
     </div>
 
     <form class="flex flex-col gap-5" (ngSubmit)="login()">
-      <div class="relative group">
+
+      <div>
+        <label for="email" class="sr-only">Email o usuario</label>
+        <input id="email" name="email" type="text" [(ngModel)]="email" placeholder="Email o usuario" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+    outline-none placeholder:text-[#626262]
+    transition-all duration-200 ease-out
+    hover:bg-white hover:shadow-md hover:-translate-y-0.5
+    focus:shadow-[inset_0_0_0_2px_#FFE8B7]
+    focus:bg-white" />
+      </div>
+
+      <div>
+        <label for="password" class="sr-only">Contrase&ntilde;a</label>
+        <input id="password" name="password" type="password" [(ngModel)]="password" placeholder="Contrase&ntilde;a" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+    outline-none placeholder:text-[#626262]
+    transition-all duration-200 ease-out
+    hover:bg-white hover:shadow-md hover:-translate-y-0.5
+    focus:shadow-[inset_0_0_0_2px_#FFE8B7]
+    focus:bg-white" />
+      </div>
+
+      <!-- <div class="relative group">
         <input
           id="email"
           name="email"
@@ -72,18 +101,15 @@
         >
           Contrasena
         </label>
-      </div>
+      </div> -->
 
       <div class="text-right -mt-1">
-        <a
-          routerLink="/forgot-password"
-          class="text-sm text-[#FFE8B7] hover:text-[#FFF3D6] relative
+        <a routerLink="/forgot-password" class="text-sm text-[#FFE8B7] hover:text-[#FFF3D6] relative
           after:content-[''] after:absolute after:left-0 after:bottom-0
           after:h-[2px] after:w-0 after:bg-[#FFF3D6]
           after:transition-all after:duration-300
-          hover:after:w-full transition-colors duration-200"
-        >
-          Has olvidado tu contrasena?
+          hover:after:w-full transition-colors duration-200">
+          &iquest;Has olvidado tu contrase&ntilde;a?
         </a>
       </div>
 
@@ -91,26 +117,22 @@
         {{ errorMessage }}
       </p>
 
-      <button
-        type="submit"
-        [disabled]="isSubmitting"
-        class="mt-2 w-full rounded-xl bg-[#FFE8B7]/70 py-4 text-xl font-semibold text-white
+      <button type="submit" [disabled]="isSubmitting" class="mt-2 w-full rounded-xl bg-[#FFE8B7]/70 py-4 text-xl font-semibold text-white
         hover:bg-[#FFE8B7] hover:text-gray-900 hover:scale-[1.02] hover:shadow-lg
         active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70
-        transition-all duration-200"
-      >
-        {{ isSubmitting ? 'Entrando...' : 'Sign in' }}
+        transition-all duration-200">
+        {{ isSubmitting ? 'Entrando...' : 'Iniciar sesi&oacute;n' }}
       </button>
     </form>
 
     <div class="mt-10 text-center text-base font-semibold">
-      <span class="text-white">No tienes cuenta? </span>
-      <a
-        routerLink="/register"
-        class="text-gray-400 hover:text-gray-300 relative after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-gray-300 after:transition-all hover:after:w-full transition-colors"
-      >
-        Registrate
+      <span class="text-white">&iquest;No tienes cuenta? </span>
+      <a routerLink="/register"
+        class="text-gray-400 hover:text-gray-300 relative after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-gray-300 after:transition-all hover:after:w-full transition-colors">
+        Reg&iacute;strate
       </a>
+    </div>
+    </div>
     </div>
   </div>
 </div>

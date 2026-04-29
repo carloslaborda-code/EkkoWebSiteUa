@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const Quote = require('../models/quote');
 const { defaultUploads, defaultUserSettings } = require('../data/defaultUserData');
 
 const hasLegacyMockUploads = (uploads = []) => {
@@ -69,7 +70,42 @@ const ensureUserDefaults = async (user) => {
     changed = true;
   }
 
+  if (!Array.isArray(user.ratedQuotes)) {
+    user.ratedQuotes = [];
+    changed = true;
+  }
+
   if (changed) {
+    await user.save();
+  }
+
+  return user;
+};
+
+const syncUploadsFromQuotes = async (user) => {
+  const createdQuotes = await Quote.find({ createdBy: user._id })
+    .sort({ createdAt: -1 })
+    .select('workTitle image mediaType');
+
+  const uploadsFromQuotes = createdQuotes.map((quote) => ({
+    title: quote.workTitle,
+    image: quote.image || '',
+    type: quote.mediaType === 'video' ? 'video' : 'audio'
+  }));
+
+  const currentUploads = Array.isArray(user.uploads) ? user.uploads.map((upload) => ({
+    title: upload.title,
+    image: upload.image || '',
+    type: upload.type || 'audio'
+  })) : [];
+
+  const hasChanged =
+    JSON.stringify(currentUploads) !== JSON.stringify(uploadsFromQuotes) ||
+    user.uploadsCount !== uploadsFromQuotes.length;
+
+  if (hasChanged) {
+    user.uploads = uploadsFromQuotes;
+    user.uploadsCount = uploadsFromQuotes.length;
     await user.save();
   }
 
@@ -119,7 +155,7 @@ const login = async (req, res) => {
     const identifier = email?.trim();
 
     if (!identifier || !password) {
-      return res.status(400).json({ message: 'Email o usuario y contrasena obligatorios' });
+      return res.status(400).json({ message: 'Correo o usuario y contraseña obligatorios' });
     }
 
     const normalizedEmail = identifier.toLowerCase();
@@ -154,6 +190,10 @@ const login = async (req, res) => {
         avatar: user.avatar,
         downloads: user.downloads,
         uploadsCount: user.uploadsCount,
+        ratedQuotes: user.ratedQuotes.map((ratedQuote) => ({
+          quoteId: ratedQuote.quoteId.toString(),
+          value: ratedQuote.value
+        })),
         settings: user.settings,
         role: user.role
       }
@@ -165,7 +205,12 @@ const login = async (req, res) => {
 
 const getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-password').populate('savedQuotes');
+    const user = await User.findById(req.user._id)
+      .select('-password')
+      .populate({
+        path: 'savedQuotes',
+        select: 'text workTitle year image mediaType duration'
+      });
     await ensureUserDefaults(user);
     res.json(user);
   } catch (error) {
@@ -193,17 +238,23 @@ const updateProfile = async (req, res) => {
     }
 
     await user.save();
+    await user.populate('savedQuotes');
 
     res.json({
       message: 'Perfil actualizado correctamente',
       user: {
-        id: user._id,
+        _id: user._id,
         username: user.username,
         email: user.email,
         avatar: user.avatar,
         downloads: user.downloads,
         uploadsCount: user.uploadsCount,
         uploads: user.uploads,
+        savedQuotes: user.savedQuotes,
+        ratedQuotes: user.ratedQuotes.map((ratedQuote) => ({
+          quoteId: ratedQuote.quoteId.toString(),
+          value: ratedQuote.value
+        })),
         settings: user.settings,
         role: user.role
       }
