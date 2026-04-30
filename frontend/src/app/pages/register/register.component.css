@@ -1,0 +1,12 @@
+.back-button .icon {
+    display: inline-block;
+    transition: transform 0.25s ease;
+}
+
+.back-button:hover .icon {
+    transform: translateX(-4px);
+}
+
+.back-button:active .icon {
+    transform: translateX(-2px) scale(0.95);
+}
