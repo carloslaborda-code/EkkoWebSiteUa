@@ -14,11 +14,66 @@ export class RegisterComponent {
   password = '';
   confirmPassword = '';
 
+  usernameAvailable: boolean | null = null;
+  emailAvailable: boolean | null = null;
+
+  private usernameTimeout: any;
+  private emailTimeout: any;
+
   errorMessage = '';
   isSubmitting = false;
   hasSubmitted = false;
 
   constructor(private auth: AuthService, public router: Router) { }
+
+  checkUsernameAvailability(): void {
+    clearTimeout(this.usernameTimeout);
+
+    const username = this.username.trim();
+
+    // Validación previa (evita peticiones inútiles)
+    if (username.length < 5 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+      this.usernameAvailable = null;
+      return;
+    }
+
+    this.usernameTimeout = setTimeout(() => {
+      this.auth.checkUsernameAvailable(username).subscribe(res => {
+        this.usernameAvailable = res.available;
+
+        if (!res.available) {
+          this.errorMessage = 'El nombre de usuario ya está en uso.';
+        } else if (this.errorMessage === 'El nombre de usuario ya está en uso.') {
+          this.errorMessage = '';
+        }
+      });
+    }, 400);
+  }
+
+  checkEmailAvailability(): void {
+    clearTimeout(this.emailTimeout);
+
+    const email = this.email.trim();
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      this.emailAvailable = null;
+      return;
+    }
+
+    this.emailTimeout = setTimeout(() => {
+      this.auth.checkEmailAvailable(email).subscribe(res => {
+        this.emailAvailable = res.available;
+
+        if (!res.available) {
+          this.errorMessage = 'El correo electrónico ya está en uso.';
+        } else if (this.errorMessage === 'El correo electrónico ya está en uso.') {
+          this.errorMessage = '';
+        }
+      });
+    }, 400);
+  }
 
   validate(showIncompleteError = false): boolean {
     const error = this.getValidationError(showIncompleteError);

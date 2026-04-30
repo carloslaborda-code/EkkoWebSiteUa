@@ -136,17 +136,27 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
 
+    const normalizedUsername = username.trim();
     const normalizedEmail = email.trim().toLowerCase();
-    const existingUser = await User.findOne({ email: normalizedEmail });
 
-    if (existingUser) {
-      return res.status(400).json({ message: 'El usuario ya existe' });
+    const existingEmail = await User.findOne({ email: normalizedEmail });
+
+    if (existingEmail) {
+      return res.status(400).json({ message: 'El correo electrónico ya está registrado' });
+    }
+
+    const existingUsername = await User.findOne({
+      username: { $regex: `^${normalizedUsername}$`, $options: 'i' }
+    });
+
+    if (existingUsername) {
+      return res.status(400).json({ message: 'El nombre de usuario ya está en uso' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      username: username.trim(),
+      username: normalizedUsername,
       email: normalizedEmail,
       password: hashedPassword,
       settings: defaultUserSettings
@@ -216,6 +226,58 @@ const login = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: 'Error en el login', error: error.message });
+  }
+};
+
+const checkUsername = async (req, res) => {
+  try {
+    const username = req.query.username?.trim();
+
+    if (!username) {
+      return res.status(400).json({
+        available: false,
+        message: 'El nombre de usuario es obligatorio'
+      });
+    }
+
+    const existingUser = await User.findOne({
+      username: { $regex: `^${username}$`, $options: 'i' }
+    });
+
+    res.json({
+      available: !existingUser
+    });
+  } catch (error) {
+    res.status(500).json({
+      available: false,
+      message: 'Error al comprobar el nombre de usuario',
+      error: error.message
+    });
+  }
+};
+
+const checkEmail = async (req, res) => {
+  try {
+    const email = req.query.email?.trim().toLowerCase();
+
+    if (!email) {
+      return res.status(400).json({
+        available: false,
+        message: 'El correo electrónico es obligatorio'
+      });
+    }
+
+    const existingUser = await User.findOne({ email });
+
+    res.json({
+      available: !existingUser
+    });
+  } catch (error) {
+    res.status(500).json({
+      available: false,
+      message: 'Error al comprobar el correo electrónico',
+      error: error.message
+    });
   }
 };
 
@@ -325,4 +387,4 @@ const updateSettings = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getCurrentUser, updateProfile, updateSettings };
+module.exports = { register, login, getCurrentUser, updateProfile, updateSettings, checkUsername, checkEmail };

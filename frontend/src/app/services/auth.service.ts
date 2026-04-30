@@ -40,7 +40,7 @@ export interface AuthResponse {
 export class AuthService {
   private API = `${API_BASE_URL}/auth`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   login(data: AuthPayload): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.API}/login`, data);
@@ -48,5 +48,19 @@ export class AuthService {
 
   register(data: AuthPayload) {
     return this.http.post(`${this.API}/register`, data);
+  }
+
+  checkUsernameAvailable(username: string): Observable<{ available: boolean; message?: string }> {
+    return this.http.get<{ available: boolean; message?: string }>(
+      `${this.API}/check-username`,
+      { params: { username } }
+    );
+  }
+
+  checkEmailAvailable(email: string): Observable<{ available: boolean; message?: string }> {
+    return this.http.get<{ available: boolean; message?: string }>(
+      `${this.API}/check-email`,
+      { params: { email } }
+    );
   }
 }
