@@ -35,7 +35,7 @@ La aplicacion distingue entre usuario invitado y usuario autenticado. Esto permi
 
 - **Angular 16**: framework principal para la construccion de la interfaz.
 - **TypeScript**: tipado estatico y mejora del mantenimiento del codigo.
-- **RxJS**: gestion reactiva de peticiones y cache en servicios.
+- **RxJS**: gestion reactiva de peticiones HTTP y estados de interfaz.
 - **Tailwind CSS**: apoyo para composicion rapida de ciertos layouts y componentes.
 - **CSS por componente**: personalizacion visual fina en cada pantalla.
 
@@ -190,9 +190,10 @@ La pantalla `Detail` muestra la informacion completa de una publicacion.
 
 #### Mejoras tecnicas introducidas
 
-- cache por `id` de cada publicacion;
-- actualizacion del cache al valorar o registrar visualizacion;
+- peticiones directas al backend para evitar datos desactualizados;
+- eliminacion de cache local en memoria para listado y detalle;
 - eliminacion de carga anticipada innecesaria del medio para mejorar tiempos de entrada;
+- transcripcion textual opcional del fragmento para mejorar accesibilidad;
 - control de clicks repetidos en valoraciones;
 - mensajes de exito o error dentro del propio panel de valoracion.
 
@@ -210,6 +211,8 @@ La pantalla `Publish` es uno de los modulos mas avanzados del proyecto.
 - portada manual en video;
 - portada automatica desde el propio video;
 - seleccion de un frame del video para usarlo como portada;
+- previsualizacion automatica de la portada al mover el selector de frame;
+- accion manual `Previsualizar este frame` para confirmar el frame elegido;
 - limites de tamano para proteger rendimiento.
 
 #### Logica de portada
@@ -217,8 +220,10 @@ La pantalla `Publish` es uno de los modulos mas avanzados del proyecto.
 Para video, el sistema permite tres caminos:
 
 - usar una portada manual;
-- capturar una portada desde un frame elegido del video;
+- previsualizar y capturar una portada desde un frame elegido del video;
 - dejar que el sistema genere una portada automatica si no se ha seleccionado ninguna.
+
+El selector de tiempo actualiza la vista previa de la portada mientras se desplaza. Esto permite comprobar visualmente el frame antes de publicar, sin esperar a una accion final.
 
 Para audio:
 
@@ -244,14 +249,22 @@ El backend mantiene resincronizadas las subidas del usuario en base a las public
 
 ### 7.6 Settings
 
-La pantalla `Settings` reune opciones basicas de accesibilidad y sesion.
+La pantalla `Settings` reune opciones de accesibilidad persistentes y acciones de sesion.
 
 #### Funciones implementadas
 
-- ajuste de tamano de texto;
-- soporte base para alto contraste;
-- soporte base para filtros de color;
+- ajuste de tamano de texto: pequeno, mediano, grande y muy grande;
+- filtros de color: normal, calido, frio y escala de grises;
+- alto contraste global;
+- reduccion de movimiento para animaciones y transiciones;
+- controles grandes para mejorar el uso tactil o con dificultad motriz;
+- subrayado de enlaces y acciones para no depender solo del color;
+- tipografia legible con mayor altura de linea;
+- modo lector de pantalla para reducir decoracion visual;
+- transcripciones visibles en contenido multimedia;
 - cierre de sesion.
+
+Los ajustes se guardan en el perfil del usuario y se aplican de forma global al documento mediante atributos `data-*` en el elemento `html`.
 
 ### 7.7 Login
 
@@ -285,6 +298,8 @@ Componente de navegacion comun para la aplicacion.
 - en movil actua como navegacion pensada para acceso rapido;
 - en escritorio se comporta como sidebar lateral;
 - en desktop puede expandirse para mostrar etiquetas de texto;
+- en escritorio coloca `Publicar` al final de las opciones principales, justo antes de `Perfil`;
+- usa el color dorado como indicador de pagina activa mediante `aria-current`;
 - controla accesos a perfil y publicacion segun el estado de autenticacion.
 
 ### 8.2 Icon
@@ -337,6 +352,18 @@ Campos principales:
 - `settings`
 - `role`
 
+#### Ajustes de accesibilidad en `settings`
+
+- `colorFilter`
+- `highContrast`
+- `textSize`
+- `reducedMotion`
+- `largeTargets`
+- `underlineLinks`
+- `readableFont`
+- `screenReaderMode`
+- `showTranscripts`
+
 ### Quote
 
 Campos principales:
@@ -363,9 +390,9 @@ Campos principales:
 Durante el desarrollo se han introducido varias mejoras de rendimiento y mantenimiento:
 
 - respuestas de listado mas ligeras desde backend;
-- cache de coleccion en frontend para `home` y `discover`;
-- cache individual por publicacion en `detail`;
-- actualizacion de cache al registrar visualizaciones y valoraciones;
+- peticiones directas al backend sin cache de coleccion en frontend;
+- detalle sin cache individual para evitar datos desactualizados;
+- respuestas API con cabeceras `no-store`;
 - reduccion de carga inicial del detalle;
 - limites de tamano en publicacion;
 - externalizacion de medios en Cloudinary.
@@ -417,6 +444,42 @@ El proyecto no se limita a ser funcional, sino que incorpora decisiones orientad
 - botones y controles amplios;
 - mensajes de error o confirmacion contextualizados;
 - separacion entre contenido exploratorio y acciones sensibles.
+
+### 13.1 Sistema global de accesibilidad
+
+La accesibilidad se gestiona desde `accessibility.service.ts`. El servicio lee los ajustes guardados en `localStorage`, normaliza valores antiguos o incompletos y aplica atributos globales en `html`:
+
+- `data-text-size`
+- `data-color-filter`
+- `data-high-contrast`
+- `data-reduced-motion`
+- `data-large-targets`
+- `data-underline-links`
+- `data-readable-font`
+- `data-screen-reader-mode`
+- `data-show-transcripts`
+
+Estos atributos permiten que `styles.css` aplique cambios globales sin duplicar logica en cada componente.
+
+### 13.2 Medidas para distintos perfiles de usuario
+
+- **Personas ciegas o usuarias de lector de pantalla**: `aria-label` en acciones clave, `aria-current` en navegacion, decoraciones con `aria-hidden`, enlace para saltar al contenido principal y transcripciones visibles opcionales.
+- **Personas sordas o con dificultad auditiva**: transcripcion textual del fragmento en `Detail` cuando se activa desde ajustes.
+- **Personas con baja vision**: alto contraste, foco visible reforzado, filtros de color, escala de grises, texto muy grande y placeholders con mejor contraste.
+- **Personas con daltonismo**: subrayado de enlaces y estados activos que no dependen solo del color.
+- **Personas con dificultad de movimiento**: controles grandes, objetivos tactiles minimos, navegacion por teclado en tarjetas interactivas y reduccion de movimientos inesperados.
+- **Personas sensibles al movimiento**: modo de reduccion de movimiento que neutraliza animaciones y transiciones.
+
+### 13.3 Navegacion por teclado y foco
+
+La aplicacion incorpora:
+
+- enlace `Saltar al contenido principal`;
+- `id="main-content"` en las vistas principales;
+- foco visible global con `:focus-visible`;
+- tarjetas de resultados navegables con `Enter` y `Espacio`;
+- botones de filtros y categorias con `aria-pressed`;
+- estado activo de navegacion con `aria-current="page"`.
 
 ## 14. Ejecucion del proyecto
 
@@ -497,8 +560,11 @@ En el momento actual, el proyecto presenta:
 - publicacion avanzada con gestion de portadas;
 - almacenamiento multimedia desacoplado de MongoDB;
 - experiencia responsive movil y escritorio;
+- sistema global de accesibilidad configurable desde ajustes;
+- navegacion por teclado, foco visible y transcripciones opcionales;
+- navbar de escritorio con estado activo claro y orden ajustado;
 - documentacion y estructura suficientemente maduras para continuar el proyecto con claridad.
 
 ## 18. Conclusion
 
-EkkoWebSiteUa representa una aplicacion web academica con una base tecnica realista y una atencion especial a la experiencia de uso. El sistema combina exploracion multimedia, autenticacion, interaccion social basica y publicacion de contenido con una arquitectura separada entre frontend, backend, base de datos y almacenamiento de medios. La evolucion del proyecto durante esta sesion ha reforzado especialmente la responsividad, el rendimiento, la mantenibilidad y la escalabilidad del sistema.
+EkkoWebSiteUa representa una aplicacion web academica con una base tecnica realista y una atencion especial a la experiencia de uso. El sistema combina exploracion multimedia, autenticacion, interaccion social basica, publicacion de contenido y ajustes de accesibilidad persistentes con una arquitectura separada entre frontend, backend, base de datos y almacenamiento de medios. La evolucion del proyecto durante esta sesion ha reforzado especialmente la responsividad, la accesibilidad, el rendimiento, la mantenibilidad y la escalabilidad del sistema.

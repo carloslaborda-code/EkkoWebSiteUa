@@ -3,6 +3,14 @@ import { Router } from '@angular/router';
 import { AccessibilityService } from '../../services/accessibility.service';
 import { UserProfile, UserService } from '../../services/user.service';
 
+type BooleanAccessibilitySetting =
+  | 'reducedMotion'
+  | 'largeTargets'
+  | 'underlineLinks'
+  | 'readableFont'
+  | 'screenReaderMode'
+  | 'showTranscripts';
+
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
@@ -11,8 +19,8 @@ import { UserProfile, UserService } from '../../services/user.service';
 export class SettingsComponent implements OnInit {
   profile: UserProfile | null = null;
   saving = false;
-  colorFilters = ['default', 'warm', 'cool'];
-  textSizes = ['small', 'medium', 'large'];
+  colorFilters = ['default', 'warm', 'cool', 'grayscale'];
+  textSizes = ['small', 'medium', 'large', 'extra-large'];
 
   constructor(
     private userService: UserService,
@@ -28,7 +36,10 @@ export class SettingsComponent implements OnInit {
 
     this.userService.getCurrentUser().subscribe({
       next: (profile) => {
-        this.profile = profile;
+        this.profile = {
+          ...profile,
+          settings: this.accessibilityService.normalizeSettings(profile.settings)
+        };
       },
       error: () => {
         this.router.navigate(['/login']);
@@ -53,12 +64,19 @@ export class SettingsComponent implements OnInit {
     this.persistSettings({ textSize: size });
   }
 
+  updateBooleanSetting(setting: BooleanAccessibilitySetting): void {
+    if (!this.profile) return;
+    this.persistSettings({ [setting]: this.profile.settings[setting] });
+  }
+
   getColorFilterLabel(filter: string): string {
     switch (filter) {
       case 'warm':
-        return 'Cálido';
+        return 'Calido';
       case 'cool':
-        return 'Frío';
+        return 'Frio';
+      case 'grayscale':
+        return 'Escala de grises';
       default:
         return 'Normal';
     }
@@ -67,9 +85,11 @@ export class SettingsComponent implements OnInit {
   getTextSizeLabel(size: string): string {
     switch (size) {
       case 'small':
-        return 'Pequeño';
+        return 'Pequeno';
       case 'large':
         return 'Grande';
+      case 'extra-large':
+        return 'Muy grande';
       default:
         return 'Mediano';
     }
@@ -82,16 +102,36 @@ export class SettingsComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  private persistSettings(payload: { colorFilter?: string; highContrast?: boolean; textSize?: string }): void {
+  private persistSettings(payload: Partial<UserProfile['settings']>): void {
+    if (!this.profile) return;
+
+    const previousSettings = this.profile.settings;
+    const optimisticSettings = this.accessibilityService.normalizeSettings({
+      ...previousSettings,
+      ...payload
+    });
+
+    this.profile.settings = optimisticSettings;
+    this.accessibilityService.persistUserSettings(optimisticSettings);
     this.saving = true;
+
     this.userService.updateSettings(payload).subscribe({
       next: ({ settings }) => {
         if (this.profile) {
-          this.profile.settings = settings;
+          this.profile.settings = this.accessibilityService.normalizeSettings({
+            ...optimisticSettings,
+            ...settings,
+            ...payload
+          });
+          this.accessibilityService.persistUserSettings(this.profile.settings);
         }
         this.saving = false;
       },
       error: () => {
+        if (this.profile) {
+          this.profile.settings = previousSettings;
+          this.accessibilityService.persistUserSettings(previousSettings);
+        }
         this.saving = false;
       }
     });

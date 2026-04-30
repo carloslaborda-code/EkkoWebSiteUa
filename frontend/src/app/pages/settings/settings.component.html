@@ -1,71 +1,160 @@
-<div class="settings-shell" [class.settings-shell--contrast]="profile?.settings?.highContrast">
-  <div class="glow glow-left"></div>
-  <div class="glow glow-top"></div>
-  <div class="glow glow-right"></div>
+<div class="settings-shell">
+  <div class="glow glow-left" aria-hidden="true"></div>
+  <div class="glow glow-top" aria-hidden="true"></div>
+  <div class="glow glow-right" aria-hidden="true"></div>
 
-  <main class="settings-frame">
-    <section class="settings-body" *ngIf="profile; else loadingState">
-      <a routerLink="/profile" class="back-link" aria-label="Volver">
+  <main id="main-content" class="settings-frame" tabindex="-1">
+    <section class="settings-body" *ngIf="profile; else loadingState" aria-labelledby="settings-title">
+      <a routerLink="/profile" class="back-link" aria-label="Volver al perfil">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </a>
 
-      <section class="settings-group">
-        <h2>CUENTA</h2>
+      <header class="settings-title-block">
+        <p>Ajustes</p>
+        <h1 id="settings-title">Accesibilidad y cuenta</h1>
+      </header>
+
+      <section class="settings-group" aria-labelledby="account-title">
+        <h2 id="account-title">CUENTA</h2>
         <button type="button" class="settings-item">
           <span class="item-left">Configuraci&oacute;n de la cuenta</span>
-          <span class="item-arrow">›</span>
+          <span class="item-arrow" aria-hidden="true">&rsaquo;</span>
         </button>
         <button type="button" class="settings-item">
           <span class="item-left">Privacidad</span>
-          <span class="item-arrow">›</span>
+          <span class="item-arrow" aria-hidden="true">&rsaquo;</span>
         </button>
         <button type="button" class="settings-item" (click)="logout()">
           <span class="item-left">Cerrar sesi&oacute;n</span>
         </button>
       </section>
 
-      <section class="settings-group">
-        <h2>ACCESIBILIDAD</h2>
-        <div class="settings-item settings-item--stack">
-          <div class="stack-top">
+      <section class="settings-group" aria-labelledby="accessibility-title">
+        <h2 id="accessibility-title">ACCESIBILIDAD</h2>
+
+        <fieldset class="settings-item settings-item--stack">
+          <legend class="stack-top">
             <span class="item-left">Filtros de color</span>
-            <span class="item-arrow">›</span>
-          </div>
-          <div class="chips-row">
-            <button type="button" class="chip" *ngFor="let filter of colorFilters" [class.chip--active]="profile.settings.colorFilter === filter" (click)="updateFilter(filter)">
+          </legend>
+          <p class="item-help">Ajusta la temperatura o elimina el color para mejorar la diferenciaci&oacute;n visual.</p>
+          <div class="chips-row" role="group" aria-label="Filtro de color">
+            <button
+              type="button"
+              class="chip"
+              *ngFor="let filter of colorFilters"
+              [class.chip--active]="profile.settings.colorFilter === filter"
+              [attr.aria-pressed]="profile.settings.colorFilter === filter"
+              (click)="updateFilter(filter)"
+            >
               {{ getColorFilterLabel(filter) }}
             </button>
           </div>
-        </div>
+        </fieldset>
 
-        <label class="settings-item settings-item--toggle">
-          <span class="item-left">Alto contraste</span>
-          <span class="toggle">
-            <input type="checkbox" [(ngModel)]="profile.settings.highContrast" (change)="updateContrast()" />
-            <span class="toggle-slider"></span>
-          </span>
-        </label>
-
-        <div class="settings-item settings-item--stack">
-          <div class="stack-top">
+        <fieldset class="settings-item settings-item--stack">
+          <legend class="stack-top">
             <span class="item-left">Tama&ntilde;o del texto</span>
-            <span class="item-arrow">›</span>
-          </div>
-          <div class="chips-row">
-            <button type="button" class="chip" *ngFor="let size of textSizes" [class.chip--active]="profile.settings.textSize === size" (click)="updateTextSize(size)">
+          </legend>
+          <p class="item-help">Aumenta el tama&ntilde;o base de la interfaz sin perder estructura.</p>
+          <div class="chips-row" role="group" aria-label="Tamano del texto">
+            <button
+              type="button"
+              class="chip"
+              *ngFor="let size of textSizes"
+              [class.chip--active]="profile.settings.textSize === size"
+              [attr.aria-pressed]="profile.settings.textSize === size"
+              (click)="updateTextSize(size)"
+            >
               {{ getTextSizeLabel(size) }}
             </button>
           </div>
-        </div>
+        </fieldset>
+
+        <label class="settings-item settings-item--toggle">
+          <span>
+            <span class="item-left">Alto contraste</span>
+            <span class="item-help">Refuerza bordes, foco y contraste de textos y controles.</span>
+          </span>
+          <span class="toggle">
+            <input type="checkbox" [(ngModel)]="profile.settings.highContrast" (change)="updateContrast()" />
+            <span class="toggle-slider" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <label class="settings-item settings-item--toggle">
+          <span>
+            <span class="item-left">Reducir movimiento</span>
+            <span class="item-help">Desactiva transiciones, animaciones y desplazamientos suaves.</span>
+          </span>
+          <span class="toggle">
+            <input type="checkbox" [(ngModel)]="profile.settings.reducedMotion" (change)="updateBooleanSetting('reducedMotion')" />
+            <span class="toggle-slider" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <label class="settings-item settings-item--toggle">
+          <span>
+            <span class="item-left">Controles grandes</span>
+            <span class="item-help">Aumenta el area tactil para personas con dificultad de movimiento.</span>
+          </span>
+          <span class="toggle">
+            <input type="checkbox" [(ngModel)]="profile.settings.largeTargets" (change)="updateBooleanSetting('largeTargets')" />
+            <span class="toggle-slider" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <label class="settings-item settings-item--toggle">
+          <span>
+            <span class="item-left">Subrayar enlaces</span>
+            <span class="item-help">Anade una senal no dependiente del color en enlaces y acciones.</span>
+          </span>
+          <span class="toggle">
+            <input type="checkbox" [(ngModel)]="profile.settings.underlineLinks" (change)="updateBooleanSetting('underlineLinks')" />
+            <span class="toggle-slider" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <label class="settings-item settings-item--toggle">
+          <span>
+            <span class="item-left">Tipografia legible</span>
+            <span class="item-help">Usa una fuente mas espaciada y mejora la altura de linea.</span>
+          </span>
+          <span class="toggle">
+            <input type="checkbox" [(ngModel)]="profile.settings.readableFont" (change)="updateBooleanSetting('readableFont')" />
+            <span class="toggle-slider" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <label class="settings-item settings-item--toggle">
+          <span>
+            <span class="item-left">Modo lector de pantalla</span>
+            <span class="item-help">Reduce decoracion visual y mantiene nombres claros para la navegacion asistida.</span>
+          </span>
+          <span class="toggle">
+            <input type="checkbox" [(ngModel)]="profile.settings.screenReaderMode" (change)="updateBooleanSetting('screenReaderMode')" />
+            <span class="toggle-slider" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <label class="settings-item settings-item--toggle">
+          <span>
+            <span class="item-left">Transcripciones visibles</span>
+            <span class="item-help">Muestra texto equivalente al audio o video cuando existe contenido textual.</span>
+          </span>
+          <span class="toggle">
+            <input type="checkbox" [(ngModel)]="profile.settings.showTranscripts" (change)="updateBooleanSetting('showTranscripts')" />
+            <span class="toggle-slider" aria-hidden="true"></span>
+          </span>
+        </label>
       </section>
 
-      <p class="saving-message" *ngIf="saving">Guardando ajustes...</p>
+      <p class="saving-message" *ngIf="saving" role="status" aria-live="polite">Guardando ajustes...</p>
     </section>
 
     <ng-template #loadingState>
-      <p class="empty-state">Cargando ajustes...</p>
+      <p class="empty-state" role="status">Cargando ajustes...</p>
     </ng-template>
   </main>
 </div>

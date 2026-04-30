@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Quote = require('../models/quote');
 const { defaultUploads, defaultUserSettings } = require('../data/defaultUserData');
+const allowedColorFilters = ['default', 'warm', 'cool', 'grayscale'];
+const allowedTextSizes = ['small', 'medium', 'large', 'extra-large'];
 
 const hasLegacyMockUploads = (uploads = []) => {
   const legacyTitles = ['Techno Echo 01', 'Vocal Snippet B', 'Mix Master Loop', 'Techno Echo 01'];
@@ -49,7 +51,7 @@ const ensureUserDefaults = async (user) => {
     user.settings = defaultUserSettings;
     changed = true;
   } else {
-    if (!user.settings.colorFilter) {
+    if (!allowedColorFilters.includes(user.settings.colorFilter)) {
       user.settings.colorFilter = defaultUserSettings.colorFilter;
       changed = true;
     }
@@ -59,10 +61,24 @@ const ensureUserDefaults = async (user) => {
       changed = true;
     }
 
-    if (!user.settings.textSize) {
+    if (!allowedTextSizes.includes(user.settings.textSize)) {
       user.settings.textSize = defaultUserSettings.textSize;
       changed = true;
     }
+
+    [
+      'reducedMotion',
+      'largeTargets',
+      'underlineLinks',
+      'readableFont',
+      'screenReaderMode',
+      'showTranscripts'
+    ].forEach((settingKey) => {
+      if (typeof user.settings[settingKey] !== 'boolean') {
+        user.settings[settingKey] = defaultUserSettings[settingKey];
+        changed = true;
+      }
+    });
   }
 
   if (!Array.isArray(user.savedQuotes)) {
@@ -266,7 +282,17 @@ const updateProfile = async (req, res) => {
 
 const updateSettings = async (req, res) => {
   try {
-    const { colorFilter, highContrast, textSize } = req.body;
+    const {
+      colorFilter,
+      highContrast,
+      textSize,
+      reducedMotion,
+      largeTargets,
+      underlineLinks,
+      readableFont,
+      screenReaderMode,
+      showTranscripts
+    } = req.body;
     const user = await User.findById(req.user._id);
 
     if (!user) {
@@ -277,9 +303,15 @@ const updateSettings = async (req, res) => {
 
     user.settings = {
       ...user.settings.toObject(),
-      ...(typeof colorFilter === 'string' ? { colorFilter } : {}),
+      ...(typeof colorFilter === 'string' && allowedColorFilters.includes(colorFilter) ? { colorFilter } : {}),
       ...(typeof highContrast === 'boolean' ? { highContrast } : {}),
-      ...(typeof textSize === 'string' ? { textSize } : {})
+      ...(typeof textSize === 'string' && allowedTextSizes.includes(textSize) ? { textSize } : {}),
+      ...(typeof reducedMotion === 'boolean' ? { reducedMotion } : {}),
+      ...(typeof largeTargets === 'boolean' ? { largeTargets } : {}),
+      ...(typeof underlineLinks === 'boolean' ? { underlineLinks } : {}),
+      ...(typeof readableFont === 'boolean' ? { readableFont } : {}),
+      ...(typeof screenReaderMode === 'boolean' ? { screenReaderMode } : {}),
+      ...(typeof showTranscripts === 'boolean' ? { showTranscripts } : {})
     };
 
     await user.save();

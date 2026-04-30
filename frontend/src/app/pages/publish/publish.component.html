@@ -1,9 +1,9 @@
 <div class="publish-shell">
-  <div class="glow glow-left"></div>
-  <div class="glow glow-top"></div>
-  <div class="glow glow-right"></div>
+  <div class="glow glow-left" aria-hidden="true"></div>
+  <div class="glow glow-top" aria-hidden="true"></div>
+  <div class="glow glow-right" aria-hidden="true"></div>
 
-  <main class="publish-frame">
+  <main id="main-content" class="publish-frame" tabindex="-1">
     <header class="publish-header">
       <button type="button" class="back-link" (click)="router.navigate(['/home'])" aria-label="Volver">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -27,10 +27,10 @@
         </div>
 
         <div class="format-switch">
-          <button type="button" class="format-option" [class.format-option--active]="mediaType === 'audio'" (click)="setMediaType('audio')">
+          <button type="button" class="format-option" [class.format-option--active]="mediaType === 'audio'" [attr.aria-pressed]="mediaType === 'audio'" (click)="setMediaType('audio')">
             Audio
           </button>
-          <button type="button" class="format-option" [class.format-option--active]="mediaType === 'video'" (click)="setMediaType('video')">
+          <button type="button" class="format-option" [class.format-option--active]="mediaType === 'video'" [attr.aria-pressed]="mediaType === 'video'" (click)="setMediaType('video')">
             Video
           </button>
         </div>
@@ -70,6 +70,8 @@
                   [max]="videoDurationSeconds || 0"
                   step="0.1"
                   [(ngModel)]="selectedCoverTimeSeconds"
+                  (input)="onCoverTimeChange()"
+                  (change)="onCoverTimeChange()"
                 />
                 <strong>{{ formatTimestamp(selectedCoverTimeSeconds) }}</strong>
               </div>
@@ -81,7 +83,7 @@
               [disabled]="!videoDurationSeconds || capturingCover"
               (click)="captureCoverFromSelectedFrame()"
             >
-              {{ capturingCover ? 'Capturando frame...' : 'Usar este frame como portada' }}
+              {{ capturingCover ? 'Previsualizando frame...' : 'Previsualizar este frame' }}
             </button>
           </section>
 
@@ -121,7 +123,7 @@
         <div class="section-head">
           <h2>LA CITA / FRAGMENTO</h2>
         </div>
-        <textarea [(ngModel)]="quoteText" rows="4" placeholder='Ej.: "Los ojos, chico. Nunca mienten."'></textarea>
+        <textarea [(ngModel)]="quoteText" rows="4" aria-label="Texto de la cita o fragmento" placeholder='Ej.: "Los ojos, chico. Nunca mienten."'></textarea>
 
         <div class="section-head">
           <h2>CATEGOR&Iacute;A</h2>
@@ -132,6 +134,7 @@
             class="category-chip"
             *ngFor="let option of categories"
             [class.category-chip--active]="category === option.value"
+            [attr.aria-pressed]="category === option.value"
             (click)="category = option.value"
           >
             {{ option.label }}

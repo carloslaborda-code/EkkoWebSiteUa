@@ -26,7 +26,17 @@ describe('ProfileComponent', () => {
                 downloads: 45,
                 uploads: [],
                 savedQuotes: [],
-                settings: { colorFilter: 'default', highContrast: false, textSize: 'medium' },
+                settings: {
+                  colorFilter: 'default',
+                  highContrast: false,
+                  textSize: 'medium',
+                  reducedMotion: false,
+                  largeTargets: false,
+                  underlineLinks: false,
+                  readableFont: false,
+                  screenReaderMode: false,
+                  showTranscripts: false
+                },
                 role: 'user'
               })
           }

@@ -1,9 +1,9 @@
 <div class="profile-shell" [class.profile-shell--contrast]="profile?.settings?.highContrast">
-  <div class="glow glow-left"></div>
-  <div class="glow glow-top"></div>
-  <div class="glow glow-right"></div>
+  <div class="glow glow-left" aria-hidden="true"></div>
+  <div class="glow glow-top" aria-hidden="true"></div>
+  <div class="glow glow-right" aria-hidden="true"></div>
 
-  <main class="profile-frame">
+  <main id="main-content" class="profile-frame" tabindex="-1">
     <header class="profile-topbar">
       <a routerLink="/settings" class="settings-link" aria-label="Ajustes">
         <app-icon name="cog-6-tooth" className="h-5 w-5"></app-icon>
@@ -77,7 +77,16 @@
         <section class="uploads-section" *ngIf="profile.savedQuotes?.length">
           <h2>Guardados</h2>
           <div class="uploads-grid">
-            <article class="upload-card upload-card--saved" *ngFor="let saved of profile.savedQuotes" (click)="router.navigate(['/quote', saved._id])">
+            <article
+              class="upload-card upload-card--saved"
+              *ngFor="let saved of profile.savedQuotes"
+              role="button"
+              tabindex="0"
+              [attr.aria-label]="'Abrir guardado ' + saved.workTitle"
+              (click)="router.navigate(['/quote', saved._id])"
+              (keydown.enter)="router.navigate(['/quote', saved._id])"
+              (keydown.space)="$event.preventDefault(); router.navigate(['/quote', saved._id])"
+            >
               <div class="upload-art upload-art--saved">
                 <img [src]="saved.image" [alt]="saved.workTitle" class="saved-image" />
                 <span class="saved-badge">{{ saved.mediaType === 'audio' ? 'Audio' : 'Video' }}</span>

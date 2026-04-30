@@ -54,6 +54,10 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/discover']);
   }
 
+  openQuote(quoteId: string): void {
+    this.router.navigate(['/quote', quoteId]);
+  }
+
   get isLoggedIn(): boolean {
     return !!localStorage.getItem('token');
   }

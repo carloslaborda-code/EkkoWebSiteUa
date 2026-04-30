@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { AccessibilityService } from '../../services/accessibility.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -14,13 +15,17 @@ export class LoginComponent {
   errorMessage = '';
   isSubmitting = false;
 
-  constructor(private auth: AuthService, public router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private accessibilityService: AccessibilityService,
+    public router: Router
+  ) {}
 
   login(): void {
     this.errorMessage = '';
 
     if (!this.email.trim() || !this.password.trim()) {
-      this.errorMessage = 'Introduce tu correo o usuario y tu contraseña.';
+      this.errorMessage = 'Introduce tu correo o usuario y tu contrasena.';
       return;
     }
 
@@ -35,12 +40,15 @@ export class LoginComponent {
       next: (res) => {
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.user));
+        if (res.user.settings) {
+          this.accessibilityService.persistUserSettings(res.user.settings);
+        }
         this.isSubmitting = false;
         this.router.navigate(['/home']);
       },
       error: (err: HttpErrorResponse) => {
         this.isSubmitting = false;
-        this.errorMessage = err.error?.message || 'No se pudo iniciar sesión. Revisa que el backend esté arrancado.';
+        this.errorMessage = err.error?.message || 'No se pudo iniciar sesion. Revisa que el backend este arrancado.';
       }
     });
   }

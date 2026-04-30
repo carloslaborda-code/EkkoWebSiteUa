@@ -1,9 +1,9 @@
 <div class="detail-shell">
-  <div class="glow glow-left"></div>
-  <div class="glow glow-top"></div>
-  <div class="glow glow-right"></div>
+  <div class="glow glow-left" aria-hidden="true"></div>
+  <div class="glow glow-top" aria-hidden="true"></div>
+  <div class="glow glow-right" aria-hidden="true"></div>
 
-  <main class="detail-frame" *ngIf="quote; else loadingState">
+  <main id="main-content" class="detail-frame" tabindex="-1" *ngIf="quote; else loadingState">
     <header class="detail-header">
       <button
         type="button"
@@ -27,18 +27,26 @@
           [src]="quote.mediaUrl"
           controls
           autoplay
+          [attr.aria-label]="'Video de ' + quote.workTitle + ': ' + quote.text"
           (loadedmetadata)="updateDuration($event)"
         ></video>
 
         <div *ngIf="isPlaying && quote.mediaType === 'audio'" class="audio-player-wrap">
           <img [src]="quote.image" [alt]="quote.workTitle" class="audio-poster" />
-          <audio class="audio-player" [src]="quote.mediaUrl" controls autoplay (loadedmetadata)="updateDuration($event)"></audio>
+          <audio class="audio-player" [src]="quote.mediaUrl" controls autoplay [attr.aria-label]="'Audio de ' + quote.workTitle + ': ' + quote.text" (loadedmetadata)="updateDuration($event)"></audio>
         </div>
 
         <button *ngIf="!isPlaying" type="button" class="play-overlay" (click)="startPlayback()" [attr.aria-label]="'Reproducir ' + quote.workTitle">
           <app-icon name="play-solid" className="h-7 w-7"></app-icon>
         </button>
       </div>
+    </section>
+
+    <section class="accessibility-transcript" aria-labelledby="transcript-title">
+      <h2 id="transcript-title">Transcripcion del fragmento</h2>
+      <p>"{{ quote.text }}"</p>
+      <p>{{ quote.workTitle }} ({{ quote.year }}). {{ quote.actorName }} como {{ quote.characterName }}.</p>
+      <p>{{ quote.synopsis }}</p>
     </section>
 
     <section class="detail-body">
@@ -53,6 +61,7 @@
             *ngFor="let star of ratingStars"
             [class.rating-star--active]="star <= userRating"
             [disabled]="ratingSaving"
+            [attr.aria-label]="'Valorar con ' + star + ' de 5'"
             (click)="rateQuote(star)"
           >
             <app-icon [name]="star <= userRating ? 'star-solid' : 'star'" className="h-7 w-7"></app-icon>
@@ -63,19 +72,19 @@
       </section>
 
       <div class="action-card">
-        <button type="button" class="action-button" (click)="handleDownload()">
+        <button type="button" class="action-button" (click)="handleDownload()" [attr.aria-label]="'Descargar ' + quote.workTitle">
           <span class="action-icon">
             <app-icon name="arrow-down-tray" className="h-5 w-5"></app-icon>
           </span>
           <span>DESCARGAR</span>
         </button>
-        <button type="button" class="action-button" (click)="shareContent()">
+        <button type="button" class="action-button" (click)="shareContent()" [attr.aria-label]="'Compartir ' + quote.workTitle">
           <span class="action-icon">
             <app-icon name="share" className="h-5 w-5"></app-icon>
           </span>
           <span>COMPARTIR</span>
         </button>
-        <button type="button" class="action-button" (click)="toggleSave()">
+        <button type="button" class="action-button" (click)="toggleSave()" [attr.aria-label]="isSaved ? 'Quitar de guardados' : 'Guardar ' + quote.workTitle">
           <span class="action-icon">
             <app-icon [name]="isSaved ? 'bookmark-solid' : 'bookmark'" className="h-5 w-5"></app-icon>
           </span>

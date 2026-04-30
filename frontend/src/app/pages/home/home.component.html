@@ -1,9 +1,9 @@
 <div class="home-shell">
-  <div class="ambient ambient-left"></div>
-  <div class="ambient ambient-top"></div>
-  <div class="ambient ambient-right"></div>
+  <div class="ambient ambient-left" aria-hidden="true"></div>
+  <div class="ambient ambient-top" aria-hidden="true"></div>
+  <div class="ambient ambient-right" aria-hidden="true"></div>
 
-  <main class="home-frame">
+  <main id="main-content" class="home-frame" tabindex="-1">
     <header class="home-header">
       <div class="brand-block">
         <div class="brand-row">
@@ -91,6 +91,11 @@
         [class.quote-card--image]="quote.image"
         [class.quote-card--placeholder]="!quote.image"
         [routerLink]="['/quote', quote._id]"
+        role="link"
+        tabindex="0"
+        [attr.aria-label]="'Abrir fragmento de ' + quote.workTitle + ': ' + quote.text"
+        (keydown.enter)="openQuote(quote._id)"
+        (keydown.space)="$event.preventDefault(); openQuote(quote._id)"
       >
         <div
           class="quote-media"

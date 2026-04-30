@@ -43,6 +43,31 @@ Despues abre en el movil la IP local del ordenador en el puerto `4200`.
 - `src/assets`: imagenes, media y recursos estaticos
 - `src/styles.css`: variables y reglas globales responsive
 
+## Accesibilidad
+
+El frontend aplica los ajustes de accesibilidad desde `src/app/services/accessibility.service.ts`. El servicio lee la configuracion guardada del usuario y activa atributos globales en `html` para que `src/styles.css` adapte toda la interfaz.
+
+Opciones disponibles desde `Settings`:
+
+- filtros de color: normal, calido, frio y escala de grises
+- alto contraste
+- tamano de texto pequeno, mediano, grande y muy grande
+- reduccion de movimiento
+- controles grandes para facilitar interaccion tactil o motriz
+- subrayado de enlaces y acciones
+- tipografia mas legible
+- modo lector de pantalla
+- transcripciones visibles en contenido multimedia
+
+Medidas implementadas:
+
+- enlace `Saltar al contenido principal`
+- `id="main-content"` en las vistas principales
+- foco visible global con `:focus-visible`
+- `aria-label`, `aria-current`, `aria-pressed` y decoraciones con `aria-hidden`
+- tarjetas de resultados navegables por teclado con `Enter` y `Espacio`
+- transcripcion opcional en `detail`
+
 ## Verificacion rapida
 
 ```bash
@@ -55,6 +80,8 @@ frontend\node_modules\.bin\tsc.cmd -p tsconfig.spec.json --noEmit
 - la app esta preparada para movil y escritorio
 - `home` muestra destacados por categoria
 - `discover` usa filtros y layout adaptado a desktop
-- `publish` permite portada manual y captura de frame desde video
-- `detail` cachea contenido y evita cargas pesadas anticipadas
+- la navbar de escritorio usa el color dorado como indicador de pagina activa
+- `publish` permite portada manual y previsualizacion de frame desde video
+- `detail` carga contenido sin cache para evitar datos desactualizados
+- `settings` aplica accesibilidad global persistente
 - los medios nuevos se publican pensando en Cloudinary desde backend

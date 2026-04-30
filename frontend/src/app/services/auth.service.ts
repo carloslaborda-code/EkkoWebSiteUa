@@ -23,6 +23,12 @@ export interface AuthResponse {
       colorFilter: string;
       highContrast: boolean;
       textSize: string;
+      reducedMotion: boolean;
+      largeTargets: boolean;
+      underlineLinks: boolean;
+      readableFont: boolean;
+      screenReaderMode: boolean;
+      showTranscripts: boolean;
     };
     role: string;
   };

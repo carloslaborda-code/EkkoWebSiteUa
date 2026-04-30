@@ -11,6 +11,9 @@
 .brand-logo-image { width: clamp(82px, 24vw, 98px); justify-self: center; }
 .header-space { width: 40px; height: 40px; }
 .hero-card { padding: 12px var(--screen-padding) 0; }
+.accessibility-transcript { margin: 14px var(--screen-padding-wide) 0; padding: 16px; border: 1px solid rgba(214,190,138,.18); border-radius: 16px; background: rgba(28,26,22,.72); }
+.accessibility-transcript h2 { margin: 0 0 10px; color: #d6be8a; font-size: 1rem; letter-spacing: .08em; text-transform: uppercase; }
+.accessibility-transcript p { margin: 8px 0 0; color: #e6edf8; line-height: 1.7; }
 .media-frame { position: relative; overflow: hidden; border-radius: 14px; background: #10151f; min-height: clamp(220px, 58vw, 340px); }
 .media-frame--audio { background: linear-gradient(145deg, #d1d1d1, #b8b8b8); }
 .media-poster, .media-player, .audio-poster { display: block; width: 100%; height: clamp(220px, 58vw, 340px); object-fit: cover; }
@@ -65,6 +68,7 @@
   }
 
   .hero-card,
+  .accessibility-transcript,
   .detail-body,
   .detail-header {
     width: calc(100% - var(--desktop-sidebar-width) - (var(--desktop-content-gap) * 2));
