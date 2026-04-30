@@ -1,0 +1,53 @@
+.back-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+
+.back-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(0);
+    opacity: 0;
+    transition: transform .25s ease, opacity .25s ease;
+}
+
+
+.back-button .icon {
+    position: relative;
+    display: inline-block;
+    transition: transform .25s ease;
+}
+
+
+.back-button:hover::before {
+    transform: translateX(-4px) scale(1);
+    opacity: 1;
+}
+
+.back-button:hover .icon {
+    transform: translateX(-4px);
+}
+
+
+.back-button:active .icon {
+    transform: translateX(-2px) scale(.95);
+}
+
+.back-button:active::before {
+    transform: translateX(-2px) scale(.95);
+}
+
+.back-button:active .icon {
+    transform: translateX(-2px) scale(.95);
+}

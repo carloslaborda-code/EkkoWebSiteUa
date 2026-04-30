@@ -5,8 +5,8 @@
 
   <main id="main-content" class="home-frame" tabindex="-1">
     <header class="home-header">
-      <div class="brand-block">
-        <div class="brand-row">
+      <div class="brand-block" [routerLink]="['/home']">
+        <div class=" brand-row">
           <img class="brand-logo-image" src="assets/images/ekko-logo.png" alt="Ekko" />
         </div>
       </div>
@@ -14,7 +14,8 @@
       <button type="button" class="icon-button icon-button--header" aria-label="Perfil" (click)="openProfile()">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
-          <path d="M4.5 19.5a8.5 8.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M4.5 19.5a8.5 8.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" />
         </svg>
       </button>
     </header>
@@ -22,41 +23,18 @@
     <section class="search-row">
       <label class="search-box" for="home-search">
         <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M11 19a8 8 0 1 1 5.3-14l.2.18A8 8 0 0 1 11 19Z"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <path
-            d="m20 20-3.5-3.5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
+          <path d="M11 19a8 8 0 1 1 5.3-14l.2.18A8 8 0 0 1 11 19Z" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" />
+          <path d="m20 20-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
         </svg>
-        <input
-          id="home-search"
-          type="search"
-          name="search"
-          [(ngModel)]="searchTerm"
-          (ngModelChange)="onSearchChange()"
-          placeholder="Busca frases ic&oacute;nicas..."
-        />
+        <input id="home-search" type="search" name="search" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
+          placeholder="Busca frases ic&oacute;nicas..." />
       </label>
 
       <button type="button" class="icon-button filter-button" aria-label="Filtros" (click)="openDiscover()">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M4 6h10M4 18h16M10 12h10"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
+          <path d="M4 6h10M4 18h16M10 12h10" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" />
           <circle cx="17" cy="6" r="2" fill="none" stroke="currentColor" stroke-width="1.8" />
           <circle cx="7" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.8" />
           <circle cx="13" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.8" />
@@ -67,8 +45,11 @@
     <section class="desktop-hero" aria-label="Resumen de exploracion">
       <div class="desktop-hero-copy">
         <p class="desktop-kicker">Explorar contenido</p>
-        <h1>Ekko te ayuda a localizar frases, escenas y fragmentos de audio dentro de peliculas, series y videojuegos.</h1>
-        <p class="desktop-summary">La aplicacion esta pensada para descubrir contenido memorable, filtrarlo por formato o categoria y acceder rapido a cada fragmento para reproducirlo, guardarlo o compartirlo.</p>
+        <h1>Ekko te ayuda a localizar frases, escenas y fragmentos de audio dentro de peliculas, series y videojuegos.
+        </h1>
+        <p class="desktop-summary">La aplicacion esta pensada para descubrir contenido memorable, filtrarlo por formato
+          o
+          categoria y acceder rapido a cada fragmento para reproducirlo, guardarlo o compartirlo.</p>
       </div>
       <div class="desktop-hero-stats">
         <article class="desktop-stat-card">
@@ -83,25 +64,17 @@
     </section>
 
     <section class="feed-section" aria-live="polite">
-      <p *ngIf="!loading && !visibleQuotes.length" class="state-message">No se han encontrado resultados para esa b&uacute;squeda.</p>
+      <p *ngIf="!loading && !visibleQuotes.length" class="state-message">No se han encontrado resultados para esa
+        b&uacute;squeda.</p>
 
-      <article
-        *ngFor="let quote of visibleQuotes; trackBy: trackByQuoteId"
-        class="quote-card"
-        [class.quote-card--image]="quote.image"
-        [class.quote-card--placeholder]="!quote.image"
-        [routerLink]="['/quote', quote._id]"
-        role="link"
-        tabindex="0"
+      <article *ngFor="let quote of visibleQuotes; trackBy: trackByQuoteId" class="quote-card"
+        [class.quote-card--image]="quote.image" [class.quote-card--placeholder]="!quote.image"
+        [routerLink]="['/quote', quote._id]" role="link" tabindex="0"
         [attr.aria-label]="'Abrir fragmento de ' + quote.workTitle + ': ' + quote.text"
-        (keydown.enter)="openQuote(quote._id)"
-        (keydown.space)="$event.preventDefault(); openQuote(quote._id)"
-      >
-        <div
-          class="quote-media"
+        (keydown.enter)="openQuote(quote._id)" (keydown.space)="$event.preventDefault(); openQuote(quote._id)">
+        <div class="quote-media"
           [style.background-image]="quote.image ? 'linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.82)), url(' + quote.image + ')' : null"
-          [class.quote-media--placeholder]="!quote.image"
-        >
+          [class.quote-media--placeholder]="!quote.image">
           <div *ngIf="!quote.image" class="placeholder-mark">{{ quote.workTitle | slice:0:1 }}</div>
           <span class="media-badge" [class.media-badge--audio]="quote.mediaType === 'audio'">
             {{ quote.mediaType === 'audio' ? 'Audio' : 'Video' }}
@@ -116,25 +89,19 @@
 
             <div class="quote-stats">
               <div class="stars" [attr.aria-label]="'Puntuacion ' + quote.rating + ' de 5'">
-                <svg *ngFor="let filled of getStarArray(quote.rating)" viewBox="0 0 24 24" [class.star--muted]="!filled">
+                <svg *ngFor="let filled of getStarArray(quote.rating)" viewBox="0 0 24 24"
+                  [class.star--muted]="!filled">
                   <path
                     d="m12 3.6 2.7 5.46 6.03.88-4.36 4.25 1.03 6-5.4-2.84-5.4 2.84 1.03-6L3.27 9.94l6.03-.88L12 3.6Z"
-                    fill="currentColor"
-                  />
+                    fill="currentColor" />
                 </svg>
                 <span>{{ quote.rating.toFixed(1) }}</span>
               </div>
 
               <div class="views">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.7"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
+                  <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" fill="none" stroke="currentColor"
+                    stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
                   <circle cx="12" cy="12" r="2.7" fill="none" stroke="currentColor" stroke-width="1.7" />
                 </svg>
                 <span>{{ quote.views }}</span>

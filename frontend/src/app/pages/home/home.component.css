@@ -178,7 +178,23 @@
 }
 
 .icon-button--header svg {
-  transition: transform 0.2s ease;
+  transition: transform .2s ease;
+}
+
+/* botón filtros */
+
+.filter-button:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.filter-button:hover svg {
+  transform: scale(1.1);
+}
+
+.filter-button svg {
+  transition: transform .2s ease;
 }
 
 /* */
