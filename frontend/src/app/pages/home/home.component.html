@@ -76,8 +76,8 @@
           <strong>{{ visibleQuotes.length }}</strong>
         </article>
         <article class="desktop-stat-card">
-          <span>Formatos</span>
-          <strong>Audio + Video</strong>
+          <span>{{ searchTerm.trim() ? 'Busqueda' : 'Formatos' }}</span>
+          <strong>{{ searchTerm.trim() ? 'Base completa' : 'Audio + Video' }}</strong>
         </article>
       </div>
     </section>

@@ -129,12 +129,13 @@ La pagina de inicio presenta una vista de acceso rapido al contenido destacado d
 
 - buscador por texto;
 - visualizacion de fragmentos destacados;
+- busqueda en toda la coleccion al escribir, con ordenacion por parecido al texto;
 - acceso al detalle de cada publicacion;
 - indicador visual de formato, valoracion y visualizaciones.
 
 #### Criterio de destacados
 
-No se muestran todas las publicaciones. En su lugar, `Home` selecciona un resultado destacado por cada categoria:
+Cuando el buscador esta vacio no se muestran todas las publicaciones. En su lugar, `Home` selecciona un resultado destacado por cada categoria:
 
 - pelicula
 - serie
@@ -150,7 +151,8 @@ La eleccion se realiza segun:
 
 - acceso inmediato al contenido mas relevante;
 - reduccion de sobrecarga visual;
-- jerarquia clara entre buscador, resumen e items destacados.
+- jerarquia clara entre buscador, resumen e items destacados;
+- resultados reactivos mientras se escribe sin limitar la busqueda a los destacados.
 
 ### 7.2 Discover
 

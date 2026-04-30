@@ -78,7 +78,7 @@ frontend\node_modules\.bin\tsc.cmd -p tsconfig.spec.json --noEmit
 ## Notas del proyecto
 
 - la app esta preparada para movil y escritorio
-- `home` muestra destacados por categoria
+- `home` muestra destacados por categoria y busca en toda la coleccion al escribir
 - `discover` usa filtros y layout adaptado a desktop
 - la navbar de escritorio usa el color dorado como indicador de pagina activa
 - `publish` permite portada manual y previsualizacion de frame desde video
