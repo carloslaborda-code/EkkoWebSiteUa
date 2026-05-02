@@ -14,7 +14,7 @@ export class HomeComponent implements OnInit {
   searchTerm = '';
   loading = true;
 
-  constructor(private quoteService: QuoteService, private router: Router) {}
+  constructor(private quoteService: QuoteService, public router: Router) {}
 
   ngOnInit(): void {
     this.loadQuotes();
