@@ -1,9 +1,9 @@
 <div class="detail-shell">
-  <div class="glow glow-left"></div>
-  <div class="glow glow-top"></div>
-  <div class="glow glow-right"></div>
+  <div class="glow glow-left" aria-hidden="true"></div>
+  <div class="glow glow-top" aria-hidden="true"></div>
+  <div class="glow glow-right" aria-hidden="true"></div>
 
-  <main class="detail-frame" *ngIf="quote; else loadingState">
+  <main id="main-content" class="detail-frame" tabindex="-1" *ngIf="quote; else loadingState">
     <header class="detail-header">
       <button
         type="button"
@@ -13,13 +13,13 @@
       >
         <app-icon name="chevron-left" className="h-6 w-6"></app-icon>
       </button>
-      <img class="brand-logo-image" src="assets/images/ekko-logo.png" alt="Ekko" />
+      <img class="brand-logo-image" src="assets/images/ekko-logo.png" alt="Ekko" decoding="async" />
       <div class="header-space"></div>
     </header>
 
     <section class="hero-card">
       <div class="media-frame" [class.media-frame--audio]="quote.mediaType === 'audio'">
-        <img *ngIf="!isPlaying" [src]="quote.image" [alt]="quote.workTitle" class="media-poster" />
+        <img *ngIf="!isPlaying" [src]="quote.image" [alt]="quote.workTitle" class="media-poster" decoding="async" fetchpriority="high" />
 
         <video
           *ngIf="isPlaying && quote.mediaType === 'video'"
@@ -27,12 +27,13 @@
           [src]="quote.mediaUrl"
           controls
           autoplay
+          [attr.aria-label]="'Video de ' + quote.workTitle + ': ' + quote.text"
           (loadedmetadata)="updateDuration($event)"
         ></video>
 
         <div *ngIf="isPlaying && quote.mediaType === 'audio'" class="audio-player-wrap">
-          <img [src]="quote.image" [alt]="quote.workTitle" class="audio-poster" />
-          <audio class="audio-player" [src]="quote.mediaUrl" controls autoplay (loadedmetadata)="updateDuration($event)"></audio>
+          <img [src]="quote.image" [alt]="quote.workTitle" class="audio-poster" decoding="async" />
+          <audio class="audio-player" [src]="quote.mediaUrl" controls autoplay [attr.aria-label]="'Audio de ' + quote.workTitle + ': ' + quote.text" (loadedmetadata)="updateDuration($event)"></audio>
         </div>
 
         <button *ngIf="!isPlaying" type="button" class="play-overlay" (click)="startPlayback()" [attr.aria-label]="'Reproducir ' + quote.workTitle">
@@ -50,9 +51,10 @@
           <button
             type="button"
             class="rating-star"
-            *ngFor="let star of ratingStars"
+            *ngFor="let star of ratingStars; trackBy: trackByNumber"
             [class.rating-star--active]="star <= userRating"
             [disabled]="ratingSaving"
+            [attr.aria-label]="'Valorar con ' + star + ' de 5'"
             (click)="rateQuote(star)"
           >
             <app-icon [name]="star <= userRating ? 'star-solid' : 'star'" className="h-7 w-7"></app-icon>
@@ -63,19 +65,19 @@
       </section>
 
       <div class="action-card">
-        <button type="button" class="action-button" (click)="handleDownload()">
+        <button type="button" class="action-button" (click)="handleDownload()" [attr.aria-label]="'Descargar ' + quote.workTitle">
           <span class="action-icon">
             <app-icon name="arrow-down-tray" className="h-5 w-5"></app-icon>
           </span>
           <span>DESCARGAR</span>
         </button>
-        <button type="button" class="action-button" (click)="shareContent()">
+        <button type="button" class="action-button" (click)="shareContent()" [attr.aria-label]="'Compartir ' + quote.workTitle">
           <span class="action-icon">
             <app-icon name="share" className="h-5 w-5"></app-icon>
           </span>
           <span>COMPARTIR</span>
         </button>
-        <button type="button" class="action-button" (click)="toggleSave()">
+        <button type="button" class="action-button" (click)="toggleSave()" [attr.aria-label]="isSaved ? 'Quitar de guardados' : 'Guardar ' + quote.workTitle">
           <span class="action-icon">
             <app-icon [name]="isSaved ? 'bookmark-solid' : 'bookmark'" className="h-5 w-5"></app-icon>
           </span>
@@ -106,7 +108,7 @@
         </div>
         <p>{{ quote.synopsis }}</p>
         <div class="hashtags-row" *ngIf="quote.hashtags?.length">
-          <span class="hashtag-chip" *ngFor="let hashtag of quote.hashtags">#{{ hashtag }}</span>
+          <span class="hashtag-chip" *ngFor="let hashtag of quote.hashtags; trackBy: trackByText">#{{ hashtag }}</span>
         </div>
       </section>
     </section>

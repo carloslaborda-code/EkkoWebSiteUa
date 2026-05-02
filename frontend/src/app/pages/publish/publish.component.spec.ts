@@ -1,12 +1,14 @@
 /// <reference types="jasmine" />
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 
 import { PublishComponent } from './publish.component';
 import { QuoteService } from '../../services/quotes.services';
+import { UserService } from '../../services/user.service';
 
 describe('PublishComponent', () => {
   let component: PublishComponent;
@@ -54,7 +56,16 @@ describe('PublishComponent', () => {
     TestBed.configureTestingModule({
       declarations: [PublishComponent],
       imports: [FormsModule, RouterTestingModule],
-      providers: [{ provide: QuoteService, useValue: quoteServiceStub }]
+      schemas: [NO_ERRORS_SCHEMA],
+      providers: [
+        { provide: QuoteService, useValue: quoteServiceStub },
+        {
+          provide: UserService,
+          useValue: {
+            syncPublishedUpload: jasmine.createSpy('syncPublishedUpload')
+          }
+        }
+      ]
     });
 
     fixture = TestBed.createComponent(PublishComponent);

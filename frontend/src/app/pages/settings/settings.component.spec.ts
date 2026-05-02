@@ -27,13 +27,29 @@ describe('SettingsComponent', () => {
                 downloads: 45,
                 uploads: [],
                 savedQuotes: [],
-                settings: { colorFilter: 'default', highContrast: false, textSize: 'medium' },
+                settings: {
+                  colorFilter: 'default',
+                  highContrast: false,
+                  textSize: 'medium',
+                  reducedMotion: false,
+                  largeTargets: false,
+                  underlineLinks: false,
+                  readableFont: false
+                },
                 role: 'user'
               }),
             updateSettings: () =>
               of({
                 message: 'ok',
-                settings: { colorFilter: 'default', highContrast: false, textSize: 'medium' }
+                settings: {
+                  colorFilter: 'default',
+                  highContrast: false,
+                  textSize: 'medium',
+                  reducedMotion: false,
+                  largeTargets: false,
+                  underlineLinks: false,
+                  readableFont: false
+                }
               })
           }
         }

@@ -1,5 +1,6 @@
-<div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-6 py-10 text-white md:px-10 lg:px-16">
-  <div class="pointer-events-none absolute inset-0">
+<main id="main-content" tabindex="-1"
+  class="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-6 py-10 text-white md:px-10 lg:px-16">
+  <div class="pointer-events-none absolute inset-0" aria-hidden="true">
     <div class="absolute top-8 left-8 h-14 w-14 rounded-full bg-white/30 blur-xl"></div>
     <div class="absolute top-12 right-6 h-10 w-10 rounded-full bg-white/40 blur-xl"></div>
     <div class="absolute top-36 left-6 h-8 w-8 rounded-full bg-white/20 blur-lg"></div>
@@ -10,85 +11,83 @@
 
   <div class="relative w-full max-w-sm md:max-w-md lg:max-w-5xl">
     <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_440px] lg:items-center lg:gap-20">
-    <div class="hidden lg:block">
-      <p class="mb-4 text-sm uppercase tracking-[0.28em] text-[#FFE8B7]/70">Ekko</p>
-      <h2 class="max-w-[12ch] text-5xl font-semibold leading-tight text-white">Crea tu cuenta desde una vista comoda tambien en escritorio.</h2>
-    </div>
-
-    <div>
-    <button type="button" aria-label="Volver" class="mb-10 text-white lg:mb-8" (click)="router.navigate(['/home'])">
-      <span class="text-4xl leading-none">&lsaquo;</span>
-    </button>
-
-    <div class="text-center mb-10 lg:text-left">
-      <h1 class="text-5xl font-light tracking-tight mb-2 transition-all duration-300 hover:-translate-y-0.5"
-        (click)="router.navigate(['/home'])">
-        ekko
-      </h1>
-
-      <h2 class="text-4xl font-semibold transition-all duration-300 hover:-translate-y-0.5">
-        Crear cuenta
-      </h2>
-    </div>
-
-    <form class="flex flex-col gap-5" (ngSubmit)="register()">
-      <div>
-        <label for="username" class="sr-only">Nombre completo</label>
-        <input id="username" name="username" type="text" [(ngModel)]="username" placeholder="Nombre completo" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
-           outline-none placeholder:text-[#626262]
-           transition-all duration-200 ease-out
-           hover:bg-white hover:shadow-md hover:-translate-y-0.5
-           focus:shadow-[inset_0_0_0_2px_#FFE8B7]
-           focus:bg-white" />
+      <div class="hidden lg:block">
+        <p class="mb-4 text-sm uppercase tracking-[0.28em] text-[#FFE8B7]/70">Ekko</p>
+        <h2 class="max-w-[12ch] text-5xl font-semibold leading-tight text-white">Crea tu cuenta desde una vista comoda
+          tambien en escritorio.</h2>
       </div>
 
       <div>
-        <label for="email" class="sr-only">Correo electr&oacute;nico</label>
-        <input id="email" name="email" type="email" [(ngModel)]="email" placeholder="Correo electr&oacute;nico" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
-           outline-none placeholder:text-[#626262]
-           transition-all duration-200 ease-out
-           hover:bg-white hover:shadow-md hover:-translate-y-0.5
-           focus:shadow-[inset_0_0_0_2px_#FFE8B7]
-           focus:bg-white" />
+        <button type="button" aria-label="Volver" class="back-button mb-10 text-white lg:mb-8"
+          (click)="router.navigate(['/home'])">
+          <span class="icon text-4xl leading-none">&lsaquo;</span>
+        </button>
+
+        <div class="mb-10 text-center lg:text-left">
+          <h1
+            class="mb-2 cursor-pointer text-5xl font-light tracking-tight transition-all duration-300 hover:-translate-y-0.5"
+            (click)="router.navigate(['/home'])">
+            ekko
+          </h1>
+
+          <h2 class="text-4xl font-semibold transition-all duration-300 hover:-translate-y-0.5">
+            Crear cuenta
+          </h2>
+        </div>
+
+        <form class="flex flex-col gap-5" (ngSubmit)="register()">
+          <div>
+            <label for="username" class="sr-only">Nombre de usuario</label>
+            <input id="username" name="username" type="text" autocomplete="username" [(ngModel)]="username"
+              placeholder="Nombre de usuario" maxlength="50" (input)="validate(); checkUsernameAvailability()"
+              class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white hover:shadow-md focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
+            <p *ngIf="usernameAvailable === true" class="mt-2 text-sm text-emerald-300">Nombre disponible.</p>
+            <p *ngIf="usernameAvailable === false" class="mt-2 text-sm text-red-200">Nombre no disponible.</p>
+          </div>
+
+          <div>
+            <label for="email" class="sr-only">Correo electr&oacute;nico</label>
+            <input id="email" name="email" type="email" autocomplete="email" [(ngModel)]="email"
+              placeholder="Correo electr&oacute;nico" maxlength="50" (input)="validate(); checkEmailAvailability()"
+              class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white hover:shadow-md focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
+            <p *ngIf="emailAvailable === true" class="mt-2 text-sm text-emerald-300">Correo disponible.</p>
+            <p *ngIf="emailAvailable === false" class="mt-2 text-sm text-red-200">Correo no disponible.</p>
+          </div>
+
+          <div>
+            <label for="password" class="sr-only">Contrase&ntilde;a</label>
+            <input id="password" name="password" type="password" autocomplete="new-password" [(ngModel)]="password"
+              placeholder="Contrase&ntilde;a" maxlength="100" (input)="validate()"
+              class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white hover:shadow-md focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
+          </div>
+
+          <div>
+            <label for="confirmPassword" class="sr-only">Confirmar contrase&ntilde;a</label>
+            <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password"
+              [(ngModel)]="confirmPassword" placeholder="Confirmar contrase&ntilde;a" maxlength="100"
+              (input)="validate()"
+              class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white hover:shadow-md focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
+          </div>
+
+          <p *ngIf="errorMessage" class="rounded-xl border border-red-400/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">
+            {{ errorMessage }}
+          </p>
+
+          <button type="submit" [disabled]="isSubmitting" class="mt-2 w-full rounded-xl bg-[#FFE8B7]/70 py-4 text-xl font-semibold text-white
+         transition-all duration-200 hover:scale-[1.02] hover:bg-[#FFE8B7] hover:text-gray-900 hover:shadow-lg
+         active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70">
+            {{ isSubmitting ? 'Creando cuenta...' : 'Crear cuenta' }}
+          </button>
+        </form>
+
+        <div class="mt-10 text-center text-base font-semibold">
+          <span class="text-white">&iquest;Ya tienes cuenta? </span>
+          <a routerLink="/login"
+            class="relative text-gray-400 transition-colors after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-gray-300 after:transition-all after:content-[''] hover:text-gray-300 hover:after:w-full">
+            Iniciar sesi&oacute;n
+          </a>
+        </div>
       </div>
-
-      <div>
-        <label for="password" class="sr-only">Contrase&ntilde;a</label>
-        <input id="password" name="password" type="password" [(ngModel)]="password" placeholder="Contrase&ntilde;a" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
-           outline-none placeholder:text-[#626262]
-           transition-all duration-200 ease-out
-           hover:bg-white hover:shadow-md hover:-translate-y-0.5
-           focus:shadow-[inset_0_0_0_2px_#FFE8B7]
-           focus:bg-white" />
-      </div>
-
-      <div>
-        <label for="confirmPassword" class="sr-only">Confirmar contrase&ntilde;a</label>
-        <input id="confirmPassword" name="confirmPassword" type="password" [(ngModel)]="confirmPassword"
-          placeholder="Confirmar contrase&ntilde;a" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
-           outline-none placeholder:text-[#626262]
-           transition-all duration-200 ease-out
-           hover:bg-white hover:shadow-md hover:-translate-y-0.5
-           focus:shadow-[inset_0_0_0_2px_#FFE8B7]
-           focus:bg-white" />
-      </div>
-
-      <button type="submit" class="mt-2 w-full rounded-xl bg-[#FFE8B7]/70 py-4 text-xl font-semibold text-white
-         hover:bg-[#FFE8B7] hover:text-gray-900 hover:scale-[1.02] hover:shadow-lg
-         active:scale-[0.98]
-         transition-all duration-200">
-        Crear cuenta
-      </button>
-    </form>
-
-    <div class="mt-10 text-center text-base font-semibold">
-      <span class="text-white">&iquest;Ya tienes cuenta? </span>
-      <a routerLink="/login"
-        class="text-gray-400 hover:text-gray-300 relative after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-0 after:bg-gray-300 after:transition-all hover:after:w-full transition-colors">
-        Iniciar sesi&oacute;n
-      </a>
-    </div>
-    </div>
     </div>
   </div>
-</div>
+</main>

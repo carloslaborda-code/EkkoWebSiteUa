@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, shareReplay, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { AccessibilityService } from './accessibility.service';
 import { API_BASE_URL } from './api-url';
 
@@ -14,6 +14,10 @@ export interface UserSettings {
   colorFilter: string;
   highContrast: boolean;
   textSize: string;
+  reducedMotion: boolean;
+  largeTargets: boolean;
+  underlineLinks: boolean;
+  readableFont: boolean;
 }
 
 export interface SavedQuote {
@@ -21,9 +25,16 @@ export interface SavedQuote {
   text: string;
   workTitle: string;
   year: number;
+  rating: number;
+  ratingsCount: number;
+  views: string;
   image: string;
   mediaType: 'video' | 'audio';
   duration: string;
+  actorName: string;
+  characterName: string;
+  hashtags: string[];
+  category: string;
 }
 
 export interface RatedQuote {
@@ -50,25 +61,19 @@ export interface UserProfile {
 })
 export class UserService {
   private apiUrl = `${API_BASE_URL}/auth`;
-  private currentUserCache$?: Observable<UserProfile>;
 
   constructor(private http: HttpClient, private accessibilityService: AccessibilityService) {}
 
-  getCurrentUser(forceRefresh = false): Observable<UserProfile> {
-    if (!this.currentUserCache$ || forceRefresh) {
-      this.currentUserCache$ = this.http
-        .get<UserProfile>(`${this.apiUrl}/me`, {
-          headers: this.getHeaders()
+  getCurrentUser(): Observable<UserProfile> {
+    return this.http
+      .get<UserProfile>(`${this.apiUrl}/me`, {
+        headers: this.getHeaders()
+      })
+      .pipe(
+        tap((profile) => {
+          this.persistUser(profile);
         })
-        .pipe(
-          tap((profile) => {
-            this.persistUser(profile);
-          }),
-          shareReplay(1)
-        );
-    }
-
-    return this.currentUserCache$;
+      );
   }
 
   updateProfile(payload: { username?: string; avatar?: string }): Observable<{ message: string; user: UserProfile }> {
@@ -79,7 +84,6 @@ export class UserService {
       .pipe(
         tap(({ user }) => {
           this.persistUser(user);
-          this.currentUserCache$ = undefined;
         })
       );
   }
@@ -91,10 +95,21 @@ export class UserService {
       })
       .pipe(
         tap(({ settings }) => {
-          this.accessibilityService.persistUserSettings(settings);
-          this.currentUserCache$ = undefined;
+          const storedSettings = this.getStoredUser()?.settings;
+          const mergedSettings = this.accessibilityService.normalizeSettings({
+            ...storedSettings,
+            ...settings,
+            ...payload
+          });
+          this.accessibilityService.persistUserSettings(mergedSettings);
         })
       );
+  }
+
+  updatePassword(payload: { currentPassword: string; newPassword: string }): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(`${this.apiUrl}/password`, payload, {
+      headers: this.getHeaders()
+    });
   }
 
   syncSavedQuotes(savedQuoteIds: string[]): void {
@@ -114,7 +129,6 @@ export class UserService {
       });
 
       localStorage.setItem('user', JSON.stringify(parsed));
-      this.currentUserCache$ = undefined;
     } catch {
       return;
     }
@@ -132,7 +146,6 @@ export class UserService {
       parsed['uploadsCount'] = payload.uploadsCount;
       parsed['uploads'] = payload.uploads;
       localStorage.setItem('user', JSON.stringify(parsed));
-      this.currentUserCache$ = undefined;
     } catch {
       return;
     }
@@ -149,7 +162,6 @@ export class UserService {
       const parsed = JSON.parse(savedUser) as Record<string, unknown>;
       parsed['ratedQuotes'] = ratedQuotes;
       localStorage.setItem('user', JSON.stringify(parsed));
-      this.currentUserCache$ = undefined;
     } catch {
       return;
     }
@@ -177,6 +189,12 @@ export class UserService {
   }
 
   private persistUser(profile: UserProfile): void {
+    const storedSettings = this.getStoredUser()?.settings;
+    const settings = this.accessibilityService.normalizeSettings({
+      ...storedSettings,
+      ...profile.settings
+    });
+
     localStorage.setItem(
       'user',
       JSON.stringify({
@@ -189,11 +207,11 @@ export class UserService {
         uploads: profile.uploads,
         savedQuotes: profile.savedQuotes,
         ratedQuotes: profile.ratedQuotes,
-        settings: profile.settings,
+        settings,
         role: profile.role
       })
     );
 
-    this.accessibilityService.persistUserSettings(profile.settings);
+    this.accessibilityService.persistUserSettings(settings);
   }
 }

@@ -50,6 +50,22 @@ const settingsSchema = new mongoose.Schema(
     textSize: {
       type: String,
       default: defaultUserSettings.textSize
+    },
+    reducedMotion: {
+      type: Boolean,
+      default: defaultUserSettings.reducedMotion
+    },
+    largeTargets: {
+      type: Boolean,
+      default: defaultUserSettings.largeTargets
+    },
+    underlineLinks: {
+      type: Boolean,
+      default: defaultUserSettings.underlineLinks
+    },
+    readableFont: {
+      type: Boolean,
+      default: defaultUserSettings.readableFont
     }
   },
   { _id: false }

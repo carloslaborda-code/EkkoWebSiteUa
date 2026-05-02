@@ -1,8 +1,11 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const Quote = require('../models/quote');
 const { defaultUploads, defaultUserSettings } = require('../data/defaultUserData');
+const allowedColorFilters = ['default', 'warm', 'cool', 'grayscale'];
+const allowedTextSizes = ['small', 'medium', 'large', 'extra-large'];
+
+const escapeRegExp = (value = '') => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const hasLegacyMockUploads = (uploads = []) => {
   const legacyTitles = ['Techno Echo 01', 'Vocal Snippet B', 'Mix Master Loop', 'Techno Echo 01'];
@@ -49,7 +52,7 @@ const ensureUserDefaults = async (user) => {
     user.settings = defaultUserSettings;
     changed = true;
   } else {
-    if (!user.settings.colorFilter) {
+    if (!allowedColorFilters.includes(user.settings.colorFilter)) {
       user.settings.colorFilter = defaultUserSettings.colorFilter;
       changed = true;
     }
@@ -59,10 +62,22 @@ const ensureUserDefaults = async (user) => {
       changed = true;
     }
 
-    if (!user.settings.textSize) {
+    if (!allowedTextSizes.includes(user.settings.textSize)) {
       user.settings.textSize = defaultUserSettings.textSize;
       changed = true;
     }
+
+    [
+      'reducedMotion',
+      'largeTargets',
+      'underlineLinks',
+      'readableFont'
+    ].forEach((settingKey) => {
+      if (typeof user.settings[settingKey] !== 'boolean') {
+        user.settings[settingKey] = defaultUserSettings[settingKey];
+        changed = true;
+      }
+    });
   }
 
   if (!Array.isArray(user.savedQuotes)) {
@@ -82,36 +97,6 @@ const ensureUserDefaults = async (user) => {
   return user;
 };
 
-const syncUploadsFromQuotes = async (user) => {
-  const createdQuotes = await Quote.find({ createdBy: user._id })
-    .sort({ createdAt: -1 })
-    .select('workTitle image mediaType');
-
-  const uploadsFromQuotes = createdQuotes.map((quote) => ({
-    title: quote.workTitle,
-    image: quote.image || '',
-    type: quote.mediaType === 'video' ? 'video' : 'audio'
-  }));
-
-  const currentUploads = Array.isArray(user.uploads) ? user.uploads.map((upload) => ({
-    title: upload.title,
-    image: upload.image || '',
-    type: upload.type || 'audio'
-  })) : [];
-
-  const hasChanged =
-    JSON.stringify(currentUploads) !== JSON.stringify(uploadsFromQuotes) ||
-    user.uploadsCount !== uploadsFromQuotes.length;
-
-  if (hasChanged) {
-    user.uploads = uploadsFromQuotes;
-    user.uploadsCount = uploadsFromQuotes.length;
-    await user.save();
-  }
-
-  return user;
-};
-
 const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -120,17 +105,27 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
 
+    const normalizedUsername = username.trim();
     const normalizedEmail = email.trim().toLowerCase();
-    const existingUser = await User.findOne({ email: normalizedEmail });
 
-    if (existingUser) {
-      return res.status(400).json({ message: 'El usuario ya existe' });
+    const existingEmail = await User.findOne({ email: normalizedEmail });
+
+    if (existingEmail) {
+      return res.status(400).json({ message: 'El correo electrónico ya está registrado' });
+    }
+
+    const existingUsername = await User.findOne({
+      username: { $regex: `^${escapeRegExp(normalizedUsername)}$`, $options: 'i' }
+    });
+
+    if (existingUsername) {
+      return res.status(400).json({ message: 'El nombre de usuario ya está en uso' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      username: username.trim(),
+      username: normalizedUsername,
       email: normalizedEmail,
       password: hashedPassword,
       settings: defaultUserSettings
@@ -203,13 +198,65 @@ const login = async (req, res) => {
   }
 };
 
+const checkUsername = async (req, res) => {
+  try {
+    const username = req.query.username?.trim();
+
+    if (!username) {
+      return res.status(400).json({
+        available: false,
+        message: 'El nombre de usuario es obligatorio'
+      });
+    }
+
+    const existingUser = await User.findOne({
+      username: { $regex: `^${escapeRegExp(username)}$`, $options: 'i' }
+    });
+
+    res.json({
+      available: !existingUser
+    });
+  } catch (error) {
+    res.status(500).json({
+      available: false,
+      message: 'Error al comprobar el nombre de usuario',
+      error: error.message
+    });
+  }
+};
+
+const checkEmail = async (req, res) => {
+  try {
+    const email = req.query.email?.trim().toLowerCase();
+
+    if (!email) {
+      return res.status(400).json({
+        available: false,
+        message: 'El correo electrónico es obligatorio'
+      });
+    }
+
+    const existingUser = await User.findOne({ email });
+
+    res.json({
+      available: !existingUser
+    });
+  } catch (error) {
+    res.status(500).json({
+      available: false,
+      message: 'Error al comprobar el correo electrónico',
+      error: error.message
+    });
+  }
+};
+
 const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
       .select('-password')
       .populate({
         path: 'savedQuotes',
-        select: 'text workTitle year image mediaType duration'
+        select: 'text workTitle year rating ratingsCount views image mediaType duration actorName characterName hashtags category'
       });
     await ensureUserDefaults(user);
     res.json(user);
@@ -238,7 +285,10 @@ const updateProfile = async (req, res) => {
     }
 
     await user.save();
-    await user.populate('savedQuotes');
+    await user.populate({
+      path: 'savedQuotes',
+      select: 'text workTitle year rating ratingsCount views image mediaType duration actorName characterName hashtags category'
+    });
 
     res.json({
       message: 'Perfil actualizado correctamente',
@@ -266,7 +316,15 @@ const updateProfile = async (req, res) => {
 
 const updateSettings = async (req, res) => {
   try {
-    const { colorFilter, highContrast, textSize } = req.body;
+    const {
+      colorFilter,
+      highContrast,
+      textSize,
+      reducedMotion,
+      largeTargets,
+      underlineLinks,
+      readableFont
+    } = req.body;
     const user = await User.findById(req.user._id);
 
     if (!user) {
@@ -277,9 +335,13 @@ const updateSettings = async (req, res) => {
 
     user.settings = {
       ...user.settings.toObject(),
-      ...(typeof colorFilter === 'string' ? { colorFilter } : {}),
+      ...(typeof colorFilter === 'string' && allowedColorFilters.includes(colorFilter) ? { colorFilter } : {}),
       ...(typeof highContrast === 'boolean' ? { highContrast } : {}),
-      ...(typeof textSize === 'string' ? { textSize } : {})
+      ...(typeof textSize === 'string' && allowedTextSizes.includes(textSize) ? { textSize } : {}),
+      ...(typeof reducedMotion === 'boolean' ? { reducedMotion } : {}),
+      ...(typeof largeTargets === 'boolean' ? { largeTargets } : {}),
+      ...(typeof underlineLinks === 'boolean' ? { underlineLinks } : {}),
+      ...(typeof readableFont === 'boolean' ? { readableFont } : {})
     };
 
     await user.save();
@@ -293,4 +355,52 @@ const updateSettings = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getCurrentUser, updateProfile, updateSettings };
+const updatePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'La contrasena actual y la nueva son obligatorias' });
+    }
+
+    if (String(newPassword).length < 6) {
+      return res.status(400).json({ message: 'La nueva contrasena debe tener al menos 6 caracteres' });
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    const currentPasswordMatches = await bcrypt.compare(currentPassword, user.password);
+
+    if (!currentPasswordMatches) {
+      return res.status(401).json({ message: 'La contrasena actual no es correcta' });
+    }
+
+    const samePassword = await bcrypt.compare(newPassword, user.password);
+
+    if (samePassword) {
+      return res.status(400).json({ message: 'La nueva contrasena debe ser diferente a la actual' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.json({ message: 'Contrasena actualizada correctamente' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al actualizar la contrasena', error: error.message });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  getCurrentUser,
+  updateProfile,
+  updateSettings,
+  updatePassword,
+  checkUsername,
+  checkEmail
+};

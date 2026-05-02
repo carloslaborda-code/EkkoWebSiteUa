@@ -22,6 +22,45 @@ body {
   overflow-x: hidden;
 }
 
+button,
+a,
+input,
+textarea,
+select,
+[role='button'],
+[tabindex]:not([tabindex='-1']) {
+  touch-action: manipulation;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role='button']:focus-visible,
+[tabindex]:not([tabindex='-1']):focus-visible {
+  outline: 3px solid #ffe8b7;
+  outline-offset: 4px;
+}
+
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: 12px;
+  z-index: 9999;
+  transform: translateY(-140%);
+  border-radius: 10px;
+  background: #ffe8b7;
+  color: #101010;
+  padding: 12px 16px;
+  font-weight: 800;
+  transition: transform 0.18s ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 :root {
   --screen-padding: clamp(14px, 4vw, 22px);
   --screen-padding-wide: clamp(16px, 4.5vw, 24px);
@@ -33,6 +72,110 @@ body {
   --content-max-width: 1440px;
   --desktop-sidebar-width: 244px;
   --desktop-content-gap: 24px;
+}
+
+html[data-text-size='small'] {
+  --screen-padding: clamp(14px, 4vw, 22px);
+}
+
+html[data-text-size='large'],
+html[data-text-size='extra-large'] {
+  --screen-padding: clamp(18px, 5vw, 28px);
+  --screen-padding-wide: clamp(20px, 5vw, 36px);
+}
+
+html[data-readable-font='true'] body {
+  font-family: Verdana, Tahoma, Arial, Helvetica, sans-serif;
+  line-height: 1.65;
+}
+
+html[data-readable-font='true'] p,
+html[data-readable-font='true'] li,
+html[data-readable-font='true'] input,
+html[data-readable-font='true'] textarea,
+html[data-readable-font='true'] button,
+html[data-readable-font='true'] a {
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+}
+
+html[data-underline-links='true'] a,
+html[data-underline-links='true'] button:not([disabled]) span {
+  text-decoration: underline;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.18em;
+}
+
+html[data-large-targets='true'] button,
+html[data-large-targets='true'] a,
+html[data-large-targets='true'] input,
+html[data-large-targets='true'] select,
+html[data-large-targets='true'] textarea,
+html[data-large-targets='true'] [role='button'] {
+  min-height: 48px;
+}
+
+html[data-large-targets='true'] button,
+html[data-large-targets='true'] a,
+html[data-large-targets='true'] [role='button'] {
+  min-width: 48px;
+}
+
+html[data-reduced-motion='true'] *,
+html[data-reduced-motion='true'] *::before,
+html[data-reduced-motion='true'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.001ms !important;
+}
+
+html[data-color-filter='warm'] body {
+  filter: sepia(0.16) saturate(0.94) hue-rotate(-8deg);
+}
+
+html[data-color-filter='cool'] body {
+  filter: saturate(0.9) hue-rotate(10deg);
+}
+
+html[data-color-filter='grayscale'] body {
+  filter: grayscale(1) contrast(1.08);
+}
+
+html[data-high-contrast='true'] body {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+html[data-high-contrast='true'] .glow,
+html[data-high-contrast='true'] .ambient {
+  display: none !important;
+}
+
+html[data-high-contrast='true'] button,
+html[data-high-contrast='true'] a,
+html[data-high-contrast='true'] input,
+html[data-high-contrast='true'] textarea,
+html[data-high-contrast='true'] select,
+html[data-high-contrast='true'] article,
+html[data-high-contrast='true'] section,
+html[data-high-contrast='true'] label {
+  border-color: rgba(255, 255, 255, 0.72) !important;
+  box-shadow: none !important;
+}
+
+html[data-high-contrast='true'] button:focus-visible,
+html[data-high-contrast='true'] a:focus-visible,
+html[data-high-contrast='true'] input:focus-visible,
+html[data-high-contrast='true'] textarea:focus-visible,
+html[data-high-contrast='true'] select:focus-visible {
+  outline-color: #fff !important;
+  outline-width: 4px !important;
+}
+
+html[data-high-contrast='true'] ::placeholder {
+  color: #d6d6d6 !important;
+  opacity: 1;
 }
 
 @media (min-width: 768px) {

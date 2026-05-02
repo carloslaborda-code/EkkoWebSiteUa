@@ -2,6 +2,16 @@ import { DOCUMENT } from '@angular/common';
 import { Inject, Injectable } from '@angular/core';
 import { UserSettings } from './user.service';
 
+const DEFAULT_ACCESSIBILITY_SETTINGS: UserSettings = {
+  colorFilter: 'default',
+  highContrast: false,
+  textSize: 'medium',
+  reducedMotion: false,
+  largeTargets: false,
+  underlineLinks: false,
+  readableFont: false
+};
+
 @Injectable({
   providedIn: 'root'
 })
@@ -12,48 +22,54 @@ export class AccessibilityService {
     const savedUser = localStorage.getItem('user');
 
     if (!savedUser) {
-      this.applyTextSize('medium');
+      this.applySettings(DEFAULT_ACCESSIBILITY_SETTINGS);
       return;
     }
 
     try {
       const parsed = JSON.parse(savedUser) as { settings?: Partial<UserSettings> };
-      this.applyTextSize(parsed.settings?.textSize || 'medium');
+      this.applySettings(this.normalizeSettings(parsed.settings));
     } catch {
-      this.applyTextSize('medium');
+      this.applySettings(DEFAULT_ACCESSIBILITY_SETTINGS);
     }
   }
 
   persistUserSettings(settings: UserSettings): void {
+    const normalizedSettings = this.normalizeSettings(settings);
     const savedUser = localStorage.getItem('user');
 
     if (!savedUser) {
-      localStorage.setItem('user', JSON.stringify({ settings }));
-      this.applyTextSize(settings.textSize);
+      localStorage.setItem('user', JSON.stringify({ settings: normalizedSettings }));
+      this.applySettings(normalizedSettings);
       return;
     }
 
     try {
       const parsed = JSON.parse(savedUser) as Record<string, unknown>;
-      parsed['settings'] = settings;
+      parsed['settings'] = normalizedSettings;
       localStorage.setItem('user', JSON.stringify(parsed));
     } catch {
-      localStorage.setItem('user', JSON.stringify({ settings }));
+      localStorage.setItem('user', JSON.stringify({ settings: normalizedSettings }));
     }
 
-    this.applyTextSize(settings.textSize);
+    this.applySettings(normalizedSettings);
   }
 
   reset(): void {
-    this.applyTextSize('medium');
+    this.applySettings(DEFAULT_ACCESSIBILITY_SETTINGS);
   }
 
-  applyTextSize(size: string): void {
+  applySettings(settings: UserSettings): void {
     const root = this.document.documentElement;
-    const mappedSize = this.getFontSize(size);
 
-    root.style.fontSize = mappedSize;
-    root.setAttribute('data-text-size', size);
+    root.style.fontSize = this.getFontSize(settings.textSize);
+    root.setAttribute('data-text-size', settings.textSize);
+    root.setAttribute('data-color-filter', settings.colorFilter);
+    root.setAttribute('data-high-contrast', String(settings.highContrast));
+    root.setAttribute('data-reduced-motion', String(settings.reducedMotion));
+    root.setAttribute('data-large-targets', String(settings.largeTargets));
+    root.setAttribute('data-underline-links', String(settings.underlineLinks));
+    root.setAttribute('data-readable-font', String(settings.readableFont));
   }
 
   private getFontSize(size: string): string {
@@ -62,8 +78,28 @@ export class AccessibilityService {
         return '14px';
       case 'large':
         return '18px';
+      case 'extra-large':
+        return '20px';
       default:
         return '16px';
     }
+  }
+
+  normalizeSettings(settings?: Partial<UserSettings>): UserSettings {
+    return {
+      ...DEFAULT_ACCESSIBILITY_SETTINGS,
+      ...settings,
+      colorFilter: this.normalizeOption(settings?.colorFilter, ['default', 'warm', 'cool', 'grayscale'], 'default'),
+      textSize: this.normalizeOption(settings?.textSize, ['small', 'medium', 'large', 'extra-large'], 'medium'),
+      highContrast: Boolean(settings?.highContrast),
+      reducedMotion: Boolean(settings?.reducedMotion),
+      largeTargets: Boolean(settings?.largeTargets),
+      underlineLinks: Boolean(settings?.underlineLinks),
+      readableFont: Boolean(settings?.readableFont)
+    };
+  }
+
+  private normalizeOption(value: unknown, allowedValues: string[], fallback: string): string {
+    return typeof value === 'string' && allowedValues.includes(value) ? value : fallback;
   }
 }

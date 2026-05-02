@@ -11,12 +11,14 @@ type Category = 'movie' | 'series' | 'game' | 'sfx';
   templateUrl: './publish.component.html',
   styleUrls: ['./publish.component.css']
 })
-export class PublishComponent implements OnInit {
+export class PublishComponent implements OnInit, OnDestroy {
   @ViewChild('videoCoverPreview') videoCoverPreview?: ElementRef<HTMLVideoElement>;
 
   private readonly maxAudioSize = 8 * 1024 * 1024;
   private readonly maxVideoSize = 20 * 1024 * 1024;
   private readonly maxCoverSize = 4 * 1024 * 1024;
+  private framePreviewTimer?: ReturnType<typeof setTimeout>;
+  private framePreviewRequestId = 0;
   mediaType: MediaType = 'audio';
   category: Category = 'movie';
   quoteText = '';
@@ -56,6 +58,7 @@ export class PublishComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
+    this.clearFramePreviewTimer();
     this.revokeVideoPreviewUrl();
   }
 
@@ -167,9 +170,21 @@ export class PublishComponent implements OnInit {
 
     this.videoDurationSeconds = video.duration;
     this.selectedCoverTimeSeconds = Math.min(this.selectedCoverTimeSeconds, this.videoDurationSeconds);
+    this.previewSelectedFrame();
+  }
+
+  onCoverTimeChange(): void {
+    this.clearFramePreviewTimer();
+    this.framePreviewTimer = setTimeout(() => {
+      this.previewSelectedFrame();
+    }, 120);
   }
 
   async captureCoverFromSelectedFrame(): Promise<void> {
+    await this.previewSelectedFrame();
+  }
+
+  async previewSelectedFrame(): Promise<void> {
     const video = this.videoCoverPreview?.nativeElement;
 
     if (!video || !this.videoPreviewUrl) {
@@ -177,17 +192,23 @@ export class PublishComponent implements OnInit {
       return;
     }
 
+    const requestId = ++this.framePreviewRequestId;
     this.capturingCover = true;
     this.message = '';
 
     try {
       const dataUrl = await this.captureFrameAtTime(video, this.selectedCoverTimeSeconds);
+      if (requestId !== this.framePreviewRequestId) {
+        return;
+      }
       this.selectedCoverDataUrl = dataUrl;
       this.coverFileName = `Frame ${this.formatTimestamp(this.selectedCoverTimeSeconds)}`;
     } catch {
       this.message = 'No se pudo capturar esa portada desde el video.';
     } finally {
-      this.capturingCover = false;
+      if (requestId === this.framePreviewRequestId) {
+        this.capturingCover = false;
+      }
     }
   }
 
@@ -196,6 +217,14 @@ export class PublishComponent implements OnInit {
     const minutes = Math.floor(safeSeconds / 60);
     const remainingSeconds = safeSeconds % 60;
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  }
+
+  trackByCategory(_index: number, option: { value: Category }): Category {
+    return option.value;
+  }
+
+  trackByYear(_index: number, year: string): string {
+    return year;
   }
 
   publish(): void {
@@ -394,6 +423,7 @@ export class PublishComponent implements OnInit {
   }
 
   private resetSelectedMedia(): void {
+    this.clearFramePreviewTimer();
     this.revokeVideoPreviewUrl();
     this.selectedFileName = '';
     this.mediaDataUrl = '';
@@ -404,6 +434,15 @@ export class PublishComponent implements OnInit {
     this.selectedCoverTimeSeconds = 0;
     this.duration = '00:00';
     this.message = '';
+  }
+
+  private clearFramePreviewTimer(): void {
+    if (!this.framePreviewTimer) {
+      return;
+    }
+
+    clearTimeout(this.framePreviewTimer);
+    this.framePreviewTimer = undefined;
   }
 
   private buildYearOptions(): string[] {

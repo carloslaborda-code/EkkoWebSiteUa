@@ -113,6 +113,18 @@ export class DiscoverComponent implements OnInit {
     this.router.navigate(['/quote', quoteId]);
   }
 
+  trackByQuoteId(_index: number, quote: Quote): string {
+    return quote._id;
+  }
+
+  trackByOptionValue(_index: number, option: { value: string }): string {
+    return option.value;
+  }
+
+  trackByTitle(_index: number, title: string): string {
+    return title;
+  }
+
   private ensureValidWorkTitle(): void {
     if (!this.selectedWorkTitle) {
       return;

@@ -45,37 +45,28 @@ export interface CreateQuotePayload {
 })
 export class QuoteService {
   private apiUrl = `${API_BASE_URL}/quotes`;
-  private quotesCache$?: Observable<Quote[]>;
-  private quoteByIdCache = new Map<string, Observable<Quote>>();
+  private quotesRequest$?: Observable<Quote[]>;
+  private quotesById = new Map<string, Quote>();
 
   constructor(private http: HttpClient) {}
 
-  getQuotes(forceRefresh = false): Observable<Quote[]> {
-    if (!this.quotesCache$ || forceRefresh) {
-      this.quotesCache$ = this.http.get<Quote[]>(this.apiUrl).pipe(
+  getQuotes(): Observable<Quote[]> {
+    if (!this.quotesRequest$) {
+      this.quotesRequest$ = this.http.get<Quote[]>(this.apiUrl).pipe(
         tap((quotes) => {
-          quotes.forEach((quote) => this.normalizeQuote(quote));
+          quotes.forEach((quote) => this.upsertQuote(this.normalizeQuote(quote)));
         }),
-        shareReplay(1)
+        shareReplay({ bufferSize: 1, refCount: false })
       );
     }
 
-    return this.quotesCache$;
+    return this.quotesRequest$;
   }
 
   getQuoteById(id: string): Observable<Quote> {
-    const cachedQuote = this.quoteByIdCache.get(id);
-    if (cachedQuote) {
-      return cachedQuote;
-    }
-
-    const request$ = this.http.get<Quote>(`${this.apiUrl}/${id}`).pipe(
-      tap((quote) => this.normalizeQuote(quote)),
-      shareReplay(1)
+    return this.http.get<Quote>(`${this.apiUrl}/${id}`).pipe(
+      tap((quote) => this.upsertQuote(this.normalizeQuote(quote)))
     );
-
-    this.quoteByIdCache.set(id, request$);
-    return request$;
   }
 
   createQuote(payload: CreateQuotePayload): Observable<{ message: string; quote: Quote; user: { uploadsCount: number; uploads: UserUpload[] } }> {
@@ -84,8 +75,9 @@ export class QuoteService {
         headers: this.getHeaders()
       })
       .pipe(
-        tap(() => {
-          this.clearQuotesCache();
+        tap(({ quote }) => {
+          this.quotesRequest$ = undefined;
+          this.upsertQuote(this.normalizeQuote(quote));
         })
       );
   }
@@ -101,7 +93,11 @@ export class QuoteService {
       headers: this.getHeaders()
     }).pipe(
       tap(({ rating, ratingsCount }) => {
-        this.patchCachedQuote(id, { rating, ratingsCount });
+        const cachedQuote = this.quotesById.get(id);
+        if (cachedQuote) {
+          cachedQuote.rating = rating;
+          cachedQuote.ratingsCount = ratingsCount;
+        }
       })
     );
   }
@@ -109,7 +105,10 @@ export class QuoteService {
   registerView(id: string): Observable<{ message: string; views: string }> {
     return this.http.post<{ message: string; views: string }>(`${this.apiUrl}/${id}/view`, {}).pipe(
       tap(({ views }) => {
-        this.patchCachedQuote(id, { views });
+        const cachedQuote = this.quotesById.get(id);
+        if (cachedQuote) {
+          cachedQuote.views = views;
+        }
       })
     );
   }
@@ -118,11 +117,6 @@ export class QuoteService {
     return this.http.post<{ message: string; mediaUrl: string }>(`${this.apiUrl}/${id}/download`, {}, {
       headers: this.getHeaders()
     });
-  }
-
-  clearQuotesCache(): void {
-    this.quotesCache$ = undefined;
-    this.quoteByIdCache.clear();
   }
 
   private normalizeQuote(quote: Quote): Quote {
@@ -144,30 +138,10 @@ export class QuoteService {
     return quote;
   }
 
-  private patchCachedQuote(id: string, patch: Partial<Quote>): void {
-    const cachedDetail = this.quoteByIdCache.get(id);
-
-    if (cachedDetail) {
-      const patchedDetail$ = cachedDetail.pipe(
-        tap((quote) => Object.assign(quote, patch)),
-        shareReplay(1)
-      );
-      this.quoteByIdCache.set(id, patchedDetail$);
+  private upsertQuote(quote: Quote): void {
+    if (quote._id) {
+      this.quotesById.set(quote._id, quote);
     }
-
-    if (!this.quotesCache$) {
-      return;
-    }
-
-    this.quotesCache$ = this.quotesCache$.pipe(
-      tap((quotes) => {
-        const targetQuote = quotes.find((quote) => quote._id === id);
-        if (targetQuote) {
-          Object.assign(targetQuote, patch);
-        }
-      }),
-      shareReplay(1)
-    );
   }
 
   private getHeaders(): HttpHeaders {

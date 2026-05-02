@@ -1,0 +1,119 @@
+<div class="library-shell relative min-h-[100dvh] overflow-hidden bg-black text-slate-50">
+  <div class="ambient ambient-left" aria-hidden="true"></div>
+  <div class="ambient ambient-top" aria-hidden="true"></div>
+  <div class="ambient ambient-right" aria-hidden="true"></div>
+
+  <main id="main-content" class="library-frame relative min-h-[100dvh]" tabindex="-1">
+    <header class="library-topbar grid grid-cols-[40px_1fr_40px] items-center border-b border-[#b6a581]/10 px-[var(--screen-padding)] py-4">
+      <button type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-transparent text-white transition hover:-translate-x-0.5 hover:bg-white/5" (click)="router.navigate(['/home'])" aria-label="Volver">
+        <app-icon name="chevron-left" className="h-6 w-6"></app-icon>
+      </button>
+      <img class="mx-auto block w-[92px] max-w-full" src="assets/images/ekko-logo.png" alt="Ekko" decoding="async" />
+      <div aria-hidden="true"></div>
+    </header>
+
+    <section class="library-content flex flex-col gap-5 px-[var(--screen-padding)] pt-6">
+      <section class="library-hero grid gap-6 rounded-[20px] border border-slate-700/55 bg-[#0c1119]/90 p-6 shadow-[0_20px_25px_-12px_rgba(0,0,0,0.24)] md:grid-cols-[minmax(0,1fr)_minmax(220px,0.45fr)] md:items-end" aria-labelledby="library-title">
+        <div>
+          <p class="mb-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[#d6be8a]">Tu coleccion</p>
+          <h1 id="library-title" class="m-0 text-[clamp(2rem,10vw,3.2rem)] leading-none text-white">Librer&iacute;a</h1>
+          <p class="mt-3 max-w-[58ch] leading-7 text-slate-300">Recupera rapido los fragmentos que has guardado para volver a escucharlos, compararlos o compartirlos.</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2.5" aria-label="Resumen de la biblioteca">
+          <article class="min-w-0 rounded-[14px] border border-white/10 bg-white/[0.035] p-3.5">
+            <strong class="block text-[clamp(1.35rem,7vw,2rem)] leading-none">{{ savedCount }}</strong>
+            <span class="mt-1.5 block break-words text-[0.72rem] font-extrabold uppercase tracking-[0.08em] text-slate-400">Guardados</span>
+          </article>
+          <article class="min-w-0 rounded-[14px] border border-white/10 bg-white/[0.035] p-3.5">
+            <strong class="block text-[clamp(1.35rem,7vw,2rem)] leading-none">{{ videoCount }}</strong>
+            <span class="mt-1.5 block break-words text-[0.72rem] font-extrabold uppercase tracking-[0.08em] text-slate-400">Videos</span>
+          </article>
+          <article class="min-w-0 rounded-[14px] border border-white/10 bg-white/[0.035] p-3.5">
+            <strong class="block text-[clamp(1.35rem,7vw,2rem)] leading-none">{{ audioCount }}</strong>
+            <span class="mt-1.5 block break-words text-[0.72rem] font-extrabold uppercase tracking-[0.08em] text-slate-400">Audios</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="library-tools flex flex-col gap-3.5 rounded-[20px] border border-slate-700/55 bg-[#0c1119]/90 p-4 shadow-[0_20px_25px_-12px_rgba(0,0,0,0.24)]" aria-label="Filtros de biblioteca">
+        <label class="flex min-h-[52px] items-center gap-3 rounded-[14px] border border-white/10 bg-slate-950/70 px-4 text-slate-500" for="library-search">
+          <app-icon name="magnifying-glass" className="h-5 w-5"></app-icon>
+          <input id="library-search" type="search" name="librarySearch" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()" class="w-full border-0 bg-transparent text-base text-white placeholder:text-slate-500 focus:outline-none" placeholder="Busca entre tus guardados..." />
+        </label>
+
+        <div class="flex flex-wrap gap-2" aria-label="Formato">
+          <button type="button" *ngFor="let option of formatOptions; trackBy: trackByOptionValue" class="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-full border px-3.5 py-2.5 text-sm font-bold transition hover:-translate-y-0.5" [ngClass]="selectedFormat === option.value ? 'border-[#d6be8a] bg-[#d6be8a] text-[#151515]' : 'border-white/10 bg-slate-900/70 text-slate-200 hover:border-[#d6be8a]/40 hover:bg-slate-800/80'" [attr.aria-pressed]="selectedFormat === option.value" (click)="setFormat(option.value)">
+            <app-icon [name]="option.icon" className="h-4 w-4"></app-icon>
+            <span>{{ option.label }}</span>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap gap-2" aria-label="Categoria">
+          <button type="button" *ngFor="let option of categoryOptions; trackBy: trackByOptionValue" class="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-full border px-3.5 py-2.5 text-sm font-bold transition hover:-translate-y-0.5 lg:flex-1 lg:basis-[140px]" [ngClass]="selectedCategory === option.value ? 'border-[#d6be8a] bg-[#d6be8a] text-[#151515]' : 'border-white/10 bg-slate-900/70 text-slate-200 hover:border-[#d6be8a]/40 hover:bg-slate-800/80'" [attr.aria-pressed]="selectedCategory === option.value" (click)="setCategory(option.value)">
+            <app-icon [name]="option.icon" className="h-4 w-4"></app-icon>
+            <span>{{ option.label }}</span>
+          </button>
+        </div>
+
+        <div class="grid gap-2">
+          <label for="library-sort" class="text-xs font-extrabold uppercase tracking-[0.12em] text-[#d6be8a]">Ordenar</label>
+          <select id="library-sort" name="librarySort" [(ngModel)]="selectedSort" (ngModelChange)="setSort($event)" class="min-h-12 rounded-[14px] border border-white/10 bg-slate-900 px-3.5 text-white">
+            <option *ngFor="let option of sortOptions; trackBy: trackByOptionValue" [ngValue]="option.value">{{ option.label }}</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="library-results flex flex-col gap-4 rounded-[20px] border border-slate-700/55 bg-[#0c1119]/90 p-4 shadow-[0_20px_25px_-12px_rgba(0,0,0,0.24)]" aria-live="polite">
+        <div class="flex items-end justify-between gap-4">
+          <div>
+            <p class="mb-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[#d6be8a]">Guardados</p>
+            <h2 class="m-0 text-[clamp(1.35rem,6vw,2rem)] leading-none text-white">{{ visibleQuotes.length }} fragmentos</h2>
+          </div>
+          <button type="button" class="min-h-[42px] shrink-0 rounded-xl bg-white/10 px-3.5 py-2.5 text-sm font-extrabold text-white" *ngIf="hasActiveFilters" (click)="clearFilters()">Limpiar filtros</button>
+        </div>
+
+        <p *ngIf="loading" class="m-0 text-center leading-7 text-slate-300">Cargando biblioteca...</p>
+        <p *ngIf="!loading && errorMessage" class="m-0 text-center leading-7 text-red-200">{{ errorMessage }}</p>
+
+        <section class="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3" *ngIf="!loading && !errorMessage && visibleQuotes.length">
+          <article *ngFor="let quote of visibleQuotes; trackBy: trackByQuoteId" class="grid cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-[#0b1018] transition hover:-translate-y-0.5 hover:border-[#d6be8a]/40 sm:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[170px_minmax(0,1fr)] 2xl:grid-cols-1" role="button" tabindex="0" [attr.aria-label]="'Abrir guardado ' + quote.workTitle" (click)="openQuote(quote._id)" (keydown.enter)="openQuote(quote._id)" (keydown.space)="$event.preventDefault(); openQuote(quote._id)">
+            <div class="relative min-h-[178px] bg-slate-900" [ngClass]="!quote.image ? 'flex items-center justify-center bg-[linear-gradient(145deg,rgba(214,190,138,0.36),rgba(15,23,42,0.94))]' : ''">
+              <img *ngIf="quote.image" class="block h-full min-h-[178px] w-full object-cover" [src]="quote.image" [alt]="quote.workTitle" loading="lazy" decoding="async" />
+              <div *ngIf="!quote.image" class="text-6xl font-extrabold text-white/80">{{ quote.workTitle | slice:0:1 }}</div>
+              <span class="absolute left-3 top-3 rounded-full bg-slate-950/70 px-2.5 py-1.5 text-xs font-extrabold text-white">{{ quote.mediaType === 'audio' ? 'Audio' : 'Video' }}</span>
+              <span class="absolute bottom-3 right-3 rounded-full bg-slate-950/70 px-2.5 py-1 text-xs font-extrabold text-white">{{ quote.duration }}</span>
+            </div>
+
+            <div class="flex min-w-0 flex-col gap-2.5 p-4">
+              <div class="flex items-center justify-between gap-3 text-xs font-extrabold uppercase tracking-[0.08em] text-[#d6be8a]">
+                <span>{{ getCategoryLabel(quote.category) }}</span>
+                <span>{{ quote.year }}</span>
+              </div>
+              <h3 class="saved-title m-0 text-base font-bold leading-tight text-white">"{{ quote.text }}"</h3>
+              <p class="m-0 truncate text-[0.95rem] font-bold text-slate-300">{{ quote.workTitle }}</p>
+              <div class="flex items-center justify-between gap-3">
+                <div class="inline-flex min-w-0 items-center gap-1 text-xs font-extrabold text-[#f5c84c]" [attr.aria-label]="'Puntuacion ' + getRatingSummary(quote) + ' de 5'">
+                  <svg *ngFor="let filled of getStarArray(quote.rating); trackBy: trackByBooleanIndex" viewBox="0 0 24 24" class="h-3 w-3" [ngClass]="filled ? 'text-[#f5c84c]' : 'text-[#5f5331]'" aria-hidden="true">
+                    <path d="m12 3.6 2.7 5.46 6.03.88-4.36 4.25 1.03 6-5.4-2.84-5.4 2.84 1.03-6L3.27 9.94l6.03-.88L12 3.6Z" fill="currentColor" />
+                  </svg>
+                  <span class="whitespace-nowrap">{{ getRatingSummary(quote) }}</span>
+                </div>
+                <span class="whitespace-nowrap text-xs font-bold text-slate-400">{{ getViewsLabel(quote) }}</span>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section *ngIf="!loading && !errorMessage && !visibleQuotes.length" class="grid justify-items-center gap-3 px-4 py-8 text-center text-[#d6be8a]">
+          <app-icon name="bookmark" className="h-9 w-9"></app-icon>
+          <h2 class="m-0 text-[clamp(1.2rem,5vw,1.6rem)] leading-tight text-white">{{ savedCount ? 'No hay coincidencias' : 'Todavia no has guardado contenido' }}</h2>
+          <p class="m-0 max-w-[42ch] leading-7 text-slate-300">{{ savedCount ? 'Prueba con otros filtros o una busqueda mas amplia.' : 'Cuando guardes un fragmento desde su detalle, aparecera aqui.' }}</p>
+          <button type="button" class="mt-1 min-h-[46px] rounded-xl bg-[#d6be8a] px-4 py-3 font-black text-[#151515]" (click)="savedCount ? clearFilters() : router.navigate(['/discover'])">{{ savedCount ? 'Limpiar filtros' : 'Descubrir fragmentos' }}</button>
+        </section>
+      </section>
+    </section>
+
+    <app-navbar activeTab="library"></app-navbar>
+  </main>
+</div>

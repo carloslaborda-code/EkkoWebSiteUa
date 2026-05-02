@@ -11,7 +11,6 @@ import { UserService } from '../../services/user.service';
 })
 export class DetailComponent implements OnInit {
   quote: Quote | null = null;
-  loading = true;
   message = '';
   ratingMessage = '';
   isSaved = false;
@@ -39,12 +38,9 @@ export class DetailComponent implements OnInit {
       next: (quote) => {
         this.quote = quote;
         this.displayDuration = quote.duration;
-        this.loading = false;
         this.registerView();
       },
-      error: () => {
-        this.loading = false;
-      }
+      error: () => {}
     });
 
     if (this.isLoggedIn) {
@@ -181,6 +177,14 @@ export class DetailComponent implements OnInit {
 
   get ratingStars(): number[] {
     return [1, 2, 3, 4, 5];
+  }
+
+  trackByNumber(_index: number, value: number): number {
+    return value;
+  }
+
+  trackByText(_index: number, value: string): string {
+    return value;
   }
 
   private formatDuration(durationInSeconds: number): string {

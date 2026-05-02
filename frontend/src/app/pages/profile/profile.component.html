@@ -1,9 +1,9 @@
 <div class="profile-shell" [class.profile-shell--contrast]="profile?.settings?.highContrast">
-  <div class="glow glow-left"></div>
-  <div class="glow glow-top"></div>
-  <div class="glow glow-right"></div>
+  <div class="glow glow-left" aria-hidden="true"></div>
+  <div class="glow glow-top" aria-hidden="true"></div>
+  <div class="glow glow-right" aria-hidden="true"></div>
 
-  <main class="profile-frame">
+  <main id="main-content" class="profile-frame" tabindex="-1">
     <header class="profile-topbar">
       <a routerLink="/settings" class="settings-link" aria-label="Ajustes">
         <app-icon name="cog-6-tooth" className="h-5 w-5"></app-icon>
@@ -21,7 +21,7 @@
             (change)="onAvatarChange($event)"
           />
           <div class="avatar-ring">
-            <img *ngIf="profile.avatar" [src]="profile.avatar" [alt]="profile.username" class="avatar-image" />
+            <img *ngIf="profile.avatar" [src]="profile.avatar" [alt]="profile.username" class="avatar-image" decoding="async" />
             <div *ngIf="!profile.avatar" class="avatar-fallback">{{ initials }}</div>
           </div>
           <button
@@ -57,9 +57,9 @@
         <section class="uploads-section">
           <h2>Mis Subidas</h2>
           <div class="uploads-grid" *ngIf="profile.uploads?.length; else emptyUploadsState">
-            <article class="upload-card" *ngFor="let upload of profile.uploads">
+            <article class="upload-card" *ngFor="let upload of profile.uploads; trackBy: trackByUploadTitle">
               <div class="upload-art" [class.upload-art--wave]="upload.type === 'audio'" [class.upload-art--mic]="upload.type === 'voice'" [class.upload-art--console]="upload.type === 'sfx'">
-                <img *ngIf="upload.image" [src]="upload.image" [alt]="upload.title" class="saved-image" />
+                <img *ngIf="upload.image" [src]="upload.image" [alt]="upload.title" class="upload-image" loading="lazy" decoding="async" />
                 <div class="wave-bars" *ngIf="upload.type === 'audio' && !upload.image">
                   <span></span><span></span><span></span><span></span><span></span>
                 </div>
@@ -72,19 +72,6 @@
           <ng-template #emptyUploadsState>
             <p class="empty-state">Todav&iacute;a no has subido contenido.</p>
           </ng-template>
-        </section>
-
-        <section class="uploads-section" *ngIf="profile.savedQuotes?.length">
-          <h2>Guardados</h2>
-          <div class="uploads-grid">
-            <article class="upload-card upload-card--saved" *ngFor="let saved of profile.savedQuotes" (click)="router.navigate(['/quote', saved._id])">
-              <div class="upload-art upload-art--saved">
-                <img [src]="saved.image" [alt]="saved.workTitle" class="saved-image" />
-                <span class="saved-badge">{{ saved.mediaType === 'audio' ? 'Audio' : 'Video' }}</span>
-              </div>
-              <p>{{ saved.workTitle }}</p>
-            </article>
-          </div>
         </section>
       </div>
     </section>

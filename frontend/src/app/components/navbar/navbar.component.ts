@@ -11,7 +11,7 @@ type NavbarTab = 'home' | 'discover' | 'publish' | 'library' | 'profile' | '';
 export class NavbarComponent {
   @Input() activeTab: NavbarTab = '';
 
-  constructor(private router: Router) {}
+  constructor(public router: Router) {}
 
   openDiscover(): void {
     this.router.navigate(['/discover']);
@@ -27,5 +27,9 @@ export class NavbarComponent {
 
   openPublish(): void {
     this.router.navigate([this.isLoggedIn ? '/publish' : '/login']);
+  }
+
+  openLibrary(): void {
+    this.router.navigate([this.isLoggedIn ? '/library' : '/login']);
   }
 }

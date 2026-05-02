@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { ProfileComponent } from './profile.component';
@@ -12,6 +13,7 @@ describe('ProfileComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ProfileComponent],
       imports: [RouterTestingModule],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {
           provide: UserService,
@@ -26,7 +28,15 @@ describe('ProfileComponent', () => {
                 downloads: 45,
                 uploads: [],
                 savedQuotes: [],
-                settings: { colorFilter: 'default', highContrast: false, textSize: 'medium' },
+                settings: {
+                  colorFilter: 'default',
+                  highContrast: false,
+                  textSize: 'medium',
+                  reducedMotion: false,
+                  largeTargets: false,
+                  underlineLinks: false,
+                  readableFont: false
+                },
                 role: 'user'
               })
           }
