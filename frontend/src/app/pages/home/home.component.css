@@ -111,6 +111,33 @@
   color: #64748b;
 }
 
+.search-box,
+.search-box svg {
+  transition: all .2s ease;
+}
+
+.search-box:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
+}
+
+.search-box:hover .search-icon {
+  transform: scale(1.1);
+  color: #d6be8a;
+}
+
+.search-box:hover input {
+  color: #ffffff;
+}
+
+.search-box:focus-within {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.35),
+    0 0 0 2px rgba(214, 190, 138, 0.25);
+}
+
 .search-icon,
 .search-box svg,
 .icon-button svg,

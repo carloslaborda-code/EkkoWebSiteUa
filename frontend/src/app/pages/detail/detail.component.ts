@@ -19,6 +19,8 @@ export class DetailComponent implements OnInit {
   isPlaying = false;
   displayDuration = '00:00';
 
+  hoverRating = 0;
+
   constructor(
     private route: ActivatedRoute,
     public router: Router,
