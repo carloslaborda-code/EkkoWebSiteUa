@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Quote, QuoteService } from '../../services/quotes.services';
+import { faUser, faMagnifyingGlass, faSliders, faStar, faStarHalfStroke, faEye, faPlay} from '@fortawesome/free-solid-svg-icons';
+
+type StarKind = 'full' | 'half' | 'empty';
 
 @Component({
   selector: 'app-home',
@@ -13,7 +16,13 @@ export class HomeComponent implements OnInit {
   visibleQuotes: Quote[] = [];
   searchTerm = '';
   loading = true;
-
+  readonly faUser = faUser;
+  readonly faMagnifyingGlass = faMagnifyingGlass;
+  readonly faSliders = faSliders;
+  readonly faStar = faStar;
+  readonly faStarHalfStroke = faStarHalfStroke;
+  readonly faEye = faEye;
+  readonly faPlay = faPlay;
   constructor(private quoteService: QuoteService, public router: Router) {}
 
   ngOnInit(): void {
@@ -48,12 +57,25 @@ export class HomeComponent implements OnInit {
       .map(({ quote }) => quote);
   }
 
-  getStarArray(rating: number): boolean[] {
-    const fullStars = Math.round(rating);
-    return Array.from({ length: 5 }, (_, index) => index < fullStars);
+  getStarArray(rating: number): StarKind[] {
+    const normalizedRating = Math.max(0, Math.min(5, Number.isFinite(rating) ? rating : 0));
+    const fullStars = Math.floor(normalizedRating);
+    const hasHalfStar = normalizedRating - fullStars >= 0.5;
+
+    return Array.from({ length: 5 }, (_, index) => {
+      if (index < fullStars) {
+        return 'full';
+      }
+
+      if (index === fullStars && hasHalfStar) {
+        return 'half';
+      }
+
+      return 'empty';
+    });
   }
 
-  trackByBooleanIndex(index: number): number {
+  trackByStarIndex(index: number): number {
     return index;
   }
 

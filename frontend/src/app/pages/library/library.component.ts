@@ -1,11 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AppIconName } from '../../components/icon/icon.component';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { SavedQuote, UserService } from '../../services/user.service';
+import {
+  faBookmark,
+  faFilm,
+  faGamepad,
+  faMagnifyingGlass,
+  faPlay,
+  faStar,
+  faStarHalfStroke,
+  faTv,
+  faVolumeHigh
+} from '@fortawesome/free-solid-svg-icons';
 
 type LibraryFormat = 'all' | 'video' | 'audio';
 type LibraryCategory = 'all' | 'movie' | 'series' | 'game' | 'sfx';
 type LibrarySort = 'recent' | 'rating' | 'title';
+type StarKind = 'full' | 'half' | 'empty';
 
 interface LibraryItem extends SavedQuote {
   originalIndex: number;
@@ -25,19 +38,29 @@ export class LibraryComponent implements OnInit {
   selectedSort: LibrarySort = 'recent';
   loading = true;
   errorMessage = '';
+  readonly faBookmark = faBookmark;
+  readonly faMagnifyingGlass = faMagnifyingGlass;
+  readonly faPlay = faPlay;
+  readonly faVolumeHigh = faVolumeHigh;
+  readonly faFilm = faFilm;
+  readonly faTv = faTv;
+  readonly faGamepad = faGamepad;
+  readonly faStar = faStar;
+  readonly faStarRegular = faStarRegular;
+  readonly faStarHalfStroke = faStarHalfStroke;
 
-  readonly formatOptions: Array<{ label: string; value: LibraryFormat; icon: AppIconName }> = [
-    { label: 'Todo', value: 'all', icon: 'bookmark' },
-    { label: 'Video', value: 'video', icon: 'play-solid' },
-    { label: 'Audio', value: 'audio', icon: 'speaker-wave' }
+  readonly formatOptions: Array<{ label: string; value: LibraryFormat; icon: IconDefinition }> = [
+    { label: 'Todo', value: 'all', icon: faBookmark },
+    { label: 'Video', value: 'video', icon: faPlay },
+    { label: 'Audio', value: 'audio', icon: faVolumeHigh }
   ];
 
-  readonly categoryOptions: Array<{ label: string; value: LibraryCategory; icon: AppIconName }> = [
-    { label: 'Todo', value: 'all', icon: 'bookmark' },
-    { label: 'Pelicula', value: 'movie', icon: 'film' },
-    { label: 'Serie', value: 'series', icon: 'tv' },
-    { label: 'Videojuego', value: 'game', icon: 'gamepad' },
-    { label: 'Efectos', value: 'sfx', icon: 'speaker-wave' }
+  readonly categoryOptions: Array<{ label: string; value: LibraryCategory; icon: IconDefinition }> = [
+    { label: 'Todo', value: 'all', icon: faBookmark },
+    { label: 'Pelicula', value: 'movie', icon: faFilm },
+    { label: 'Serie', value: 'series', icon: faTv },
+    { label: 'Videojuego', value: 'game', icon: faGamepad },
+    { label: 'Efectos', value: 'sfx', icon: faVolumeHigh }
   ];
 
   readonly sortOptions: Array<{ label: string; value: LibrarySort }> = [
@@ -155,16 +178,29 @@ export class LibraryComponent implements OnInit {
     return safeViews === 1 ? '1 visita' : `${formattedViews} visitas`;
   }
 
-  getStarArray(rating: number): boolean[] {
+  getStarArray(rating: number): StarKind[] {
     const normalizedRating = Math.max(0, Math.min(5, Number.isFinite(rating) ? rating : 0));
-    return Array.from({ length: 5 }, (_item, index) => index < Math.round(normalizedRating));
+    const fullStars = Math.floor(normalizedRating);
+    const hasHalfStar = normalizedRating - fullStars >= 0.5;
+
+    return Array.from({ length: 5 }, (_item, index) => {
+      if (index < fullStars) {
+        return 'full';
+      }
+
+      if (index === fullStars && hasHalfStar) {
+        return 'half';
+      }
+
+      return 'empty';
+    });
   }
 
   trackByOptionValue(_index: number, option: { value: string }): string {
     return option.value;
   }
 
-  trackByBooleanIndex(index: number): number {
+  trackByStarIndex(index: number): number {
     return index;
   }
 

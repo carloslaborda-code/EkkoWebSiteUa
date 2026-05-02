@@ -5,11 +5,6 @@
 .glow-left { top: calc(var(--safe-top) + 48px); left: 12vw; width: clamp(40px, 12vw, 48px); height: clamp(40px, 12vw, 48px); }
 .glow-top { top: calc(var(--safe-top) + 12px); right: 4vw; width: clamp(44px, 13vw, 56px); height: clamp(44px, 13vw, 56px); }
 .glow-right { right: 4vw; bottom: calc(var(--bottom-nav-height) + 14vh); width: clamp(44px, 14vw, 60px); height: clamp(44px, 14vw, 60px); }
-.detail-header { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; gap: 10px; padding: 8px var(--screen-padding-wide) 18px; border-bottom: 1px solid rgba(182,165,129,.12); }
-.back-link { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 0; background: transparent; color: #fff; }
-.back-link svg { width: 24px; height: 24px; }
-.brand-logo-image { width: clamp(82px, 24vw, 98px); justify-self: center; }
-.header-space { width: 40px; height: 40px; }
 .hero-card { padding: 12px var(--screen-padding) 0; }
 .media-frame { position: relative; overflow: hidden; border-radius: 14px; background: #10151f; min-height: clamp(220px, 58vw, 340px); }
 .media-frame--audio { background: linear-gradient(145deg, #d1d1d1, #b8b8b8); }
