@@ -20,6 +20,13 @@
   min-height: 40px;
 }
 
+.app-header__brand-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+}
+
 .app-header__side--end {
   justify-content: flex-end;
 }
@@ -55,7 +62,8 @@
   display: block;
   width: clamp(82px, 24vw, 98px);
   height: auto;
-  justify-self: center;
+  flex: 0 0 auto;
+  transform: translateY(-2px);
 }
 
 .app-header__side--end > [header-end] {
