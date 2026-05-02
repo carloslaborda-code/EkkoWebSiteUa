@@ -148,9 +148,7 @@ html[data-high-contrast='true'] body {
 }
 
 html[data-high-contrast='true'] .glow,
-html[data-high-contrast='true'] .ambient,
-html[data-screen-reader-mode='true'] .glow,
-html[data-screen-reader-mode='true'] .ambient {
+html[data-high-contrast='true'] .ambient {
   display: none !important;
 }
 
@@ -178,14 +176,6 @@ html[data-high-contrast='true'] select:focus-visible {
 html[data-high-contrast='true'] ::placeholder {
   color: #d6d6d6 !important;
   opacity: 1;
-}
-
-.accessibility-transcript {
-  display: none;
-}
-
-html[data-show-transcripts='true'] .accessibility-transcript {
-  display: block;
 }
 
 @media (min-width: 768px) {

@@ -28,4 +28,8 @@ export class NavbarComponent {
   openPublish(): void {
     this.router.navigate([this.isLoggedIn ? '/publish' : '/login']);
   }
+
+  openLibrary(): void {
+    this.router.navigate([this.isLoggedIn ? '/library' : '/login']);
+  }
 }

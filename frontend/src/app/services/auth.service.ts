@@ -27,8 +27,6 @@ export interface AuthResponse {
       largeTargets: boolean;
       underlineLinks: boolean;
       readableFont: boolean;
-      screenReaderMode: boolean;
-      showTranscripts: boolean;
     };
     role: string;
   };

@@ -66,14 +66,6 @@ const settingsSchema = new mongoose.Schema(
     readableFont: {
       type: Boolean,
       default: defaultUserSettings.readableFont
-    },
-    screenReaderMode: {
-      type: Boolean,
-      default: defaultUserSettings.screenReaderMode
-    },
-    showTranscripts: {
-      type: Boolean,
-      default: defaultUserSettings.showTranscripts
     }
   },
   { _id: false }

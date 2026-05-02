@@ -34,9 +34,7 @@ describe('SettingsComponent', () => {
                   reducedMotion: false,
                   largeTargets: false,
                   underlineLinks: false,
-                  readableFont: false,
-                  screenReaderMode: false,
-                  showTranscripts: false
+                  readableFont: false
                 },
                 role: 'user'
               }),
@@ -50,9 +48,7 @@ describe('SettingsComponent', () => {
                   reducedMotion: false,
                   largeTargets: false,
                   underlineLinks: false,
-                  readableFont: false,
-                  screenReaderMode: false,
-                  showTranscripts: false
+                  readableFont: false
                 }
               })
           }

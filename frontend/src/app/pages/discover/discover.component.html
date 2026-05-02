@@ -13,7 +13,7 @@
       >
         <app-icon name="chevron-left" className="h-6 w-6"></app-icon>
       </button>
-      <img class="mx-auto w-[92px] max-w-full" src="assets/images/ekko-logo.png" alt="Ekko" />
+      <img class="mx-auto w-[92px] max-w-full" src="assets/images/ekko-logo.png" alt="Ekko" decoding="async" />
       <div class="h-10 w-10"></div>
     </header>
 
@@ -46,7 +46,7 @@
             <button
               type="button"
               class="inline-flex items-center gap-2 rounded-full border px-5 py-3 text-[0.95rem] font-semibold transition-all duration-200 hover:-translate-y-0.5"
-              *ngFor="let option of visibleCategoryOptions"
+              *ngFor="let option of visibleCategoryOptions; trackBy: trackByOptionValue"
               [ngClass]="selectedCategory === option.value
                 ? 'border-[#d7c29d] bg-[#c4ae88] text-[#1d1a15] shadow-[0_10px_24px_rgba(0,0,0,0.24)]'
                 : 'border-white/10 bg-[#151515] text-slate-200 hover:border-white/20 hover:bg-[#1a1a1a]'"
@@ -109,7 +109,7 @@
               <button
                 type="button"
                 class="block w-full bg-transparent px-4 py-3 text-left font-semibold text-white transition-colors duration-150 hover:bg-white/5"
-                *ngFor="let title of availableWorkTitles"
+                *ngFor="let title of availableWorkTitles; trackBy: trackByTitle"
                 [ngClass]="title === selectedWorkTitle ? 'bg-[#c4ae88] text-[#1d1a15]' : ''"
                 (click)="selectWorkTitle(title); applyFilters()"
               >
@@ -140,7 +140,7 @@
           <p *ngIf="!loading && !filteredQuotes.length" class="mx-1 text-center text-sm text-slate-400 lg:col-span-2">No hay publicaciones que coincidan con estos filtros.</p>
 
           <article
-            *ngFor="let quote of filteredQuotes"
+            *ngFor="let quote of filteredQuotes; trackBy: trackByQuoteId"
             class="grid cursor-pointer grid-cols-[110px_1fr] gap-4 overflow-hidden rounded-[20px] border border-white/6 bg-[#10141b] shadow-[0_18px_34px_rgba(0,0,0,0.28)] transition-transform duration-200 hover:-translate-y-0.5"
             role="button"
             tabindex="0"
@@ -150,7 +150,7 @@
             (keydown.space)="$event.preventDefault(); openQuote(quote._id)"
           >
             <div class="relative min-h-[120px] bg-[#161b24]">
-              <img class="h-full w-full object-cover" [src]="quote.image" [alt]="quote.workTitle" />
+              <img class="h-full w-full object-cover" [src]="quote.image" [alt]="quote.workTitle" loading="lazy" decoding="async" />
               <span class="absolute bottom-2.5 right-2.5 rounded-full bg-black/60 px-2.5 py-1 text-[0.72rem] font-bold text-white">
                 {{ quote.mediaType === 'audio' ? 'Audio' : 'Video' }}
               </span>

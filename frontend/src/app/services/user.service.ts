@@ -18,8 +18,6 @@ export interface UserSettings {
   largeTargets: boolean;
   underlineLinks: boolean;
   readableFont: boolean;
-  screenReaderMode: boolean;
-  showTranscripts: boolean;
 }
 
 export interface SavedQuote {
@@ -27,9 +25,16 @@ export interface SavedQuote {
   text: string;
   workTitle: string;
   year: number;
+  rating: number;
+  ratingsCount: number;
+  views: string;
   image: string;
   mediaType: 'video' | 'audio';
   duration: string;
+  actorName: string;
+  characterName: string;
+  hashtags: string[];
+  category: string;
 }
 
 export interface RatedQuote {
@@ -99,6 +104,12 @@ export class UserService {
           this.accessibilityService.persistUserSettings(mergedSettings);
         })
       );
+  }
+
+  updatePassword(payload: { currentPassword: string; newPassword: string }): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(`${this.apiUrl}/password`, payload, {
+      headers: this.getHeaders()
+    });
   }
 
   syncSavedQuotes(savedQuoteIds: string[]): void {

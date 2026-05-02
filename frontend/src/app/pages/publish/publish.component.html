@@ -10,7 +10,7 @@
           <path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
-      <img class="brand-logo-image" src="assets/images/ekko-logo.png" alt="Ekko" />
+      <img class="brand-logo-image" src="assets/images/ekko-logo.png" alt="Ekko" decoding="async" />
       <div class="header-space"></div>
     </header>
 
@@ -88,7 +88,7 @@
           </section>
 
           <div class="cover-preview" *ngIf="coverPreview; else emptyCoverState">
-            <img [src]="coverPreview" alt="Vista previa de la portada" />
+            <img [src]="coverPreview" alt="Vista previa de la portada" decoding="async" />
           </div>
 
           <ng-template #emptyCoverState>
@@ -132,7 +132,7 @@
           <button
             type="button"
             class="category-chip"
-            *ngFor="let option of categories"
+            *ngFor="let option of categories; trackBy: trackByCategory"
             [class.category-chip--active]="category === option.value"
             [attr.aria-pressed]="category === option.value"
             (click)="category = option.value"
@@ -150,7 +150,7 @@
             <span>A&Ntilde;O</span>
             <select [(ngModel)]="year">
               <option value="">Selecciona</option>
-              <option *ngFor="let option of yearOptions" [value]="option">{{ option }}</option>
+              <option *ngFor="let option of yearOptions; trackBy: trackByYear" [value]="option">{{ option }}</option>
             </select>
           </label>
         </div>

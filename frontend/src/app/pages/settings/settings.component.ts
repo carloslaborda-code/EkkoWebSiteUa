@@ -7,9 +7,7 @@ type BooleanAccessibilitySetting =
   | 'reducedMotion'
   | 'largeTargets'
   | 'underlineLinks'
-  | 'readableFont'
-  | 'screenReaderMode'
-  | 'showTranscripts';
+  | 'readableFont';
 
 @Component({
   selector: 'app-settings',
@@ -19,6 +17,15 @@ type BooleanAccessibilitySetting =
 export class SettingsComponent implements OnInit {
   profile: UserProfile | null = null;
   saving = false;
+  accountConfigOpen = false;
+  passwordSaving = false;
+  passwordMessage = '';
+  passwordError = false;
+  passwordForm = {
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  };
   colorFilters = ['default', 'warm', 'cool', 'grayscale'];
   textSizes = ['small', 'medium', 'large', 'extra-large'];
 
@@ -67,6 +74,64 @@ export class SettingsComponent implements OnInit {
   updateBooleanSetting(setting: BooleanAccessibilitySetting): void {
     if (!this.profile) return;
     this.persistSettings({ [setting]: this.profile.settings[setting] });
+  }
+
+  trackByValue(_index: number, value: string): string {
+    return value;
+  }
+
+  toggleAccountConfig(): void {
+    this.accountConfigOpen = !this.accountConfigOpen;
+  }
+
+  submitPasswordChange(): void {
+    if (!this.profile || this.passwordSaving) return;
+
+    this.passwordMessage = '';
+    this.passwordError = false;
+
+    if (!this.passwordForm.currentPassword || !this.passwordForm.newPassword || !this.passwordForm.confirmPassword) {
+      this.passwordError = true;
+      this.passwordMessage = 'Completa los tres campos para cambiar la contrasena.';
+      return;
+    }
+
+    if (this.passwordForm.newPassword.length < 6) {
+      this.passwordError = true;
+      this.passwordMessage = 'La nueva contrasena debe tener al menos 6 caracteres.';
+      return;
+    }
+
+    if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
+      this.passwordError = true;
+      this.passwordMessage = 'La confirmacion no coincide con la nueva contrasena.';
+      return;
+    }
+
+    this.passwordSaving = true;
+
+    this.userService
+      .updatePassword({
+        currentPassword: this.passwordForm.currentPassword,
+        newPassword: this.passwordForm.newPassword
+      })
+      .subscribe({
+        next: ({ message }) => {
+          this.passwordSaving = false;
+          this.passwordError = false;
+          this.passwordMessage = message || 'Contrasena actualizada correctamente.';
+          this.passwordForm = {
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+          };
+        },
+        error: (error) => {
+          this.passwordSaving = false;
+          this.passwordError = true;
+          this.passwordMessage = error?.error?.message || 'No se pudo actualizar la contrasena.';
+        }
+      });
   }
 
   getColorFilterLabel(filter: string): string {

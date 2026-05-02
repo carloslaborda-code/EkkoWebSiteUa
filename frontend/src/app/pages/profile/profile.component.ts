@@ -9,7 +9,6 @@ import { UserProfile, UserService } from '../../services/user.service';
 })
 export class ProfileComponent implements OnInit {
   profile: UserProfile | null = null;
-  loading = true;
   avatarSaving = false;
   avatarMessage = '';
   avatarError = false;
@@ -25,10 +24,8 @@ export class ProfileComponent implements OnInit {
     this.userService.getCurrentUser().subscribe({
       next: (profile) => {
         this.profile = profile;
-        this.loading = false;
       },
       error: () => {
-        this.loading = false;
         this.router.navigate(['/login']);
       }
     });
@@ -104,5 +101,9 @@ export class ProfileComponent implements OnInit {
     };
 
     reader.readAsDataURL(file);
+  }
+
+  trackByUploadTitle(index: number, upload: { title: string }): string {
+    return `${upload.title}-${index}`;
   }
 }

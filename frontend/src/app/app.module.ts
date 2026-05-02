@@ -8,6 +8,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { DiscoverComponent } from './pages/discover/discover.component';
 import { DetailComponent } from './pages/detail/detail.component';
 import { HomeComponent } from './pages/home/home.component';
+import { LibraryComponent } from './pages/library/library.component';
 import { LoginComponent } from './pages/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -24,6 +25,7 @@ import { SettingsComponent } from './pages/settings/settings.component';
     DiscoverComponent,
     DetailComponent,
     HomeComponent,
+    LibraryComponent,
     LoginComponent,
     PublishComponent,
     RegisterComponent,

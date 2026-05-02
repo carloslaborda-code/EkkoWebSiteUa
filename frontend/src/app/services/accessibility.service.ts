@@ -9,9 +9,7 @@ const DEFAULT_ACCESSIBILITY_SETTINGS: UserSettings = {
   reducedMotion: false,
   largeTargets: false,
   underlineLinks: false,
-  readableFont: false,
-  screenReaderMode: false,
-  showTranscripts: false
+  readableFont: false
 };
 
 @Injectable({
@@ -72,8 +70,6 @@ export class AccessibilityService {
     root.setAttribute('data-large-targets', String(settings.largeTargets));
     root.setAttribute('data-underline-links', String(settings.underlineLinks));
     root.setAttribute('data-readable-font', String(settings.readableFont));
-    root.setAttribute('data-screen-reader-mode', String(settings.screenReaderMode));
-    root.setAttribute('data-show-transcripts', String(settings.showTranscripts));
   }
 
   private getFontSize(size: string): string {
@@ -99,9 +95,7 @@ export class AccessibilityService {
       reducedMotion: Boolean(settings?.reducedMotion),
       largeTargets: Boolean(settings?.largeTargets),
       underlineLinks: Boolean(settings?.underlineLinks),
-      readableFont: Boolean(settings?.readableFont),
-      screenReaderMode: Boolean(settings?.screenReaderMode),
-      showTranscripts: Boolean(settings?.showTranscripts)
+      readableFont: Boolean(settings?.readableFont)
     };
   }
 

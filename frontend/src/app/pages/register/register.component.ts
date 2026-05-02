@@ -1,40 +1,57 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  templateUrl: './register.component.html'
 })
 export class RegisterComponent {
   username = '';
   email = '';
   password = '';
   confirmPassword = '';
+  errorMessage = '';
+  isSubmitting = false;
 
   constructor(private auth: AuthService, public router: Router) {}
 
-  register() {
-    if (this.password !== this.confirmPassword) {
-      alert('Las contraseñas no coinciden');
+  register(): void {
+    this.errorMessage = '';
+
+    if (!this.username.trim() || !this.email.trim() || !this.password.trim() || !this.confirmPassword.trim()) {
+      this.errorMessage = 'Completa todos los campos para crear tu cuenta.';
       return;
     }
 
-    const data = {
-      username: this.username,
-      email: this.email,
-      password: this.password
-    };
+    if (this.password.length < 6) {
+      this.errorMessage = 'La contrasena debe tener al menos 6 caracteres.';
+      return;
+    }
 
-    this.auth.register(data).subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-      },
-      error: (err) => {
-        console.error('Error en registro', err);
-        alert(err.error?.message || 'Error al registrar el usuario');
-      }
-    });
+    if (this.password !== this.confirmPassword) {
+      this.errorMessage = 'Las contrasenas no coinciden.';
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    this.auth
+      .register({
+        username: this.username.trim(),
+        email: this.email.trim(),
+        password: this.password
+      })
+      .subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.router.navigate(['/login']);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.isSubmitting = false;
+          this.errorMessage = err.error?.message || 'No se pudo registrar el usuario.';
+        }
+      });
   }
 }

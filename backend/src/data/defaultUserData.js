@@ -5,9 +5,7 @@ const defaultUserSettings = {
   reducedMotion: false,
   largeTargets: false,
   underlineLinks: false,
-  readableFont: false,
-  screenReaderMode: false,
-  showTranscripts: false
+  readableFont: false
 };
 
 const defaultUploads = [];

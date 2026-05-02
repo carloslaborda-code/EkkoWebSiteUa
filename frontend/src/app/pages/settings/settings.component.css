@@ -20,7 +20,15 @@
 .item-left { display: block; font-size: 1rem; font-weight: 700; }
 .item-help { display: block; margin: 6px 0 0; color: #a9b4c7; font-size: .9rem; line-height: 1.45; }
 .item-arrow { color: #8d96ad; font-size: 1.4rem; line-height: 1; }
+.settings-item[aria-expanded='true'] .item-arrow { transform: rotate(90deg); }
 .settings-item--toggle { cursor: pointer; }
+.password-form { margin: -2px 0 12px; padding: 16px; border: 1px solid rgba(214,190,138,.12); border-radius: 12px; background: rgba(10,12,17,.72); }
+.password-field { display: grid; gap: 8px; margin-bottom: 12px; color: #dbe3f2; font-size: .92rem; font-weight: 700; }
+.password-field input { min-height: 46px; width: 100%; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; background: rgba(2,6,23,.78); color: #fff; padding: 0 12px; font: inherit; }
+.password-submit { min-height: 46px; width: 100%; border: 0; border-radius: 10px; background: #d6be8a; color: #15120e; font-weight: 900; cursor: pointer; }
+.password-submit:disabled { opacity: .68; cursor: progress; }
+.password-message { margin: 12px 0 0; color: #d6be8a; line-height: 1.45; }
+.password-message--error { color: #f2a8a8; }
 .toggle { position: relative; flex: 0 0 auto; width: 52px; height: 32px; }
 .toggle input { position: absolute; inset: 0; opacity: 0; }
 .toggle-slider { display: block; width: 100%; height: 100%; border-radius: 999px; background: #48556e; position: relative; transition: .2s ease; }

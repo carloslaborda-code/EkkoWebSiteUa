@@ -11,7 +11,7 @@ type Category = 'movie' | 'series' | 'game' | 'sfx';
   templateUrl: './publish.component.html',
   styleUrls: ['./publish.component.css']
 })
-export class PublishComponent implements OnInit {
+export class PublishComponent implements OnInit, OnDestroy {
   @ViewChild('videoCoverPreview') videoCoverPreview?: ElementRef<HTMLVideoElement>;
 
   private readonly maxAudioSize = 8 * 1024 * 1024;
@@ -217,6 +217,14 @@ export class PublishComponent implements OnInit {
     const minutes = Math.floor(safeSeconds / 60);
     const remainingSeconds = safeSeconds % 60;
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  }
+
+  trackByCategory(_index: number, option: { value: Category }): Category {
+    return option.value;
+  }
+
+  trackByYear(_index: number, year: string): string {
+    return year;
   }
 
   publish(): void {

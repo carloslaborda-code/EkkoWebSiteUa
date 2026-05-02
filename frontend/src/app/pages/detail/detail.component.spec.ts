@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
@@ -14,6 +15,7 @@ describe('DetailComponent', () => {
     TestBed.configureTestingModule({
       declarations: [DetailComponent],
       imports: [RouterTestingModule],
+      schemas: [NO_ERRORS_SCHEMA],
       providers: [
         {
           provide: QuoteService,
@@ -47,6 +49,7 @@ describe('DetailComponent', () => {
           provide: UserService,
           useValue: {
             getCurrentUser: () => of({ savedQuotes: [], ratedQuotes: [] }),
+            getStoredUser: () => null,
             syncSavedQuotes: () => undefined,
             syncRatedQuotes: () => undefined
           }

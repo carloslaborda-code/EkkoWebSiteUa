@@ -53,6 +53,10 @@ export class HomeComponent implements OnInit {
     return Array.from({ length: 5 }, (_, index) => index < fullStars);
   }
 
+  trackByBooleanIndex(index: number): number {
+    return index;
+  }
+
   trackByQuoteId(_: number, quote: Quote): string {
     return quote._id;
   }

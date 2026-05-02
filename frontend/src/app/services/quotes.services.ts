@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, shareReplay, tap } from 'rxjs';
 import { UserUpload } from './user.service';
 import { API_BASE_URL } from './api-url';
 
@@ -45,20 +45,27 @@ export interface CreateQuotePayload {
 })
 export class QuoteService {
   private apiUrl = `${API_BASE_URL}/quotes`;
+  private quotesRequest$?: Observable<Quote[]>;
+  private quotesById = new Map<string, Quote>();
 
   constructor(private http: HttpClient) {}
 
   getQuotes(): Observable<Quote[]> {
-    return this.http.get<Quote[]>(this.apiUrl).pipe(
-      tap((quotes) => {
-        quotes.forEach((quote) => this.normalizeQuote(quote));
-      })
-    );
+    if (!this.quotesRequest$) {
+      this.quotesRequest$ = this.http.get<Quote[]>(this.apiUrl).pipe(
+        tap((quotes) => {
+          quotes.forEach((quote) => this.upsertQuote(this.normalizeQuote(quote)));
+        }),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+    }
+
+    return this.quotesRequest$;
   }
 
   getQuoteById(id: string): Observable<Quote> {
     return this.http.get<Quote>(`${this.apiUrl}/${id}`).pipe(
-      tap((quote) => this.normalizeQuote(quote))
+      tap((quote) => this.upsertQuote(this.normalizeQuote(quote)))
     );
   }
 
@@ -66,7 +73,13 @@ export class QuoteService {
     return this.http
       .post<{ message: string; quote: Quote; user: { uploadsCount: number; uploads: UserUpload[] } }>(this.apiUrl, payload, {
         headers: this.getHeaders()
-      });
+      })
+      .pipe(
+        tap(({ quote }) => {
+          this.quotesRequest$ = undefined;
+          this.upsertQuote(this.normalizeQuote(quote));
+        })
+      );
   }
 
   toggleSave(id: string): Observable<{ message: string; saved: boolean; savedCount: number; savedQuoteIds: string[] }> {
@@ -78,11 +91,26 @@ export class QuoteService {
   rateQuote(id: string, value: number): Observable<{ message: string; rating: number; ratingsCount: number; ratedQuotes: { quoteId: string; value: number }[] }> {
     return this.http.post<{ message: string; rating: number; ratingsCount: number; ratedQuotes: { quoteId: string; value: number }[] }>(`${this.apiUrl}/${id}/rate`, { value }, {
       headers: this.getHeaders()
-    });
+    }).pipe(
+      tap(({ rating, ratingsCount }) => {
+        const cachedQuote = this.quotesById.get(id);
+        if (cachedQuote) {
+          cachedQuote.rating = rating;
+          cachedQuote.ratingsCount = ratingsCount;
+        }
+      })
+    );
   }
 
   registerView(id: string): Observable<{ message: string; views: string }> {
-    return this.http.post<{ message: string; views: string }>(`${this.apiUrl}/${id}/view`, {});
+    return this.http.post<{ message: string; views: string }>(`${this.apiUrl}/${id}/view`, {}).pipe(
+      tap(({ views }) => {
+        const cachedQuote = this.quotesById.get(id);
+        if (cachedQuote) {
+          cachedQuote.views = views;
+        }
+      })
+    );
   }
 
   registerDownload(id: string): Observable<{ message: string; mediaUrl: string }> {
@@ -108,6 +136,12 @@ export class QuoteService {
     quote.category = typeof quote.category === 'string' && quote.category.trim() ? quote.category : 'movie';
     quote.mediaType = quote.mediaType === 'audio' ? 'audio' : 'video';
     return quote;
+  }
+
+  private upsertQuote(quote: Quote): void {
+    if (quote._id) {
+      this.quotesById.set(quote._id, quote);
+    }
   }
 
   private getHeaders(): HttpHeaders {

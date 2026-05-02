@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const Quote = require('../models/quote');
 const { defaultUploads, defaultUserSettings } = require('../data/defaultUserData');
 const allowedColorFilters = ['default', 'warm', 'cool', 'grayscale'];
 const allowedTextSizes = ['small', 'medium', 'large', 'extra-large'];
@@ -70,9 +69,7 @@ const ensureUserDefaults = async (user) => {
       'reducedMotion',
       'largeTargets',
       'underlineLinks',
-      'readableFont',
-      'screenReaderMode',
-      'showTranscripts'
+      'readableFont'
     ].forEach((settingKey) => {
       if (typeof user.settings[settingKey] !== 'boolean') {
         user.settings[settingKey] = defaultUserSettings[settingKey];
@@ -92,36 +89,6 @@ const ensureUserDefaults = async (user) => {
   }
 
   if (changed) {
-    await user.save();
-  }
-
-  return user;
-};
-
-const syncUploadsFromQuotes = async (user) => {
-  const createdQuotes = await Quote.find({ createdBy: user._id })
-    .sort({ createdAt: -1 })
-    .select('workTitle image mediaType');
-
-  const uploadsFromQuotes = createdQuotes.map((quote) => ({
-    title: quote.workTitle,
-    image: quote.image || '',
-    type: quote.mediaType === 'video' ? 'video' : 'audio'
-  }));
-
-  const currentUploads = Array.isArray(user.uploads) ? user.uploads.map((upload) => ({
-    title: upload.title,
-    image: upload.image || '',
-    type: upload.type || 'audio'
-  })) : [];
-
-  const hasChanged =
-    JSON.stringify(currentUploads) !== JSON.stringify(uploadsFromQuotes) ||
-    user.uploadsCount !== uploadsFromQuotes.length;
-
-  if (hasChanged) {
-    user.uploads = uploadsFromQuotes;
-    user.uploadsCount = uploadsFromQuotes.length;
     await user.save();
   }
 
@@ -225,7 +192,7 @@ const getCurrentUser = async (req, res) => {
       .select('-password')
       .populate({
         path: 'savedQuotes',
-        select: 'text workTitle year image mediaType duration'
+        select: 'text workTitle year rating ratingsCount views image mediaType duration actorName characterName hashtags category'
       });
     await ensureUserDefaults(user);
     res.json(user);
@@ -254,7 +221,10 @@ const updateProfile = async (req, res) => {
     }
 
     await user.save();
-    await user.populate('savedQuotes');
+    await user.populate({
+      path: 'savedQuotes',
+      select: 'text workTitle year rating ratingsCount views image mediaType duration actorName characterName hashtags category'
+    });
 
     res.json({
       message: 'Perfil actualizado correctamente',
@@ -289,9 +259,7 @@ const updateSettings = async (req, res) => {
       reducedMotion,
       largeTargets,
       underlineLinks,
-      readableFont,
-      screenReaderMode,
-      showTranscripts
+      readableFont
     } = req.body;
     const user = await User.findById(req.user._id);
 
@@ -309,9 +277,7 @@ const updateSettings = async (req, res) => {
       ...(typeof reducedMotion === 'boolean' ? { reducedMotion } : {}),
       ...(typeof largeTargets === 'boolean' ? { largeTargets } : {}),
       ...(typeof underlineLinks === 'boolean' ? { underlineLinks } : {}),
-      ...(typeof readableFont === 'boolean' ? { readableFont } : {}),
-      ...(typeof screenReaderMode === 'boolean' ? { screenReaderMode } : {}),
-      ...(typeof showTranscripts === 'boolean' ? { showTranscripts } : {})
+      ...(typeof readableFont === 'boolean' ? { readableFont } : {})
     };
 
     await user.save();
@@ -325,4 +291,43 @@ const updateSettings = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getCurrentUser, updateProfile, updateSettings };
+const updatePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'La contrasena actual y la nueva son obligatorias' });
+    }
+
+    if (String(newPassword).length < 6) {
+      return res.status(400).json({ message: 'La nueva contrasena debe tener al menos 6 caracteres' });
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    const currentPasswordMatches = await bcrypt.compare(currentPassword, user.password);
+
+    if (!currentPasswordMatches) {
+      return res.status(401).json({ message: 'La contrasena actual no es correcta' });
+    }
+
+    const samePassword = await bcrypt.compare(newPassword, user.password);
+
+    if (samePassword) {
+      return res.status(400).json({ message: 'La nueva contrasena debe ser diferente a la actual' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.json({ message: 'Contrasena actualizada correctamente' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al actualizar la contrasena', error: error.message });
+  }
+};
+
+module.exports = { register, login, getCurrentUser, updateProfile, updateSettings, updatePassword };

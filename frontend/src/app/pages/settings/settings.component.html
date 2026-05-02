@@ -18,10 +18,58 @@
 
       <section class="settings-group" aria-labelledby="account-title">
         <h2 id="account-title">CUENTA</h2>
-        <button type="button" class="settings-item">
+        <button type="button" class="settings-item" (click)="toggleAccountConfig()" [attr.aria-expanded]="accountConfigOpen">
           <span class="item-left">Configuraci&oacute;n de la cuenta</span>
           <span class="item-arrow" aria-hidden="true">&rsaquo;</span>
         </button>
+        <form class="password-form" *ngIf="accountConfigOpen" (ngSubmit)="submitPasswordChange()" aria-label="Cambiar contrasena">
+          <label class="password-field" for="current-password">
+            <span>Contrase&ntilde;a actual</span>
+            <input
+              id="current-password"
+              type="password"
+              name="currentPassword"
+              autocomplete="current-password"
+              [(ngModel)]="passwordForm.currentPassword"
+            />
+          </label>
+
+          <label class="password-field" for="new-password">
+            <span>Nueva contrase&ntilde;a</span>
+            <input
+              id="new-password"
+              type="password"
+              name="newPassword"
+              autocomplete="new-password"
+              [(ngModel)]="passwordForm.newPassword"
+            />
+          </label>
+
+          <label class="password-field" for="confirm-password">
+            <span>Confirmar contrase&ntilde;a</span>
+            <input
+              id="confirm-password"
+              type="password"
+              name="confirmPassword"
+              autocomplete="new-password"
+              [(ngModel)]="passwordForm.confirmPassword"
+            />
+          </label>
+
+          <button type="submit" class="password-submit" [disabled]="passwordSaving">
+            {{ passwordSaving ? 'Guardando...' : 'Actualizar contrasena' }}
+          </button>
+
+          <p
+            class="password-message"
+            *ngIf="passwordMessage"
+            [class.password-message--error]="passwordError"
+            role="status"
+            aria-live="polite"
+          >
+            {{ passwordMessage }}
+          </p>
+        </form>
         <button type="button" class="settings-item">
           <span class="item-left">Privacidad</span>
           <span class="item-arrow" aria-hidden="true">&rsaquo;</span>
@@ -43,7 +91,7 @@
             <button
               type="button"
               class="chip"
-              *ngFor="let filter of colorFilters"
+              *ngFor="let filter of colorFilters; trackBy: trackByValue"
               [class.chip--active]="profile.settings.colorFilter === filter"
               [attr.aria-pressed]="profile.settings.colorFilter === filter"
               (click)="updateFilter(filter)"
@@ -62,7 +110,7 @@
             <button
               type="button"
               class="chip"
-              *ngFor="let size of textSizes"
+              *ngFor="let size of textSizes; trackBy: trackByValue"
               [class.chip--active]="profile.settings.textSize === size"
               [attr.aria-pressed]="profile.settings.textSize === size"
               (click)="updateTextSize(size)"
@@ -123,28 +171,6 @@
           </span>
           <span class="toggle">
             <input type="checkbox" [(ngModel)]="profile.settings.readableFont" (change)="updateBooleanSetting('readableFont')" />
-            <span class="toggle-slider" aria-hidden="true"></span>
-          </span>
-        </label>
-
-        <label class="settings-item settings-item--toggle">
-          <span>
-            <span class="item-left">Modo lector de pantalla</span>
-            <span class="item-help">Reduce decoracion visual y mantiene nombres claros para la navegacion asistida.</span>
-          </span>
-          <span class="toggle">
-            <input type="checkbox" [(ngModel)]="profile.settings.screenReaderMode" (change)="updateBooleanSetting('screenReaderMode')" />
-            <span class="toggle-slider" aria-hidden="true"></span>
-          </span>
-        </label>
-
-        <label class="settings-item settings-item--toggle">
-          <span>
-            <span class="item-left">Transcripciones visibles</span>
-            <span class="item-help">Muestra texto equivalente al audio o video cuando existe contenido textual.</span>
-          </span>
-          <span class="toggle">
-            <input type="checkbox" [(ngModel)]="profile.settings.showTranscripts" (change)="updateBooleanSetting('showTranscripts')" />
             <span class="toggle-slider" aria-hidden="true"></span>
           </span>
         </label>

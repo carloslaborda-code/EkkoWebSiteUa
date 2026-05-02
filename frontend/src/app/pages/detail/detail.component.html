@@ -13,13 +13,13 @@
       >
         <app-icon name="chevron-left" className="h-6 w-6"></app-icon>
       </button>
-      <img class="brand-logo-image" src="assets/images/ekko-logo.png" alt="Ekko" />
+      <img class="brand-logo-image" src="assets/images/ekko-logo.png" alt="Ekko" decoding="async" />
       <div class="header-space"></div>
     </header>
 
     <section class="hero-card">
       <div class="media-frame" [class.media-frame--audio]="quote.mediaType === 'audio'">
-        <img *ngIf="!isPlaying" [src]="quote.image" [alt]="quote.workTitle" class="media-poster" />
+        <img *ngIf="!isPlaying" [src]="quote.image" [alt]="quote.workTitle" class="media-poster" decoding="async" fetchpriority="high" />
 
         <video
           *ngIf="isPlaying && quote.mediaType === 'video'"
@@ -32,7 +32,7 @@
         ></video>
 
         <div *ngIf="isPlaying && quote.mediaType === 'audio'" class="audio-player-wrap">
-          <img [src]="quote.image" [alt]="quote.workTitle" class="audio-poster" />
+          <img [src]="quote.image" [alt]="quote.workTitle" class="audio-poster" decoding="async" />
           <audio class="audio-player" [src]="quote.mediaUrl" controls autoplay [attr.aria-label]="'Audio de ' + quote.workTitle + ': ' + quote.text" (loadedmetadata)="updateDuration($event)"></audio>
         </div>
 
@@ -40,13 +40,6 @@
           <app-icon name="play-solid" className="h-7 w-7"></app-icon>
         </button>
       </div>
-    </section>
-
-    <section class="accessibility-transcript" aria-labelledby="transcript-title">
-      <h2 id="transcript-title">Transcripcion del fragmento</h2>
-      <p>"{{ quote.text }}"</p>
-      <p>{{ quote.workTitle }} ({{ quote.year }}). {{ quote.actorName }} como {{ quote.characterName }}.</p>
-      <p>{{ quote.synopsis }}</p>
     </section>
 
     <section class="detail-body">
@@ -58,7 +51,7 @@
           <button
             type="button"
             class="rating-star"
-            *ngFor="let star of ratingStars"
+            *ngFor="let star of ratingStars; trackBy: trackByNumber"
             [class.rating-star--active]="star <= userRating"
             [disabled]="ratingSaving"
             [attr.aria-label]="'Valorar con ' + star + ' de 5'"
@@ -115,7 +108,7 @@
         </div>
         <p>{{ quote.synopsis }}</p>
         <div class="hashtags-row" *ngIf="quote.hashtags?.length">
-          <span class="hashtag-chip" *ngFor="let hashtag of quote.hashtags">#{{ hashtag }}</span>
+          <span class="hashtag-chip" *ngFor="let hashtag of quote.hashtags; trackBy: trackByText">#{{ hashtag }}</span>
         </div>
       </section>
     </section>

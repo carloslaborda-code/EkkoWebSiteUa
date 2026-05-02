@@ -34,7 +34,7 @@
     <form class="flex flex-col gap-5" (ngSubmit)="register()">
       <div>
         <label for="username" class="sr-only">Nombre completo</label>
-        <input id="username" name="username" type="text" [(ngModel)]="username" placeholder="Nombre completo" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+        <input id="username" name="username" type="text" autocomplete="name" [(ngModel)]="username" placeholder="Nombre completo" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
            outline-none placeholder:text-[#626262]
            transition-all duration-200 ease-out
            hover:bg-white hover:shadow-md hover:-translate-y-0.5
@@ -44,7 +44,7 @@
 
       <div>
         <label for="email" class="sr-only">Correo electr&oacute;nico</label>
-        <input id="email" name="email" type="email" [(ngModel)]="email" placeholder="Correo electr&oacute;nico" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+        <input id="email" name="email" type="email" autocomplete="email" [(ngModel)]="email" placeholder="Correo electr&oacute;nico" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
            outline-none placeholder:text-[#626262]
            transition-all duration-200 ease-out
            hover:bg-white hover:shadow-md hover:-translate-y-0.5
@@ -54,7 +54,7 @@
 
       <div>
         <label for="password" class="sr-only">Contrase&ntilde;a</label>
-        <input id="password" name="password" type="password" [(ngModel)]="password" placeholder="Contrase&ntilde;a" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+        <input id="password" name="password" type="password" autocomplete="new-password" [(ngModel)]="password" placeholder="Contrase&ntilde;a" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
            outline-none placeholder:text-[#626262]
            transition-all duration-200 ease-out
            hover:bg-white hover:shadow-md hover:-translate-y-0.5
@@ -65,7 +65,7 @@
       <div>
         <label for="confirmPassword" class="sr-only">Confirmar contrase&ntilde;a</label>
         <input id="confirmPassword" name="confirmPassword" type="password" [(ngModel)]="confirmPassword"
-          placeholder="Confirmar contrase&ntilde;a" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
+          autocomplete="new-password" placeholder="Confirmar contrase&ntilde;a" class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262]
            outline-none placeholder:text-[#626262]
            transition-all duration-200 ease-out
            hover:bg-white hover:shadow-md hover:-translate-y-0.5
@@ -73,11 +73,15 @@
            focus:bg-white" />
       </div>
 
-      <button type="submit" class="mt-2 w-full rounded-xl bg-[#FFE8B7]/70 py-4 text-xl font-semibold text-white
+      <p *ngIf="errorMessage" class="rounded-xl border border-red-400/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">
+        {{ errorMessage }}
+      </p>
+
+      <button type="submit" [disabled]="isSubmitting" class="mt-2 w-full rounded-xl bg-[#FFE8B7]/70 py-4 text-xl font-semibold text-white
          hover:bg-[#FFE8B7] hover:text-gray-900 hover:scale-[1.02] hover:shadow-lg
-         active:scale-[0.98]
+         active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70
          transition-all duration-200">
-        Crear cuenta
+        {{ isSubmitting ? 'Creando cuenta...' : 'Crear cuenta' }}
       </button>
     </form>
 

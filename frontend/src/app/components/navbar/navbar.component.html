@@ -31,8 +31,7 @@
       class="lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:transition-all lg:duration-200 lg:group-hover/nav:max-w-[120px] lg:group-hover/nav:opacity-100">Descubrir</span>
   </button>
 
-  <button type="button" aria-label="Libreria" [attr.aria-current]="activeTab === 'library' ? 'page' : null"
-    aria-disabled="true"
+  <button type="button" aria-label="Libreria" (click)="openLibrary()" [attr.aria-current]="activeTab === 'library' ? 'page' : null"
     class="order-4 group flex cursor-pointer flex-col items-center justify-center gap-1.5 text-xs transition-all duration-200 ease-out hover:text-white active:scale-95 lg:order-none lg:min-h-[58px] lg:flex-row lg:justify-start lg:gap-4 lg:rounded-2xl lg:px-4 lg:py-3 lg:text-[0.95rem] lg:hover:bg-white/5 lg:hover:translate-x-1"
     [ngClass]="activeTab === 'library' ? 'text-[#d6be8a] lg:bg-[#d6be8a] lg:text-[#151515] lg:hover:bg-[#c2a86f]' : 'text-[#9aa0a6]'">
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="h-6 w-6 lg:h-7 lg:w-7 lg:flex-none">
