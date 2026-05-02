@@ -1,0 +1,37 @@
+.profile-summary {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.profile-summary-copy,
+.profile-meta {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.identity--desktop,
+.stats-grid--desktop {
+  display: none;
+}
+
+.identity h1 span {
+  color: #9a9eb0;
+  font-size: .72em;
+  font-weight: 600;
+  letter-spacing: .03em;
+}
+
+@media (min-width: 1100px) {
+  .identity--instagram-mobile,
+  .stats-inline {
+    display: none;
+  }
+
+  .identity--desktop {
+    display: block;
+  }
+
+  .stats-grid--desktop {
+    display: grid;
+  }
+}

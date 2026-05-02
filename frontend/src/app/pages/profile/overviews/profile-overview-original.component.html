@@ -1,0 +1,45 @@
+<div class="profile-summary">
+  <div class="avatar-wrap">
+    <input
+      #avatarInput
+      type="file"
+      accept="image/*"
+      class="avatar-input"
+      (change)="avatarSelected.emit($event)"
+    />
+    <div class="avatar-ring">
+      <img *ngIf="profile.avatar" [src]="profile.avatar" [alt]="profile.username" class="avatar-image" decoding="async" />
+      <div *ngIf="!profile.avatar" class="avatar-fallback">{{ initials }}</div>
+    </div>
+    <button
+      type="button"
+      class="avatar-edit"
+      aria-label="Editar foto de perfil"
+      [disabled]="avatarSaving"
+      (click)="avatarInput.click()"
+    >
+      <fa-icon [icon]="faPencil" aria-hidden="true"></fa-icon>
+    </button>
+  </div>
+
+  <div class="profile-summary-copy">
+    <div class="profile-meta">
+      <div class="identity">
+        <h1>{{ profile.username }}</h1>
+        <p>@{{ profile.username.toLowerCase().replace(' ', '_') }}_ekko</p>
+      </div>
+      <p class="avatar-message" *ngIf="avatarMessage" [class.avatar-message--error]="avatarError">{{ avatarMessage }}</p>
+    </div>
+  </div>
+</div>
+
+<section class="stats-grid">
+  <article class="stat-card">
+    <strong>{{ profile.uploadsCount }}</strong>
+    <span>SUBIDAS</span>
+  </article>
+  <article class="stat-card">
+    <strong>{{ profile.downloads }}</strong>
+    <span>DESCARGAS</span>
+  </article>
+</section>

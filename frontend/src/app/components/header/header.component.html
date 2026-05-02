@@ -1,0 +1,13 @@
+<header class="app-header">
+  <div class="app-header__side app-header__side--start">
+    <button *ngIf="showBack" type="button" class="app-header__back" (click)="goBack()" aria-label="Volver">
+      <fa-icon [icon]="faChevronLeft" aria-hidden="true"></fa-icon>
+    </button>
+  </div>
+
+  <img class="app-header__brand" src="assets/images/ekko-logo.png" alt="Ekko" decoding="async" />
+
+  <div class="app-header__side app-header__side--end">
+    <ng-content select="[header-end]"></ng-content>
+  </div>
+</header>
