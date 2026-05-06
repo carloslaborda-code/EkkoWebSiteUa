@@ -9,13 +9,13 @@
         (click)="router.navigate(['/home'])" aria-label="Volver">
         <app-icon name="chevron-left" className="h-6 w-6"></app-icon>
       </button>
-      <img class="brand-logo-image" src="assets/images/ekko-logo.png" alt="Ekko" decoding="async" />
+      <img class="brand-logo-image" src="assets/images/ekko-logo-small.png" alt="Ekko" width="344" height="119" decoding="async" />
       <div class="header-space"></div>
     </header>
 
     <section class="hero-card">
       <div class="media-frame" [class.media-frame--audio]="quote.mediaType === 'audio'">
-        <img *ngIf="!isPlaying" [src]="quote.image" [alt]="quote.workTitle" class="media-poster" decoding="async"
+        <img *ngIf="!isPlaying" [src]="quote.image" [alt]="quote.workTitle" class="media-poster" width="1280" height="720" decoding="async"
           fetchpriority="high" />
 
         <video *ngIf="isPlaying && quote.mediaType === 'video'" class="media-player" [src]="quote.mediaUrl" controls
@@ -23,7 +23,7 @@
           (loadedmetadata)="updateDuration($event)"></video>
 
         <div *ngIf="isPlaying && quote.mediaType === 'audio'" class="audio-player-wrap">
-          <img [src]="quote.image" [alt]="quote.workTitle" class="audio-poster" decoding="async" />
+          <img [src]="quote.image" [alt]="quote.workTitle" class="audio-poster" width="1280" height="720" decoding="async" />
           <audio class="audio-player" [src]="quote.mediaUrl" controls autoplay
             [attr.aria-label]="'Audio de ' + quote.workTitle + ': ' + quote.text"
             (loadedmetadata)="updateDuration($event)"></audio>
