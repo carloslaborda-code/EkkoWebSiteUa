@@ -6,4 +6,4 @@ const runtimeApiBaseUrl =
     : '';
 const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
 
-export const API_BASE_URL = runtimeApiBaseUrl || (isLocalHost ? `${protocol}//${hostname}:5000/api` : '/api');
+export const API_BASE_URL = runtimeApiBaseUrl || (isLocalHost ? `${protocol}//${hostname}:5000/api` : '/_/backend/api');
