@@ -520,6 +520,44 @@ Notas:
 - `JWT_SECRET` firma los tokens de autenticacion.
 - Las variables de Cloudinary permiten subir portadas y medios.
 
+## Despliegue en Vercel
+
+La opcion recomendada es desplegar el frontend Angular en Vercel y mantener el backend Express en un servicio Node publico como Render, Railway o similar. El backend de Ekko recibe archivos de audio/video y no encaja bien con limites pequenos de payload en funciones serverless.
+
+### Frontend en Vercel
+
+Al importar el repositorio en Vercel:
+
+- Framework Preset: `Angular`
+- Root Directory: `frontend`
+- Build Command: `npm run build`
+- Output Directory: `dist/client`
+
+Variable de entorno necesaria en Vercel:
+
+```env
+EKKO_API_BASE_URL=https://tu-backend-publico.com/api
+```
+
+En local no hace falta definirla: el frontend usa automaticamente `http://localhost:5000/api`.
+
+### Rutas SPA
+
+`frontend/vercel.json` incluye rewrites para que rutas como `/home`, `/library`, `/quote/:id`, `/login` o `/settings` funcionen al recargar la pagina directamente en Vercel.
+
+### Backend
+
+El backend necesita estas variables en la plataforma donde se despliegue:
+
+```env
+PORT=5000
+MONGO_URI=...
+JWT_SECRET=...
+CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
+```
+
 ## Cloudinary
 
 Cloudinary se utiliza para guardar archivos pesados fuera de MongoDB.

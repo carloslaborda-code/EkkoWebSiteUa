@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "angular",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/client",
+  "rewrites": [
+    { "source": "/home", "destination": "/index.html" },
+    { "source": "/discover", "destination": "/index.html" },
+    { "source": "/library", "destination": "/index.html" },
+    { "source": "/quote/:id", "destination": "/index.html" },
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/publish", "destination": "/index.html" },
+    { "source": "/register", "destination": "/index.html" },
+    { "source": "/profile", "destination": "/index.html" },
+    { "source": "/settings", "destination": "/index.html" }
+  ]
+}
