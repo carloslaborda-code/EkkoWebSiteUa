@@ -78,6 +78,51 @@ const formatCount = (value) => {
   return String(value);
 };
 
+const getUrlExtension = (value = '') => {
+  try {
+    const parsedUrl = new URL(value, 'http://localhost');
+    const match = parsedUrl.pathname.match(/\.[a-z0-9]+$/i);
+    return match ? match[0] : '';
+  } catch {
+    return '';
+  }
+};
+
+const buildDownloadFileName = (quote) => {
+  const fallbackName = quote.mediaType === 'audio' ? 'ekko-audio' : 'ekko-video';
+  const baseName = `${quote.workTitle || fallbackName}-${quote.mediaType || 'media'}`
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[<>:"/\\|?*\x00-\x1F]+/g, '-')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase() || fallbackName;
+  const extension = getUrlExtension(quote.mediaUrl);
+
+  return extension && !baseName.endsWith(extension.toLowerCase()) ? `${baseName}${extension}` : baseName;
+};
+
+const buildDownloadUrl = (mediaUrl = '') => {
+  if (!mediaUrl) {
+    return '';
+  }
+
+  try {
+    const parsedUrl = new URL(mediaUrl);
+    const isCloudinaryDelivery = parsedUrl.hostname.includes('res.cloudinary.com') && parsedUrl.pathname.includes('/upload/');
+
+    if (!isCloudinaryDelivery || parsedUrl.pathname.includes('/upload/fl_attachment')) {
+      return mediaUrl;
+    }
+
+    parsedUrl.pathname = parsedUrl.pathname.replace('/upload/', '/upload/fl_attachment/');
+    return parsedUrl.toString();
+  } catch {
+    return mediaUrl;
+  }
+};
+
 const ensureSeedQuotes = async () => {
   const totalQuotes = await Quote.countDocuments();
 
@@ -362,12 +407,18 @@ const registerDownload = async (req, res) => {
       return res.status(404).json({ message: 'No se encontro el contenido o el usuario' });
     }
 
+    if (!quote.mediaUrl) {
+      return res.status(404).json({ message: 'El contenido no tiene archivo descargable' });
+    }
+
     user.downloads += 1;
     await user.save();
 
     res.json({
       message: 'Descarga registrada correctamente',
-      mediaUrl: quote.mediaUrl
+      mediaUrl: quote.mediaUrl,
+      downloadUrl: buildDownloadUrl(quote.mediaUrl),
+      fileName: buildDownloadFileName(quote)
     });
   } catch (error) {
     res.status(500).json({ message: 'Error al registrar la descarga', error: error.message });

@@ -75,12 +75,9 @@ export class DetailComponent implements OnInit {
     }
 
     this.quoteService.registerDownload(this.quote._id).subscribe({
-      next: ({ mediaUrl }) => {
-        this.message = '';
-        const link = document.createElement('a');
-        link.href = mediaUrl;
-        link.download = `${this.quote?.workTitle}-${this.quote?.mediaType}`;
-        link.click();
+      next: ({ mediaUrl, downloadUrl, fileName }) => {
+        this.message = 'Descarga iniciada.';
+        this.startBrowserDownload(downloadUrl || mediaUrl, fileName || this.buildDownloadFileName(mediaUrl));
       },
       error: () => {
         this.message = 'No se pudo registrar la descarga.';
@@ -200,6 +197,31 @@ export class DetailComponent implements OnInit {
     const ss = String(seconds).padStart(2, '0');
 
     return `${hh}:${mm}:${ss}`;
+  }
+
+  private startBrowserDownload(url: string, fileName: string): void {
+    const link = document.createElement('a');
+    link.href = new URL(url, window.location.origin).toString();
+    link.download = fileName;
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  private buildDownloadFileName(mediaUrl: string): string {
+    const extensionMatch = mediaUrl.split('?')[0].match(/\.[a-z0-9]+$/i);
+    const extension = extensionMatch ? extensionMatch[0] : '';
+    const baseName = `${this.quote?.workTitle || 'ekko'}-${this.quote?.mediaType || 'media'}`
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[<>:"/\\|?*\x00-\x1F]+/g, '-')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .toLowerCase() || 'ekko-media';
+
+    return extension && !baseName.endsWith(extension.toLowerCase()) ? `${baseName}${extension}` : baseName;
   }
 
   private registerView(): void {
