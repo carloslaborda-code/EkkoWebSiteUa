@@ -94,6 +94,23 @@
   letter-spacing: 0.12em;
 }
 
+.publish-shell h1,
+.publish-shell h2,
+.publish-shell .field span,
+.publish-shell button span {
+  text-decoration: none;
+}
+
+.publish-shell h1::after,
+.publish-shell h2::after,
+.publish-shell .field span::after {
+  content: none;
+}
+
+html[data-underline-links='true'] .publish-shell button:not([disabled]) span {
+  text-decoration: none;
+}
+
 .format-switch {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
