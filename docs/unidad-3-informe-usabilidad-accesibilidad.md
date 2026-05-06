@@ -6,9 +6,9 @@
 
 **Curso:** 2025-2026
 
-**Grupo/autores:** _Pendiente de completar_
+**Grupo/autores:** Carlos Laborda Martinez, Sergio Pernas, Ionathan
 
-**Fecha:** _Pendiente de completar_
+**Fecha:** 06/05/2026
 
 ---
 
