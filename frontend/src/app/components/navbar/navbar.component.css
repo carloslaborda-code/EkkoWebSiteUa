@@ -1,3 +1,30 @@
 :host {
   display: block;
 }
+
+.navbar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: 1.5rem;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.navbar-icon--publish {
+  font-size: 1.35rem;
+}
+
+@media (min-width: 1024px) {
+  .navbar-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 1.75rem;
+  }
+
+  .navbar-icon--publish {
+    font-size: 1.75rem;
+  }
+}

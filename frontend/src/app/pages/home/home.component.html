@@ -4,41 +4,21 @@
   <div class="ambient ambient-right" aria-hidden="true"></div>
 
   <main id="main-content" class="home-frame" tabindex="-1">
-    <header class="home-header">
-      <a class="brand-block" routerLink="/home" aria-label="Ir a inicio">
-        <div class="brand-row">
-          <img class="brand-logo-image" src="assets/images/ekko-logo-small.png" alt="Ekko" width="344" height="119" decoding="async" />
-        </div>
-      </a>
-
-      <button type="button" class="icon-button icon-button--header" aria-label="Perfil" (click)="openProfile()">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8" />
-          <path d="M4.5 19.5a8.5 8.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.8"
-            stroke-linecap="round" />
-        </svg>
+    <app-header class="home-header">
+      <button header-end type="button" class="icon-button icon-button--header" aria-label="Perfil" (click)="openProfile()">
+        <fa-icon [icon]="faUser" aria-hidden="true"></fa-icon>
       </button>
-    </header>
+    </app-header>
 
     <section class="search-row">
       <label class="search-box" for="home-search">
-        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M11 19a8 8 0 1 1 5.3-14l.2.18A8 8 0 0 1 11 19Z" fill="none" stroke="currentColor"
-            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="m20 20-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-        </svg>
+        <fa-icon [icon]="faMagnifyingGlass" aria-hidden="true" class="search-icon"></fa-icon>
         <input id="home-search" type="search" name="search" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
           placeholder="Busca frases ic&oacute;nicas..." />
       </label>
 
       <button type="button" class="icon-button filter-button" aria-label="Filtros" (click)="openDiscover()">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 6h10M4 18h16M10 12h10" fill="none" stroke="currentColor" stroke-width="1.8"
-            stroke-linecap="round" />
-          <circle cx="17" cy="6" r="2" fill="none" stroke="currentColor" stroke-width="1.8" />
-          <circle cx="7" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.8" />
-          <circle cx="13" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.8" />
-        </svg>
+        <fa-icon [icon]="faSliders" aria-hidden="true"></fa-icon>
       </button>
     </section>
 
@@ -75,7 +55,7 @@
           [style.background-image]="quote.image ? 'linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.82)), url(' + quote.image + ')' : null"
           [class.quote-media--placeholder]="!quote.image">
           <div *ngIf="!quote.image" class="placeholder-mark">{{ quote.workTitle | slice:0:1 }}</div>
-          <span class="media-badge" [class.media-badge--audio]="quote.mediaType === 'audio'">
+          <span class="media-badge">
             {{ quote.mediaType === 'audio' ? 'Audio' : 'Video' }}
           </span>
         </div>
@@ -88,29 +68,20 @@
 
             <div class="quote-stats">
               <div class="stars" [attr.aria-label]="'Puntuacion ' + quote.rating + ' de 5'">
-                <svg *ngFor="let filled of getStarArray(quote.rating); trackBy: trackByBooleanIndex" viewBox="0 0 24 24"
-                  [class.star--muted]="!filled">
-                  <path
-                    d="m12 3.6 2.7 5.46 6.03.88-4.36 4.25 1.03 6-5.4-2.84-5.4 2.84 1.03-6L3.27 9.94l6.03-.88L12 3.6Z"
-                    fill="currentColor" />
-                </svg>
-                <span>{{ quote.rating.toFixed(1) }}</span>
+                <fa-icon *ngFor="let star of getStarArray(quote.rating); trackBy: trackByStarIndex"
+                  [class.star--muted]="star === 'empty'" [icon]="star === 'half' ? faStarHalfStroke : faStar"
+                  aria-hidden="true"></fa-icon>
+                <span class="stars-value">{{ quote.rating.toFixed(1) }}</span>
               </div>
 
               <div class="views">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" fill="none"
-                    stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-                  <circle cx="12" cy="12" r="2.7" fill="none" stroke="currentColor" stroke-width="1.7" />
-                </svg>
+                <fa-icon [icon]="faEye" aria-hidden="true" class="views-icon"></fa-icon>
                 <span>{{ quote.views }}</span>
               </div>
             </div>
 
             <button type="button" class="play-button" [attr.aria-label]="'Reproducir ' + quote.workTitle">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8 6.5v11l9-5.5-9-5.5Z" fill="currentColor" />
-              </svg>
+              <fa-icon [icon]="faPlay" aria-hidden="true"></fa-icon>
             </button>
           </div>
         </div>

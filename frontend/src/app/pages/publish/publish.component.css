@@ -29,36 +29,12 @@
 .glow-top { top: calc(var(--safe-top) + 14px); right: 3vw; width: 56px; height: 56px; }
 .glow-right { bottom: calc(var(--bottom-nav-height) + 10vh); right: 2vw; width: 52px; height: 52px; }
 
-.publish-header {
-  display: grid;
-  grid-template-columns: 40px 1fr 40px;
-  align-items: center;
-  gap: 10px;
-  padding: 8px var(--screen-padding-wide) 18px;
-  border-bottom: 1px solid rgba(182, 165, 129, 0.12);
-}
-
-.back-link,
 .format-option,
 .category-chip,
 .publish-button {
   border: 0;
   font: inherit;
 }
-
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: transparent;
-  color: #fff;
-}
-
-.back-link svg { width: 24px; height: 24px; }
-.brand-logo-image { width: clamp(82px, 24vw, 98px); justify-self: center; }
-.header-space { width: 40px; height: 40px; }
 
 .publish-body {
   display: flex;

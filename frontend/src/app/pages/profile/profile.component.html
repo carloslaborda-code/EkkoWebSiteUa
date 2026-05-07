@@ -4,53 +4,45 @@
   <div class="glow glow-right" aria-hidden="true"></div>
 
   <main id="main-content" class="profile-frame" tabindex="-1">
-    <header class="profile-topbar">
-      <a routerLink="/settings" class="settings-link" aria-label="Ajustes">
-        <app-icon name="cog-6-tooth" className="h-5 w-5"></app-icon>
+    <app-header class="profile-topbar">
+      <a header-end routerLink="/settings" class="icon-button icon-button--header" aria-label="Ajustes">
+        <fa-icon [icon]="faGear" aria-hidden="true"></fa-icon>
       </a>
-    </header>
+    </app-header>
 
     <section class="profile-body" *ngIf="profile; else loadingState">
       <aside class="profile-overview">
-        <div class="avatar-wrap">
-          <input
-            #avatarInput
-            type="file"
-            accept="image/*"
-            class="avatar-input"
-            (change)="onAvatarChange($event)"
-          />
-          <div class="avatar-ring">
-            <img *ngIf="profile.avatar" [src]="profile.avatar" [alt]="profile.username" class="avatar-image" width="110" height="110" decoding="async" />
-            <div *ngIf="!profile.avatar" class="avatar-fallback">{{ initials }}</div>
-          </div>
-          <button
-            type="button"
-            class="avatar-edit"
-            aria-label="Editar foto de perfil"
-            [disabled]="avatarSaving"
-            (click)="avatarInput.click()"
-          >
-            <app-icon name="pencil-square" className="h-3.5 w-3.5"></app-icon>
-          </button>
-        </div>
-        <p class="avatar-message" *ngIf="avatarMessage" [class.avatar-message--error]="avatarError">{{ avatarMessage }}</p>
+        <ng-container [ngSwitch]="activeOverviewLayout">
+          <app-profile-overview-original
+            *ngSwitchCase="'original'"
+            [profile]="profile"
+            [initials]="initials"
+            [avatarSaving]="avatarSaving"
+            [avatarMessage]="avatarMessage"
+            [avatarError]="avatarError"
+            (avatarSelected)="onAvatarChange($event)"
+          ></app-profile-overview-original>
 
-        <div class="identity">
-          <h1>{{ profile.username }}</h1>
-          <p>@{{ profile.username.toLowerCase().replace(' ', '_') }}_ekko</p>
-        </div>
+          <app-profile-overview-instagram
+            *ngSwitchCase="'instagram'"
+            [profile]="profile"
+            [initials]="initials"
+            [avatarSaving]="avatarSaving"
+            [avatarMessage]="avatarMessage"
+            [avatarError]="avatarError"
+            (avatarSelected)="onAvatarChange($event)"
+          ></app-profile-overview-instagram>
 
-        <section class="stats-grid">
-          <article class="stat-card">
-            <strong>{{ profile.uploadsCount }}</strong>
-            <span>SUBIDAS</span>
-          </article>
-          <article class="stat-card">
-            <strong>{{ profile.downloads }}</strong>
-            <span>DESCARGAS</span>
-          </article>
-        </section>
+          <app-profile-overview-compact
+            *ngSwitchDefault
+            [profile]="profile"
+            [initials]="initials"
+            [avatarSaving]="avatarSaving"
+            [avatarMessage]="avatarMessage"
+            [avatarError]="avatarError"
+            (avatarSelected)="onAvatarChange($event)"
+          ></app-profile-overview-compact>
+        </ng-container>
       </aside>
 
       <div class="profile-library">

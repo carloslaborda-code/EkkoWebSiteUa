@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { UserProfile, UserService, UserUpload } from '../../services/user.service';
+
+export type ProfileOverviewLayout = 'original' | 'compact' | 'instagram';
 
 @Component({
   selector: 'app-profile',
@@ -8,6 +11,8 @@ import { UserProfile, UserService, UserUpload } from '../../services/user.servic
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
+  readonly faGear = faGear;
+  readonly activeOverviewLayout: ProfileOverviewLayout = 'instagram';
   profile: UserProfile | null = null;
   avatarSaving = false;
   avatarMessage = '';

@@ -100,16 +100,11 @@
     padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 28px);
   }
 
-  .discover-frame > header,
+  .discover-frame > .discover-topbar,
   .discover-frame > section {
     width: calc(100% - var(--desktop-sidebar-width) - (var(--desktop-content-gap) * 2));
     margin-left: calc(var(--desktop-sidebar-width) + var(--desktop-content-gap) + 24px);
     margin-right: var(--desktop-content-gap);
-  }
-
-  .discover-frame > header {
-    padding-left: 0;
-    padding-right: 0;
   }
 
   .discover-content {

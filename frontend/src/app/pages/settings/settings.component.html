@@ -6,9 +6,7 @@
   <main id="main-content" class="settings-frame" tabindex="-1">
     <section class="settings-body" *ngIf="profile; else loadingState" aria-labelledby="settings-title">
       <a routerLink="/profile" class="back-link" aria-label="Volver al perfil">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
+        <fa-icon [icon]="faChevronLeft" aria-hidden="true"></fa-icon>
       </a>
 
       <header class="settings-title-block">
@@ -20,7 +18,7 @@
         <h2 id="account-title">CUENTA</h2>
         <button type="button" class="settings-item" (click)="toggleAccountConfig()" [attr.aria-expanded]="accountConfigOpen">
           <span class="item-left">Configuraci&oacute;n de la cuenta</span>
-          <span class="item-arrow" aria-hidden="true">&rsaquo;</span>
+          <fa-icon [icon]="faChevronRight" aria-hidden="true"></fa-icon>
         </button>
         <form class="password-form" *ngIf="accountConfigOpen" (ngSubmit)="submitPasswordChange()" aria-label="Cambiar contrasena">
           <label class="password-field" for="current-password">
@@ -72,7 +70,7 @@
         </form>
         <button type="button" class="settings-item">
           <span class="item-left">Privacidad</span>
-          <span class="item-arrow" aria-hidden="true">&rsaquo;</span>
+          <fa-icon [icon]="faChevronRight" aria-hidden="true"></fa-icon>
         </button>
         <button type="button" class="settings-item" (click)="logout()">
           <span class="item-left">Cerrar sesi&oacute;n</span>

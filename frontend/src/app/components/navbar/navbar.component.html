@@ -8,59 +8,52 @@
     </span>
   </a>
 
-  <a routerLink="/home" [attr.aria-current]="activeTab === 'home' ? 'page' : null"
-    class="order-1 group flex cursor-pointer flex-col items-center justify-center gap-1.5 text-xs transition-all duration-200 ease-out hover:text-white active:scale-95 lg:order-none lg:min-h-[58px] lg:flex-row lg:justify-start lg:gap-4 lg:rounded-2xl lg:px-4 lg:py-3 lg:text-[0.95rem] lg:hover:bg-white/5 lg:hover:translate-x-1"
+  <button type="button" (click)="openHome()" [attr.aria-current]="activeTab === 'home' ? 'page' : null"
+    class="order-2 group flex cursor-pointer flex-col items-center justify-center gap-1.5 text-xs transition-all duration-200 ease-out hover:text-white active:scale-95 lg:order-none lg:min-h-[58px] lg:flex-row lg:justify-start lg:gap-4 lg:rounded-2xl lg:px-4 lg:py-3 lg:text-[0.95rem] lg:hover:bg-white/5 lg:hover:translate-x-1"
     [ngClass]="activeTab === 'home' ? 'text-[#d6be8a] lg:bg-[#d6be8a] lg:text-[#151515] lg:hover:bg-[#c2a86f]' : 'text-[#9aa0a6]'">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="h-6 w-6 lg:h-7 lg:w-7 lg:flex-none">
-      <path
-        d="M2.25 12 11.204 3.046a1.125 1.125 0 0 1 1.592 0L21.75 12M4.5 9.75V19.5A1.5 1.5 0 0 0 6 21h3.75v-5.25A1.5 1.5 0 0 1 11.25 14.25h1.5a1.5 1.5 0 0 1 1.5 1.5V21H18a1.5 1.5 0 0 0 1.5-1.5V9.75"
-        stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
+    <fa-icon [icon]="faHouseSolid" aria-hidden="true" class="navbar-icon lg:flex-none"></fa-icon>
     <span
       class="lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:transition-all lg:duration-200 lg:group-hover/nav:max-w-[120px] lg:group-hover/nav:opacity-100">Inicio</span>
-  </a>
+  </button>
 
   <button type="button" (click)="openDiscover()" [attr.aria-current]="activeTab === 'discover' ? 'page' : null"
     class="order-2 group flex cursor-pointer flex-col items-center justify-center gap-1.5 text-xs transition-all duration-200 ease-out hover:text-white active:scale-95 lg:order-none lg:min-h-[58px] lg:flex-row lg:justify-start lg:gap-4 lg:rounded-2xl lg:px-4 lg:py-3 lg:text-[0.95rem] lg:hover:bg-white/5 lg:hover:translate-x-1"
     [ngClass]="activeTab === 'discover' ? 'text-[#d6be8a] lg:bg-[#d6be8a] lg:text-[#151515] lg:hover:bg-[#c2a86f]' : 'text-[#9aa0a6]'">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="h-6 w-6 lg:h-7 lg:w-7 lg:flex-none">
-      <path d="M12 3.75a8.25 8.25 0 1 0 8.25 8.25M12 3.75v8.25l5.835 5.835" stroke="currentColor" stroke-width="1.7"
-        stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
+    <fa-icon [icon]="activeTab === 'discover' ? faCompassSolid : faCompassRegular" aria-hidden="true"
+      class="navbar-icon lg:flex-none"></fa-icon>
     <span
       class="lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:transition-all lg:duration-200 lg:group-hover/nav:max-w-[120px] lg:group-hover/nav:opacity-100">Descubrir</span>
   </button>
 
-  <button type="button" aria-label="Libreria" (click)="openLibrary()" [attr.aria-current]="activeTab === 'library' ? 'page' : null"
+  <button type="button" aria-label="Libreria" (click)="openLibrary()"
+    [attr.aria-current]="activeTab === 'library' ? 'page' : null"
     class="order-4 group flex cursor-pointer flex-col items-center justify-center gap-1.5 text-xs transition-all duration-200 ease-out hover:text-white active:scale-95 lg:order-none lg:min-h-[58px] lg:flex-row lg:justify-start lg:gap-4 lg:rounded-2xl lg:px-4 lg:py-3 lg:text-[0.95rem] lg:hover:bg-white/5 lg:hover:translate-x-1"
     [ngClass]="activeTab === 'library' ? 'text-[#d6be8a] lg:bg-[#d6be8a] lg:text-[#151515] lg:hover:bg-[#c2a86f]' : 'text-[#9aa0a6]'">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="h-6 w-6 lg:h-7 lg:w-7 lg:flex-none">
-      <path d="M17.25 21 12 17.25 6.75 21V5.625A1.875 1.875 0 0 1 8.625 3.75h6.75a1.875 1.875 0 0 1 1.875 1.875V21Z"
-        stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
+    <fa-icon [icon]="activeTab === 'library' ? faBookmarkSolid : faBookmarkRegular" aria-hidden="true"
+      class="navbar-icon lg:flex-none"></fa-icon>
     <span
       class="lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:transition-all lg:duration-200 lg:group-hover/nav:max-w-[120px] lg:group-hover/nav:opacity-100">Librer&iacute;a</span>
   </button>
 
   <button type="button" aria-label="Publicar" (click)="openPublish()"
     [attr.aria-current]="activeTab === 'publish' ? 'page' : null"
-    class="order-3 group flex h-[42px] w-[42px] items-center justify-center justify-self-center rounded-full bg-[#d6be8a] text-[#151515] transition-all duration-200 ease-out hover:bg-[#c2a86f] active:scale-95 lg:order-none lg:min-h-[58px] lg:h-auto lg:w-full lg:flex-row lg:justify-start lg:gap-4 lg:self-auto lg:rounded-2xl lg:px-4 lg:py-3 lg:text-[0.95rem] lg:hover:translate-x-1"
-    [ngClass]="activeTab === 'publish' ? 'lg:bg-[#d6be8a] lg:text-[#151515] lg:hover:bg-[#c2a86f]' : 'lg:bg-transparent lg:text-[#9aa0a6] lg:hover:bg-white/5 lg:hover:text-white'">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="h-5 w-5 lg:h-7 lg:w-7 lg:flex-none">
-      <path d="M12 4.5v15m7.5-7.5h-15" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-        stroke-linejoin="round" />
-    </svg>
+    class="order-3 group flex h-[42px] w-[42px] items-center justify-center justify-self-center rounded-full border transition-all duration-200 ease-out active:scale-95 lg:order-none lg:min-h-[58px] lg:h-auto lg:w-full lg:flex-row lg:justify-start lg:gap-4 lg:self-auto lg:rounded-2xl lg:px-4 lg:py-3 lg:text-[0.95rem] lg:hover:translate-x-1"
+    [ngClass]="activeTab === 'publish'
+    ? 'border-[#d6be8a] bg-[#d6be8a] text-[#151515] lg:hover:bg-[#c2a86f]'
+    : 'border-[#9aa0a6] bg-[#9aa0a6] text-black lg:hover:bg-white/5 lg:hover:text-white'">
+    <fa-icon [icon]="faPlus" class="navbar-icon navbar-icon--publish lg:flex-none"></fa-icon>
     <span
-      class="hidden text-[0.95rem] font-medium lg:inline lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:transition-all lg:duration-200 lg:group-hover/nav:max-w-[120px] lg:group-hover/nav:opacity-100">Publicar</span>
+      class="hidden text-[0.95rem] font-medium lg:inline lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:transition-all lg:duration-200 lg:group-hover/nav:max-w-[120px] lg:group-hover/nav:opacity-100">
+      Publicar
+    </span>
   </button>
+
 
   <button type="button" (click)="openProfile()" [attr.aria-current]="activeTab === 'profile' ? 'page' : null"
     class="order-5 group flex cursor-pointer flex-col items-center justify-center gap-1.5 border-0 bg-transparent text-xs transition-all duration-200 ease-out hover:text-white active:scale-95 lg:order-none lg:mt-auto lg:min-h-[58px] lg:flex-row lg:justify-start lg:gap-4 lg:rounded-2xl lg:px-4 lg:py-3 lg:text-[0.95rem] lg:hover:bg-white/5 lg:hover:translate-x-1"
     [ngClass]="activeTab === 'profile' ? 'text-[#d6be8a] lg:bg-[#d6be8a] lg:text-[#151515] lg:hover:bg-[#c2a86f]' : 'text-[#9aa0a6]'">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="h-6 w-6 lg:h-7 lg:w-7 lg:flex-none">
-      <path d="M15.75 6.75a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a8.966 8.966 0 0 1 14.998 0"
-        stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
+    <fa-icon [icon]="activeTab === 'profile' ? faUserSolid : faUserRegular" aria-hidden="true"
+      class="navbar-icon lg:flex-none"></fa-icon>
     <span
       class="lg:max-w-0 lg:overflow-hidden lg:whitespace-nowrap lg:opacity-0 lg:transition-all lg:duration-200 lg:group-hover/nav:max-w-[120px] lg:group-hover/nav:opacity-100">Perfil</span>
   </button>

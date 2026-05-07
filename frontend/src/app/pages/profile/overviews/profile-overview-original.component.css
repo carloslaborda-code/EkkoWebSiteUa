@@ -1,0 +1,28 @@
+.profile-summary {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.profile-summary-copy,
+.profile-meta {
+  align-items: center;
+  text-align: center;
+}
+
+.avatar-wrap {
+  margin: 0 auto;
+}
+
+.avatar-ring {
+  width: clamp(108px, 30vw, 132px);
+  height: clamp(108px, 30vw, 132px);
+}
+
+.identity h1 {
+  font-size: clamp(1.95rem, 7.5vw, 2.35rem);
+}
+
+.stats-grid {
+  margin-top: 22px;
+}

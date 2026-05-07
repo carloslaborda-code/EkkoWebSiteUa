@@ -4,15 +4,7 @@
   <div class="glow glow-right" aria-hidden="true"></div>
 
   <main id="main-content" class="publish-frame" tabindex="-1">
-    <header class="publish-header">
-      <button type="button" class="back-link" (click)="router.navigate(['/home'])" aria-label="Volver">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </button>
-      <img class="brand-logo-image" src="assets/images/ekko-logo-small.png" alt="Ekko" width="344" height="119" decoding="async" />
-      <div class="header-space"></div>
-    </header>
+    <app-header class="publish-header" [showBack]="true"></app-header>
 
     <section class="publish-body">
       <aside class="publish-media-column">

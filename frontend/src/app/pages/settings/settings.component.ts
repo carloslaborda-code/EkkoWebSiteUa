@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AccessibilityService } from '../../services/accessibility.service';
 import { UserProfile, UserService } from '../../services/user.service';
+import { faChevronLeft, faChevronRight} from '@fortawesome/free-solid-svg-icons';
 
 type BooleanAccessibilitySetting =
   | 'reducedMotion'
@@ -28,6 +29,8 @@ export class SettingsComponent implements OnInit {
   };
   colorFilters = ['default', 'warm', 'cool', 'grayscale'];
   textSizes = ['small', 'medium', 'large', 'extra-large'];
+  readonly faChevronLeft = faChevronLeft;
+  readonly faChevronRight = faChevronRight;
 
   constructor(
     private userService: UserService,

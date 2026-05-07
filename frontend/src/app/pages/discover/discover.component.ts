@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { faChevronDown, faClapperboard, faGamepad, faMagnifyingGlass, faPlay, faTv, faVolumeHigh } from '@fortawesome/free-solid-svg-icons';
 import { Quote, QuoteService } from '../../services/quotes.services';
 
 type DiscoverCategory = 'movie' | 'series' | 'game' | 'sfx';
@@ -19,12 +21,16 @@ export class DiscoverComponent implements OnInit {
   selectedWorkTitle = '';
   loading = true;
   dropdownOpen = false;
+  readonly faChevronDown = faChevronDown;
+  readonly faMagnifyingGlass = faMagnifyingGlass;
+  readonly faPlay = faPlay;
+  readonly faVolumeHigh = faVolumeHigh;
 
-  readonly categoryOptions: Array<{ label: string; value: DiscoverCategory; icon: 'film' | 'tv' | 'gamepad' | 'speaker-wave' }> = [
-    { label: 'Pelicula', value: 'movie', icon: 'film' },
-    { label: 'Serie', value: 'series', icon: 'tv' },
-    { label: 'Videojuego', value: 'game', icon: 'gamepad' },
-    { label: 'Efectos', value: 'sfx', icon: 'speaker-wave' }
+  readonly categoryOptions: Array<{ label: string; value: DiscoverCategory; icon: IconDefinition }> = [
+    { label: 'Pelicula', value: 'movie', icon: faClapperboard },
+    { label: 'Serie', value: 'series', icon: faTv },
+    { label: 'Videojuego', value: 'game', icon: faGamepad },
+    { label: 'Efectos', value: 'sfx', icon: faVolumeHigh }
   ];
 
   constructor(private quoteService: QuoteService, public router: Router) {}
@@ -45,7 +51,7 @@ export class DiscoverComponent implements OnInit {
     });
   }
 
-  get visibleCategoryOptions(): Array<{ label: string; value: DiscoverCategory; icon: 'film' | 'tv' | 'gamepad' | 'speaker-wave' }> {
+  get visibleCategoryOptions(): Array<{ label: string; value: DiscoverCategory; icon: IconDefinition }> {
     return this.categoryOptions.filter((option) =>
       this.allQuotes.some((quote) => quote.category === option.value)
     );
