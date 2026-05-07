@@ -55,30 +55,7 @@
 }
 
 .home-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding: 16px var(--screen-padding) 13px;
-  border-bottom: 1px solid rgba(182, 165, 129, 0.12);
   backdrop-filter: blur(6px);
-}
-
-.brand-row {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all .2s ease;
-}
-
-.brand-row:hover {
-  opacity: 0.9;
-}
-
-.brand-logo-image {
-  display: block;
-  width: clamp(82px, 24vw, 98px);
-  height: auto;
 }
 
 .search-row {
@@ -267,16 +244,12 @@
   right: 12px;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.78);
+  background: rgba(214, 190, 138, 0.3);
+  border: 1px solid rgba(214, 190, 138, 0.28);
   color: #d9e1ef;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-}
-
-.media-badge--audio {
-  background: rgba(214, 190, 138, 0.18);
-  color: #f2dcae;
 }
 
 .quote-media--placeholder {
@@ -337,6 +310,14 @@
   gap: 2px;
 }
 
+.stars fa-icon {
+  color: #f5c84c;
+}
+
+.stars-value {
+  margin-left: 6px;
+}
+
 .stars:hover {
   transform: translateY(-2px);
   color: #e2e8f0;
@@ -346,11 +327,12 @@
   width: 10px;
   height: 10px;
   color: #f5c84c;
+  fill: currentColor;
 }
 
 .stars:hover svg {
   transform: scale(1.15);
-  color: #ffd86b;
+  color: #f5c84c;
 }
 
 .star--muted {

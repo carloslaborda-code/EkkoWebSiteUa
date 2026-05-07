@@ -4,18 +4,7 @@
   <div class="glow glow-right" aria-hidden="true"></div>
 
   <main id="main-content" class="discover-frame" tabindex="-1">
-    <header class="mx-auto grid w-full max-w-[var(--app-tablet-width)] grid-cols-[40px_1fr_40px] items-center border-b border-white/10 px-4 pb-3 pt-4 lg:mx-0 lg:max-w-none lg:px-8">
-      <button
-        type="button"
-        class="inline-flex h-10 w-10 items-center justify-center border-0 bg-transparent text-white transition-transform duration-200 hover:-translate-x-0.5"
-        (click)="router.navigate(['/home'])"
-        aria-label="Volver"
-      >
-        <app-icon name="chevron-left" className="h-6 w-6"></app-icon>
-      </button>
-      <img class="mx-auto w-[92px] max-w-full" src="assets/images/ekko-logo.png" alt="Ekko" decoding="async" />
-      <div class="h-10 w-10"></div>
-    </header>
+    <app-header class="discover-topbar" [showBack]="true"></app-header>
 
     <section class="discover-content mx-auto flex w-full max-w-[var(--app-tablet-width)] flex-col gap-7 px-4 pb-28 pt-7 lg:mx-0 lg:max-w-none lg:px-8">
       <aside class="discover-filters-panel">
@@ -28,7 +17,7 @@
           for="discover-search"
           class="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#131313] px-4 py-4 text-slate-400 shadow-[0_18px_34px_rgba(0,0,0,0.26)]"
         >
-          <app-icon name="magnifying-glass" className="h-5 w-5 text-slate-500"></app-icon>
+          <fa-icon [icon]="faMagnifyingGlass" aria-hidden="true" class="text-slate-500"></fa-icon>
           <input
             id="discover-search"
             type="search"
@@ -53,7 +42,7 @@
               [attr.aria-pressed]="selectedCategory === option.value"
               (click)="setCategory(option.value)"
             >
-              <app-icon [name]="option.icon" className="h-4 w-4"></app-icon>
+              <fa-icon [icon]="option.icon" aria-hidden="true"></fa-icon>
               <span>{{ option.label }}</span>
             </button>
           </div>
@@ -69,7 +58,7 @@
               [attr.aria-pressed]="selectedFormat === 'video'"
               (click)="setFormat('video')"
             >
-              <app-icon name="play-solid" className="h-4 w-4"></app-icon>
+              <fa-icon [icon]="faPlay" aria-hidden="true"></fa-icon>
               <span>Video</span>
             </button>
             <button
@@ -79,7 +68,7 @@
               [attr.aria-pressed]="selectedFormat === 'audio'"
               (click)="setFormat('audio')"
             >
-              <app-icon name="speaker-wave" className="h-4 w-4"></app-icon>
+              <fa-icon [icon]="faVolumeHigh" aria-hidden="true"></fa-icon>
               <span>Audio</span>
             </button>
           </div>
@@ -95,7 +84,7 @@
               (click)="dropdownOpen = !dropdownOpen"
             >
               <span>{{ currentDropdownLabel }}</span>
-              <app-icon name="chevron-down" className="h-5 w-5" [className]="'h-5 w-5 transition-transform duration-200 ' + (dropdownOpen ? 'rotate-180' : '')"></app-icon>
+              <fa-icon [icon]="faChevronDown" aria-hidden="true" class="transition-transform duration-200" [ngClass]="dropdownOpen ? 'rotate-180' : ''"></fa-icon>
             </button>
 
             <div *ngIf="dropdownOpen" class="overflow-hidden rounded-b-2xl border-x border-b border-[#2e5cff] bg-[#171717] shadow-[0_22px_36px_rgba(0,0,0,0.22)]">

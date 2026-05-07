@@ -1,0 +1,14 @@
+.profile-summary {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.profile-summary-copy,
+.profile-meta {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.avatar-wrap {
+  margin: 0;
+}

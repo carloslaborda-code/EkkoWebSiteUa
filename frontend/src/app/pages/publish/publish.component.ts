@@ -2,6 +2,8 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/co
 import { Router } from '@angular/router';
 import { CreateQuotePayload, QuoteService } from '../../services/quotes.services';
 import { UserService } from '../../services/user.service';
+import { faChevronLeft, faChevronRight} from '@fortawesome/free-solid-svg-icons';
+
 
 type MediaType = 'audio' | 'video';
 type Category = 'movie' | 'series' | 'game' | 'sfx';
@@ -48,6 +50,8 @@ export class PublishComponent implements OnInit, OnDestroy {
     { label: 'Efectos', value: 'sfx' }
   ];
   readonly yearOptions = this.buildYearOptions();
+  readonly faChevronLeft = faChevronLeft;
+  readonly faChevronRight = faChevronRight;
 
   constructor(private quoteService: QuoteService, private userService: UserService, public router: Router) {}
 

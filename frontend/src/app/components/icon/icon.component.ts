@@ -21,9 +21,14 @@ export type AppIconName =
 
 @Component({
   selector: 'app-icon',
-  templateUrl: './icon.component.html'
+  templateUrl: './icon.component.html',
+  styleUrls: ['./icon.component.css']
 })
 export class IconComponent {
   @Input() name: AppIconName = 'star';
   @Input() className = 'h-6 w-6';
+
+  get resolvedClassName(): string {
+    return `app-common-icon ${this.className}`;
+  }
 }

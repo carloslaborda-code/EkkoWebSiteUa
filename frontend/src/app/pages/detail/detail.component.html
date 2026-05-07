@@ -4,14 +4,7 @@
   <div class="glow glow-right" aria-hidden="true"></div>
 
   <main id="main-content" class="detail-frame" tabindex="-1" *ngIf="quote; else loadingState">
-    <header class="detail-header">
-      <button type="button" class="inline-flex h-10 w-10 items-center justify-center border-0 bg-transparent text-white"
-        (click)="router.navigate(['/home'])" aria-label="Volver">
-        <app-icon name="chevron-left" className="h-6 w-6"></app-icon>
-      </button>
-      <img class="brand-logo-image" src="assets/images/ekko-logo.png" alt="Ekko" decoding="async" />
-      <div class="header-space"></div>
-    </header>
+    <app-header class="detail-header" [showBack]="true"></app-header>
 
     <section class="hero-card">
       <div class="media-frame" [class.media-frame--audio]="quote.mediaType === 'audio'">
@@ -31,7 +24,7 @@
 
         <button *ngIf="!isPlaying" type="button" class="play-overlay" (click)="startPlayback()"
           [attr.aria-label]="'Reproducir ' + quote.workTitle">
-          <app-icon name="play-solid" className="h-7 w-7"></app-icon>
+          <fa-icon [icon]="faPlay" aria-hidden="true"></fa-icon>
         </button>
       </div>
     </section>
@@ -41,26 +34,12 @@
 
       <section class="rating-panel">
         <p class="rating-label">VALORA ESTE CONTENIDO</p>
-        <!-- <div class="rating-stars" aria-label="Valorar contenido">
-          <button
-            type="button"
-            class="rating-star"
-            *ngFor="let star of ratingStars; trackBy: trackByNumber"
-            [class.rating-star--active]="star <= userRating"
-            [disabled]="ratingSaving"
-            [attr.aria-label]="'Valorar con ' + star + ' de 5'"
-            (click)="rateQuote(star)"
-          >
-            <app-icon [name]="star <= userRating ? 'star-solid' : 'star'" className="h-7 w-7"></app-icon>
-          </button>
-        </div> -->
         <div class="rating-stars" aria-label="Valorar contenido" (mouseleave)="hoverRating = 0">
           <button type="button" class="rating-star" *ngFor="let star of ratingStars; trackBy: trackByNumber"
             [class.rating-star--active]="star <= (hoverRating || userRating)" [disabled]="ratingSaving"
             [attr.aria-label]="'Valorar con ' + star + ' de 5'" (mouseenter)="hoverRating = star"
             (click)="rateQuote(star)">
-            <app-icon [name]="star <= (hoverRating || userRating) ? 'star-solid' : 'star'"
-              className="h-7 w-7"></app-icon>
+            <fa-icon [icon]="star <= (hoverRating || userRating) ? faStarSolid : faStarRegular" aria-hidden="true"></fa-icon>
           </button>
         </div>
         <p class="rating-summary">{{ quote.rating.toFixed(1) }} / 5 - {{ quote.ratingsCount }} valoraciones</p>
@@ -71,21 +50,21 @@
         <button type="button" class="action-button" (click)="handleDownload()"
           [attr.aria-label]="'Descargar ' + quote.workTitle">
           <span class="action-icon">
-            <app-icon name="arrow-down-tray" className="h-5 w-5"></app-icon>
+            <fa-icon [icon]="faDownload" aria-hidden="true"></fa-icon>
           </span>
           <span>DESCARGAR</span>
         </button>
         <button type="button" class="action-button" (click)="shareContent()"
           [attr.aria-label]="'Compartir ' + quote.workTitle">
           <span class="action-icon">
-            <app-icon name="share" className="h-5 w-5"></app-icon>
+            <fa-icon [icon]="faShareNodes" aria-hidden="true"></fa-icon>
           </span>
           <span>COMPARTIR</span>
         </button>
         <button type="button" class="action-button" (click)="toggleSave()"
           [attr.aria-label]="isSaved ? 'Quitar de guardados' : 'Guardar ' + quote.workTitle">
           <span class="action-icon">
-            <app-icon [name]="isSaved ? 'bookmark-solid' : 'bookmark'" className="h-5 w-5"></app-icon>
+            <fa-icon [icon]="isSaved ? faBookmarkSolid : faBookmark" aria-hidden="true"></fa-icon>
           </span>
           <span>{{ isSaved ? 'GUARDADO' : 'GUARDAR' }}</span>
         </button>

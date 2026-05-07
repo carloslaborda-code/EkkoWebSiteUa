@@ -1,6 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { faStar as faStarRegular, faBookmark } from '@fortawesome/free-regular-svg-icons';
+import { faBookmark as faBookmarkSolid, faPlay, faDownload, faShareNodes, faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons';
 import { Quote, QuoteService } from '../../services/quotes.services';
 import { UserService } from '../../services/user.service';
 
@@ -10,6 +12,13 @@ import { UserService } from '../../services/user.service';
   styleUrls: ['./detail.component.css']
 })
 export class DetailComponent implements OnInit {
+  readonly faBookmark = faBookmark;
+  readonly faBookmarkSolid = faBookmarkSolid;
+  readonly faPlay = faPlay;
+  readonly faDownload = faDownload;
+  readonly faShareNodes = faShareNodes;
+  readonly faStarRegular = faStarRegular;
+  readonly faStarSolid = faStarSolid;
   quote: Quote | null = null;
   message = '';
   ratingMessage = '';
