@@ -7,6 +7,8 @@
 .glow-top { top: calc(var(--safe-top) + 12px); right: 4vw; width: clamp(44px, 13vw, 56px); height: clamp(44px, 13vw, 56px); }
 .glow-right { right: 4vw; bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 90px); width: clamp(44px, 14vw, 58px); height: clamp(44px, 14vw, 58px); }
 .profile-topbar { display: block; }
+.icon-button--header { transition: background-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease, color 0.2s ease; }
+.icon-button--header:hover { background: rgba(255, 255, 255, 0.06); color: #f2dcae; transform: translateY(-2px) scale(1.05); box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35), 0 0 10px rgba(214, 190, 138, 0.12); }
 .settings-link { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; color: #f4f4f4; }
 .profile-body { padding: 8px var(--screen-padding-wide) 0; text-align: center; }
 .profile-overview,
