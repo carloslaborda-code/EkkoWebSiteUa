@@ -67,8 +67,28 @@ const uploadToCloudinary = async (file, { folder, resourceType }) => {
   return payload.secure_url || payload.url || file;
 };
 
+const createUploadSignature = ({ folder, resourceType }) => {
+  if (!hasCloudinaryConfig()) {
+    throw new Error('Cloudinary no esta configurado.');
+  }
+
+  const { cloudName, apiKey, apiSecret } = getCloudinaryConfig();
+  const timestamp = Math.floor(Date.now() / 1000);
+  const signature = buildSignature({ folder, timestamp }, apiSecret);
+
+  return {
+    cloudName,
+    apiKey,
+    folder,
+    resourceType,
+    timestamp,
+    signature
+  };
+};
+
 module.exports = {
   uploadToCloudinary,
   isDataUri,
-  hasCloudinaryConfig
+  hasCloudinaryConfig,
+  createUploadSignature
 };

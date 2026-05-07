@@ -4,6 +4,7 @@ const authMiddleware = require('../middleware/auth.middleware');
 const {
   getQuotes,
   getQuoteById,
+  getUploadSignature,
   createQuote,
   toggleSaveQuote,
   rateQuote,
@@ -13,6 +14,7 @@ const {
 
 router.get('/', getQuotes);
 router.get('/:id', getQuoteById);
+router.post('/upload-signature', authMiddleware, getUploadSignature);
 router.post('/', authMiddleware, createQuote);
 router.post('/:id/view', registerView);
 router.post('/:id/save', authMiddleware, toggleSaveQuote);

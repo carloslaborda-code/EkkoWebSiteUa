@@ -40,6 +40,17 @@ export interface CreateQuotePayload {
   category: string;
 }
 
+export type UploadKind = 'cover' | 'audio' | 'video';
+
+export interface CloudinaryUploadSignature {
+  cloudName: string;
+  apiKey: string;
+  folder: string;
+  resourceType: 'image' | 'video';
+  timestamp: number;
+  signature: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -80,6 +91,12 @@ export class QuoteService {
           this.upsertQuote(this.normalizeQuote(quote));
         })
       );
+  }
+
+  createUploadSignature(kind: UploadKind): Observable<CloudinaryUploadSignature> {
+    return this.http.post<CloudinaryUploadSignature>(`${this.apiUrl}/upload-signature`, { kind }, {
+      headers: this.getHeaders()
+    });
   }
 
   toggleSave(id: string): Observable<{ message: string; saved: boolean; savedCount: number; savedQuoteIds: string[] }> {

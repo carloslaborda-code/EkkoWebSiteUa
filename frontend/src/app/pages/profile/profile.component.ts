@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserProfile, UserService } from '../../services/user.service';
+import { UserProfile, UserService, UserUpload } from '../../services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -103,7 +103,7 @@ export class ProfileComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  trackByUploadTitle(index: number, upload: { title: string }): string {
-    return `${upload.title}-${index}`;
+  trackByUpload(index: number, upload: UserUpload): string {
+    return upload.quoteId || `${upload.title}-${index}`;
   }
 }

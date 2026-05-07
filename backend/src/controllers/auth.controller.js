@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const Quote = require('../models/quote');
 const { defaultUploads, defaultUserSettings } = require('../data/defaultUserData');
 const allowedColorFilters = ['default', 'warm', 'cool', 'grayscale'];
 const allowedTextSizes = ['small', 'medium', 'large', 'extra-large'];
@@ -15,6 +16,51 @@ const hasLegacyMockUploads = (uploads = []) => {
     uploads.length === legacyTitles.length &&
     uploads.every((upload, index) => upload?.title === legacyTitles[index])
   );
+};
+
+const buildUploadFromQuote = (quote) => ({
+  quoteId: quote._id,
+  title: quote.workTitle || '',
+  image: quote.image || '',
+  type: quote.mediaType === 'video' ? 'video' : 'audio'
+});
+
+const uploadsAreSynced = (currentUploads = [], nextUploads = []) => {
+  if (!Array.isArray(currentUploads) || currentUploads.length !== nextUploads.length) {
+    return false;
+  }
+
+  return nextUploads.every((nextUpload, index) => {
+    const currentUpload = currentUploads[index];
+
+    return (
+      currentUpload?.quoteId?.toString?.() === nextUpload.quoteId?.toString?.() &&
+      currentUpload?.title === nextUpload.title &&
+      (currentUpload?.image || '') === nextUpload.image &&
+      currentUpload?.type === nextUpload.type
+    );
+  });
+};
+
+const syncUserUploadsWithCreatedQuotes = async (user) => {
+  const createdQuotes = await Quote.find({ createdBy: user._id })
+    .sort({ createdAt: -1 })
+    .select('_id workTitle image mediaType')
+    .lean();
+
+  if (!createdQuotes.length) {
+    return;
+  }
+
+  const syncedUploads = createdQuotes.map(buildUploadFromQuote);
+
+  if (uploadsAreSynced(user.uploads, syncedUploads) && user.uploadsCount === syncedUploads.length) {
+    return;
+  }
+
+  user.uploads = syncedUploads;
+  user.uploadsCount = syncedUploads.length;
+  await user.save();
 };
 
 const ensureUserDefaults = async (user) => {
@@ -93,6 +139,8 @@ const ensureUserDefaults = async (user) => {
   if (changed) {
     await user.save();
   }
+
+  await syncUserUploadsWithCreatedQuotes(user);
 
   return user;
 };

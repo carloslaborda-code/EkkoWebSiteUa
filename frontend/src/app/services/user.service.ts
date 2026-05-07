@@ -5,6 +5,7 @@ import { AccessibilityService } from './accessibility.service';
 import { API_BASE_URL } from './api-url';
 
 export interface UserUpload {
+  quoteId?: string | null;
   title: string;
   image: string;
   type: string;

@@ -3,6 +3,11 @@ const { defaultUserSettings, defaultUploads } = require('../data/defaultUserData
 
 const uploadSchema = new mongoose.Schema(
   {
+    quoteId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Quote',
+      default: null
+    },
     title: {
       type: String,
       required: true,

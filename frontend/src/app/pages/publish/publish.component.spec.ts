@@ -18,7 +18,7 @@ describe('PublishComponent', () => {
   let router: Router;
 
   beforeEach(() => {
-    quoteServiceStub = jasmine.createSpyObj<QuoteService>('QuoteService', ['createQuote']);
+    quoteServiceStub = jasmine.createSpyObj<QuoteService>('QuoteService', ['createQuote', 'createUploadSignature']);
     quoteServiceStub.createQuote.and.returnValue(
       of({
         message: 'ok',
@@ -50,6 +50,16 @@ describe('PublishComponent', () => {
             }
           ]
         }
+      })
+    );
+    quoteServiceStub.createUploadSignature.and.returnValue(
+      of({
+        cloudName: 'demo',
+        apiKey: 'key',
+        folder: 'ekko/audio',
+        resourceType: 'video',
+        timestamp: 1,
+        signature: 'signature'
       })
     );
   });
@@ -86,7 +96,7 @@ describe('PublishComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should publish with Unkown when actor and character are empty', () => {
+  it('should publish with Unkown when actor and character are empty', async () => {
     localStorage.setItem('token', 'token');
     component.quoteText = 'quote';
     component.workTitle = 'title';
@@ -94,9 +104,9 @@ describe('PublishComponent', () => {
     component.actorName = '   ';
     component.characterName = '';
     component.synopsis = 'synopsis';
-    component.mediaDataUrl = 'data:audio/mp3;base64,AAA';
+    component.mediaDataUrl = 'https://cdn.example/audio.mp3';
 
-    component.publish();
+    await component.publish();
 
     expect(quoteServiceStub.createQuote).toHaveBeenCalledWith(jasmine.objectContaining({
       actorName: 'Unkown',
