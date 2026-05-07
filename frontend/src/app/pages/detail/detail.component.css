@@ -16,9 +16,7 @@
 .play-overlay svg { width: 28px; height: 28px; transition: all .25s ease; }
 .play-overlay:hover svg { transform: scale(1.1); }
 .detail-body { padding: 14px var(--screen-padding-wide) 0; }
-.detail-quote { margin: 0 0 16px; font-size: clamp(1.5rem, 7vw, 2.2rem); line-height: 1.1; position: relative; display: inline-block; cursor: default; width: fit-content; font-weight: bolder; }
-.detail-quote::after { content: ""; position: absolute; left: 0; bottom: -4px; width: 0%; height: 3px; background: #fff; transition: width 0.25s ease; }
-.detail-quote:hover::after { width: 100%; }
+.detail-quote { margin: 0 0 16px; font-size: clamp(1.5rem, 7vw, 2.2rem); line-height: 1.1; width: fit-content; font-weight: bolder; }
 .rating-panel { margin-bottom: 16px; padding: 16px; border-radius: 16px; background: rgba(28,26,22,.56); border: 1px solid rgba(214,190,138,.12); transition: all .25s ease; }
 .rating-panel:hover { background: rgba(28,26,22,.7); border-color: rgba(214,190,138,.25); box-shadow: 0 10px 22px rgba(0,0,0,.3); }
 .rating-label { margin: 0 0 10px; color: #d6be8a; font-size: .82rem; letter-spacing: .12em; }
@@ -42,9 +40,7 @@
 .character-name { margin: 4px 0 2px; color: #d6be8a; font-size: 1.15rem; }
 .meta-line { margin: 0; color: #96a0b5; }
 .detail-stats { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 8px; color: #d6be8a; font-size: .9rem; }
-.credit-copy h2, .character-name, .meta-line, .detail-stats span { position: relative; display: inline-block; cursor: default; }
-.credit-copy h2::after, .meta-line::after, .detail-stats span::after { content: ""; position: absolute; left: 0; bottom: -2px; width: 0%; height: 2px; background: currentColor; transition: width 0.25s ease; }
-.credit-copy h2:hover::after, .meta-line:hover::after, .detail-stats span:hover::after { width: 100%; }
+.credit-copy h2, .character-name, .meta-line, .detail-stats span { display: inline-block; }
 .duration-pill { display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(214,190,138,.45); color: #d6be8a; font-weight: 600; white-space: nowrap; transition: all .25s ease; cursor: default; }
 .duration-pill:hover { background: #d6be8a; color: #151515; border-color: #d6be8a; transform: translateY(-1px); }
 .synopsis-block { margin-top: 28px; }
@@ -57,10 +53,6 @@
 .hashtag-chip:hover { background: rgba(214, 190, 138, 0.12); color: #f2dcae; border-color: rgba(214, 190, 138, 0.35); transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3); }
 .hashtag-chip:active { transform: scale(0.95); }
 .loading-state { min-height: 100dvh; display: flex; align-items: center; justify-content: center; color: #94a3b8; }
-
-h3 { position: relative; display: inline-block; width: fit-content; cursor: default; }
-h3::after { content: ""; position: absolute; left: 0; bottom: -3px; width: 0%; height: 2px; background: currentColor; transition: width 0.25s ease; }
-h3:hover::after { width: 100%; }
 
 @media (min-width: 768px) {
   .detail-frame {

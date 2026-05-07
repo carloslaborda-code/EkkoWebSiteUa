@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { CreateQuotePayload, QuoteService } from '../../services/quotes.services';
+import { firstValueFrom } from 'rxjs';
+import { CreateQuotePayload, QuoteService, UploadKind } from '../../services/quotes.services';
 import { UserService } from '../../services/user.service';
 import { faChevronLeft, faChevronRight} from '@fortawesome/free-solid-svg-icons';
 
@@ -232,7 +233,7 @@ export class PublishComponent implements OnInit, OnDestroy {
     return year;
   }
 
-  publish(): void {
+  async publish(): Promise<void> {
     if (!localStorage.getItem('token')) {
       this.router.navigate(['/login']);
       return;
@@ -258,37 +259,68 @@ export class PublishComponent implements OnInit, OnDestroy {
     const actorName = this.withUnknownFallback(this.actorName);
     const characterName = this.withUnknownFallback(this.characterName);
 
-    const payload: CreateQuotePayload = {
-      text: this.quoteText.trim(),
-      workTitle: this.workTitle.trim(),
-      year: parsedYear,
-      rating: 0,
-      views: '0',
-      image,
-      mediaType: this.mediaType,
-      mediaUrl: this.mediaDataUrl,
-      duration: this.duration,
-      actorName,
-      characterName,
-      synopsis: this.synopsis.trim(),
-      hashtags: this.parseHashtags(this.hashtagsText),
-      category: this.category
-    };
-
     this.submitting = true;
-    this.message = '';
+    this.message = 'Subiendo archivos...';
 
-    this.quoteService.createQuote(payload).subscribe({
-      next: ({ quote, user }) => {
-        this.submitting = false;
-        this.userService.syncPublishedUpload(user);
-        this.router.navigate(['/quote', quote._id]);
-      },
-      error: () => {
-        this.submitting = false;
-        this.message = 'No se pudo publicar el contenido.';
-      }
+    try {
+      const [uploadedImage, uploadedMediaUrl] = await Promise.all([
+        this.uploadAsset(image, 'cover'),
+        this.uploadAsset(this.mediaDataUrl, this.mediaType)
+      ]);
+
+      const payload: CreateQuotePayload = {
+        text: this.quoteText.trim(),
+        workTitle: this.workTitle.trim(),
+        year: parsedYear,
+        rating: 0,
+        views: '0',
+        image: uploadedImage,
+        mediaType: this.mediaType,
+        mediaUrl: uploadedMediaUrl,
+        duration: this.duration,
+        actorName,
+        characterName,
+        synopsis: this.synopsis.trim(),
+        hashtags: this.parseHashtags(this.hashtagsText),
+        category: this.category
+      };
+
+      this.message = 'Publicando contenido...';
+      const { quote, user } = await firstValueFrom(this.quoteService.createQuote(payload));
+      this.submitting = false;
+      this.userService.syncPublishedUpload(user);
+      this.router.navigate(['/quote', quote._id]);
+    } catch {
+      this.submitting = false;
+      this.message = 'No se pudo publicar el contenido.';
+    }
+  }
+
+  private async uploadAsset(file: string, kind: UploadKind): Promise<string> {
+    if (!file || !file.startsWith('data:')) {
+      return file;
+    }
+
+    const uploadConfig = await firstValueFrom(this.quoteService.createUploadSignature(kind));
+    const formData = new FormData();
+
+    formData.append('file', file);
+    formData.append('folder', uploadConfig.folder);
+    formData.append('timestamp', String(uploadConfig.timestamp));
+    formData.append('api_key', uploadConfig.apiKey);
+    formData.append('signature', uploadConfig.signature);
+
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${uploadConfig.cloudName}/${uploadConfig.resourceType}/upload`, {
+      method: 'POST',
+      body: formData
     });
+
+    if (!response.ok) {
+      throw new Error('No se pudo subir el archivo.');
+    }
+
+    const payload = (await response.json()) as { secure_url?: string; url?: string };
+    return payload.secure_url || payload.url || file;
   }
 
   private parseHashtags(raw: string): string[] {

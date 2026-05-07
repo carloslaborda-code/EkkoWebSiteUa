@@ -49,7 +49,13 @@
         <section class="uploads-section">
           <h2>Mis Subidas</h2>
           <div class="uploads-grid" *ngIf="profile.uploads?.length; else emptyUploadsState">
-            <article class="upload-card" *ngFor="let upload of profile.uploads; trackBy: trackByUploadTitle">
+            <a
+              class="upload-card"
+              *ngFor="let upload of profile.uploads; trackBy: trackByUpload"
+              [routerLink]="upload.quoteId ? ['/quote', upload.quoteId] : null"
+              [class.upload-card--disabled]="!upload.quoteId"
+              [attr.aria-label]="upload.quoteId ? 'Abrir ' + upload.title : null"
+            >
               <div class="upload-art" [class.upload-art--wave]="upload.type === 'audio'" [class.upload-art--mic]="upload.type === 'voice'" [class.upload-art--console]="upload.type === 'sfx'">
                 <img *ngIf="upload.image" [src]="upload.image" [alt]="upload.title" class="upload-image" width="320" height="320" loading="lazy" decoding="async" />
                 <div class="wave-bars" *ngIf="upload.type === 'audio' && !upload.image">
@@ -59,7 +65,7 @@
                 <div class="console-shape" *ngIf="upload.type === 'sfx' && !upload.image"></div>
               </div>
               <p>{{ upload.title }}</p>
-            </article>
+            </a>
           </div>
           <ng-template #emptyUploadsState>
             <p class="empty-state">Todav&iacute;a no has subido contenido.</p>

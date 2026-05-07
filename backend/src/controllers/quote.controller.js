@@ -1,7 +1,7 @@
 const Quote = require('../models/quote');
 const seedQuotes = require('../data/seedQuotes');
 const User = require('../models/user');
-const { uploadToCloudinary, isDataUri } = require('../services/cloudinary.service');
+const { uploadToCloudinary, isDataUri, createUploadSignature } = require('../services/cloudinary.service');
 
 const UNKNOWN_LABEL = 'Unkown';
 
@@ -185,6 +185,27 @@ const getQuoteById = async (req, res) => {
   }
 };
 
+const uploadKinds = {
+  cover: { folder: 'ekko/covers', resourceType: 'image' },
+  audio: { folder: 'ekko/audio', resourceType: 'video' },
+  video: { folder: 'ekko/video', resourceType: 'video' }
+};
+
+const getUploadSignature = async (req, res) => {
+  try {
+    const kind = req.body?.kind;
+    const uploadConfig = uploadKinds[kind];
+
+    if (!uploadConfig) {
+      return res.status(400).json({ message: 'Tipo de subida no valido' });
+    }
+
+    res.json(createUploadSignature(uploadConfig));
+  } catch (error) {
+    res.status(500).json({ message: 'Error al preparar la subida', error: error.message });
+  }
+};
+
 const createQuote = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -262,6 +283,7 @@ const createQuote = async (req, res) => {
     const uploadType = normalizedMediaType === 'video' ? 'video' : 'audio';
 
     user.uploads.push({
+      quoteId: newQuote._id,
       title: newQuote.workTitle,
       image: newQuote.image,
       type: uploadType
@@ -437,6 +459,7 @@ const registerDownload = async (req, res) => {
 module.exports = {
   getQuotes,
   getQuoteById,
+  getUploadSignature,
   createQuote,
   toggleSaveQuote,
   rateQuote,

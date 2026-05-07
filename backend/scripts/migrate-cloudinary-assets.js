@@ -18,6 +18,7 @@ const rebuildUserUploads = async () => {
       .lean();
 
     const uploads = createdQuotes.map((quote) => ({
+      quoteId: quote._id,
       title: quote.workTitle || '',
       image: quote.image || '',
       type: quote.mediaType === 'video' ? 'video' : 'audio'
