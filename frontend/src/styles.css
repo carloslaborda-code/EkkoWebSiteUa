@@ -130,11 +130,13 @@ html[data-reduced-motion='true'] *::after {
 }
 
 html[data-color-filter='warm'] body {
-  filter: sepia(0.16) saturate(0.94) hue-rotate(-8deg);
+  filter:
+    sepia(0.45) saturate(1.25) hue-rotate(-18deg) brightness(1.04);
 }
 
 html[data-color-filter='cool'] body {
-  filter: saturate(0.9) hue-rotate(10deg);
+  filter:
+    saturate(1.2) hue-rotate(24deg) brightness(1.02) contrast(1.06);
 }
 
 html[data-color-filter='grayscale'] body {
@@ -186,6 +188,7 @@ html[data-high-contrast='true'] ::placeholder {
 }
 
 @media (max-width: 767px) {
+
   input,
   select,
   textarea {
