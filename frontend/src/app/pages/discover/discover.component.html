@@ -139,7 +139,7 @@
             (keydown.space)="$event.preventDefault(); openQuote(quote._id)"
           >
             <div class="relative min-h-[120px] bg-[#161b24]">
-              <img class="h-full w-full object-cover" [src]="quote.image" [alt]="quote.workTitle" loading="lazy" decoding="async" />
+              <img class="h-full w-full object-cover" [src]="quote.image" [alt]="quote.workTitle" width="320" height="180" loading="lazy" decoding="async" />
               <span class="absolute bottom-2.5 right-2.5 rounded-full bg-black/60 px-2.5 py-1 text-[0.72rem] font-bold text-white">
                 {{ quote.mediaType === 'audio' ? 'Audio' : 'Video' }}
               </span>

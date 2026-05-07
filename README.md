@@ -16,11 +16,15 @@ El proyecto se ha desarrollado para la asignatura de Usabilidad y Accesibilidad 
 - [Modelos de datos](#modelos-de-datos)
 - [Instalacion y ejecucion](#instalacion-y-ejecucion)
 - [Variables de entorno](#variables-de-entorno)
+- [Despliegue en Vercel](#despliegue-en-vercel)
 - [Cloudinary](#cloudinary)
 - [Accesibilidad y usabilidad](#accesibilidad-y-usabilidad)
 - [Rendimiento](#rendimiento)
 - [Verificacion](#verificacion)
 - [Estado actual](#estado-actual)
+- [Decisiones recientes](#decisiones-recientes)
+- [Posibles mejoras futuras](#posibles-mejoras-futuras)
+- [Conclusiones](#conclusiones)
 
 ## Vision general
 
@@ -95,7 +99,7 @@ El proyecto sigue una arquitectura cliente-servidor:
 - MongoDB: almacena usuarios, publicaciones, relaciones de guardados, valoraciones y ajustes.
 - Cloudinary: almacena los archivos multimedia y portadas, evitando guardar binarios pesados en MongoDB.
 
-El frontend consume la API mediante `API_BASE_URL` y mantiene en `localStorage` el token, el perfil basico y los ajustes necesarios para aplicar accesibilidad global.
+El frontend consume la API mediante `API_BASE_URL` y mantiene en `localStorage` el token, el perfil basico y los ajustes necesarios para aplicar accesibilidad global. En desarrollo local la API apunta a `http://localhost:5000/api`. En produccion integrada con Vercel apunta a `/_/backend/api`, que es el prefijo publico del servicio Express definido en `vercel.json`.
 
 ## Estructura del proyecto
 
@@ -337,11 +341,28 @@ Componente centralizado para iconos SVG internos.
 
 ## API REST
 
-URL base local habitual:
+URL base del servidor local:
 
 ```text
 http://localhost:5000
 ```
+
+URL base que usa el frontend en local:
+
+```text
+http://localhost:5000/api
+```
+
+URL base publica en Vercel cuando frontend y backend se despliegan juntos con `vercel.json`:
+
+```text
+/_/backend/api
+```
+
+Por ejemplo, la lista de publicaciones queda asi:
+
+- Local: `http://localhost:5000/api/quotes`
+- Vercel: `https://tu-dominio.vercel.app/_/backend/api/quotes`
 
 ### Auth
 
@@ -502,7 +523,7 @@ Despues se accede desde el movil usando la IP local del ordenador y el puerto `4
 
 El backend usa `backend/.env`. Este archivo no debe subirse al repositorio.
 
-Variables esperadas:
+Variables esperadas en backend:
 
 ```env
 PORT=5000
@@ -520,43 +541,79 @@ Notas:
 - `JWT_SECRET` firma los tokens de autenticacion.
 - Las variables de Cloudinary permiten subir portadas y medios.
 
+El frontend no necesita `.env` para funcionar en local o en el despliegue integrado de Vercel. La URL base se resuelve en `frontend/src/app/services/api-url.ts` con estas reglas:
+
+- si existe `EKKO_API_BASE_URL` o `NG_APP_API_BASE_URL`, se usa ese valor;
+- si el navegador esta en `localhost` o `127.0.0.1`, se usa `http://localhost:5000/api`;
+- en cualquier otro dominio, se usa `/_/backend/api`.
+
+El script `frontend/scripts/write-runtime-config.js` genera `frontend/src/assets/runtime-config.js` antes del build y permite sobrescribir la API sin tocar codigo cuando haga falta apuntar a otro backend.
+
 ## Despliegue en Vercel
 
-La opcion recomendada es desplegar el frontend Angular en Vercel y mantener el backend Express en un servicio Node publico como Render, Railway o similar. El backend de Ekko recibe archivos de audio/video y no encaja bien con limites pequenos de payload en funciones serverless.
+El repositorio esta preparado para desplegar frontend Angular y backend Express en Vercel desde un unico `vercel.json` en la raiz.
+
+Configuracion actual:
+
+```json
+{
+  "experimentalServices": {
+    "frontend": {
+      "entrypoint": "frontend",
+      "routePrefix": "/",
+      "framework": "angular"
+    },
+    "backend": {
+      "entrypoint": "backend",
+      "routePrefix": "/_/backend",
+      "framework": "express"
+    }
+  }
+}
+```
+
+Con esta configuracion:
+
+- el frontend queda publicado en `/`;
+- el backend queda publicado bajo `/_/backend`;
+- la API real de Express mantiene sus rutas internas `/api/auth` y `/api/quotes`;
+- por tanto, en produccion el frontend llama a `/_/backend/api`.
 
 ### Frontend en Vercel
 
 Al importar el repositorio en Vercel:
 
-- Framework Preset: `Angular`
-- Root Directory: `frontend`
-- Build Command: `npm run build`
-- Output Directory: `dist/client`
+- usar el repositorio completo, no solo la carpeta `frontend`;
+- mantener el `vercel.json` de la raiz;
+- el servicio frontend usa `frontend/package.json`;
+- el build del frontend ejecuta `npm run build`;
+- la salida de Angular queda en `frontend/dist/client`.
 
-Variable de entorno necesaria en Vercel:
+No hace falta definir `EKKO_API_BASE_URL` para el despliegue integrado. Si se quisiera apuntar temporalmente a un backend externo, se puede anadir:
 
 ```env
 EKKO_API_BASE_URL=https://tu-backend-publico.com/api
 ```
 
-En local no hace falta definirla: el frontend usa automaticamente `http://localhost:5000/api`.
+En local tampoco hace falta definirla: el frontend usa automaticamente `http://localhost:5000/api`.
 
 ### Rutas SPA
 
-`frontend/vercel.json` incluye rewrites para que rutas como `/home`, `/library`, `/quote/:id`, `/login` o `/settings` funcionen al recargar la pagina directamente en Vercel.
+El servicio frontend esta configurado como Angular con `routePrefix` `/`, por lo que rutas como `/home`, `/library`, `/quote/:id`, `/login` o `/settings` pertenecen a la SPA.
 
 ### Backend
 
-El backend necesita estas variables en la plataforma donde se despliegue:
+El backend necesita estas variables en Vercel:
 
 ```env
-PORT=5000
 MONGO_URI=...
 JWT_SECRET=...
 CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
 ```
+
+`PORT` solo es necesario para desarrollo local o plataformas donde se arranque Express directamente. En Vercel el servicio gestiona el puerto.
 
 ## Cloudinary
 
@@ -646,8 +703,9 @@ Resultado de la ultima verificacion:
 
 ```text
 Build OK
-Initial Total: 496.62 kB
-Estimated Transfer Size: 115.05 kB
+Initial Total: 506.31 kB
+Estimated Transfer Size: 116.53 kB
+Warning: initial bundle exceeded the 500.00 kB budget by 6.31 kB
 ```
 
 ### Tests frontend
@@ -697,6 +755,10 @@ Rutas comprobadas con respuesta `200`:
 - `http://localhost:5000/`
 - `http://localhost:5000/api/quotes`
 
+En Vercel, la comprobacion equivalente de API debe usar el prefijo del servicio backend:
+
+- `https://tu-dominio.vercel.app/_/backend/api/quotes`
+
 ## Estado actual
 
 El proyecto tiene actualmente:
@@ -712,7 +774,8 @@ El proyecto tiene actualmente:
 - ajustes visuales y de accesibilidad;
 - configuracion de cuenta con cambio de contrasena;
 - limpieza de codigo muerto y referencias obsoletas;
-- mejoras de rendimiento en listas, imagenes y servicios.
+- mejoras de rendimiento en listas, imagenes y servicios;
+- ruteo de API compatible con Vercel mediante `/_/backend/api`.
 
 ## Decisiones recientes
 
@@ -723,6 +786,7 @@ El proyecto tiene actualmente:
 - Register usa errores inline en lugar de `alert`.
 - Se elimino el enlace a recuperacion de contrasena porque no existe ruta implementada.
 - El backend mantiene una limpieza conservadora de datos heredados de usuario.
+- En Vercel, el backend Express se sirve bajo `/_/backend`, asi que el frontend usa `/_/backend/api` en produccion.
 
 ## Posibles mejoras futuras
 

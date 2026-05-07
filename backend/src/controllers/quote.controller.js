@@ -3,6 +3,8 @@ const seedQuotes = require('../data/seedQuotes');
 const User = require('../models/user');
 const { uploadToCloudinary, isDataUri } = require('../services/cloudinary.service');
 
+const UNKNOWN_LABEL = 'Unkown';
+
 const normalizeSavedQuotes = (savedQuotes = []) => {
   const seenIds = new Set();
 
@@ -78,6 +80,51 @@ const formatCount = (value) => {
   return String(value);
 };
 
+const getUrlExtension = (value = '') => {
+  try {
+    const parsedUrl = new URL(value, 'http://localhost');
+    const match = parsedUrl.pathname.match(/\.[a-z0-9]+$/i);
+    return match ? match[0] : '';
+  } catch {
+    return '';
+  }
+};
+
+const buildDownloadFileName = (quote) => {
+  const fallbackName = quote.mediaType === 'audio' ? 'ekko-audio' : 'ekko-video';
+  const baseName = `${quote.workTitle || fallbackName}-${quote.mediaType || 'media'}`
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[<>:"/\\|?*\x00-\x1F]+/g, '-')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase() || fallbackName;
+  const extension = getUrlExtension(quote.mediaUrl);
+
+  return extension && !baseName.endsWith(extension.toLowerCase()) ? `${baseName}${extension}` : baseName;
+};
+
+const buildDownloadUrl = (mediaUrl = '') => {
+  if (!mediaUrl) {
+    return '';
+  }
+
+  try {
+    const parsedUrl = new URL(mediaUrl);
+    const isCloudinaryDelivery = parsedUrl.hostname.includes('res.cloudinary.com') && parsedUrl.pathname.includes('/upload/');
+
+    if (!isCloudinaryDelivery || parsedUrl.pathname.includes('/upload/fl_attachment')) {
+      return mediaUrl;
+    }
+
+    parsedUrl.pathname = parsedUrl.pathname.replace('/upload/', '/upload/fl_attachment/');
+    return parsedUrl.toString();
+  } catch {
+    return mediaUrl;
+  }
+};
+
 const ensureSeedQuotes = async () => {
   const totalQuotes = await Quote.countDocuments();
 
@@ -104,6 +151,11 @@ const applyQuoteDefaults = (quote = {}) => ({
   image: quote.image || '',
   category: quote.category || 'movie'
 });
+
+const withUnknownFallback = (value) => {
+  const normalizedValue = typeof value === 'string' ? value.trim() : '';
+  return normalizedValue || UNKNOWN_LABEL;
+};
 
 const getQuotes = async (req, res) => {
   try {
@@ -158,9 +210,9 @@ const createQuote = async (req, res) => {
       category
     } = req.body;
 
-    if (!text || !workTitle || !year || !actorName || !characterName || !synopsis || !mediaType || !mediaUrl || !category) {
+    if (!text || !workTitle || !year || !synopsis || !mediaType || !mediaUrl || !category) {
       return res.status(400).json({
-        message: 'text, workTitle, year, actorName, characterName, synopsis, mediaType, mediaUrl y category son obligatorios'
+        message: 'text, workTitle, year, synopsis, mediaType, mediaUrl y category son obligatorios'
       });
     }
 
@@ -176,6 +228,8 @@ const createQuote = async (req, res) => {
       return res.status(400).json({ message: 'El ano debe ser un numero valido mayor o igual que 0' });
     }
 
+    const normalizedActorName = withUnknownFallback(actorName);
+    const normalizedCharacterName = withUnknownFallback(characterName);
     const normalizedMediaType = mediaType === 'audio' ? 'audio' : 'video';
     const uploadedImage = typeof image === 'string' && isDataUri(image)
       ? await uploadToCloudinary(image, { folder: 'ekko/covers', resourceType: 'image' })
@@ -197,8 +251,8 @@ const createQuote = async (req, res) => {
       mediaType: normalizedMediaType,
       mediaUrl: uploadedMediaUrl,
       duration: typeof duration === 'string' && duration.trim() ? duration.trim() : '00:00',
-      actorName: String(actorName).trim(),
-      characterName: String(characterName).trim(),
+      actorName: normalizedActorName,
+      characterName: normalizedCharacterName,
       synopsis: String(synopsis).trim(),
       hashtags: normalizedHashtags,
       category,
@@ -362,12 +416,18 @@ const registerDownload = async (req, res) => {
       return res.status(404).json({ message: 'No se encontro el contenido o el usuario' });
     }
 
+    if (!quote.mediaUrl) {
+      return res.status(404).json({ message: 'El contenido no tiene archivo descargable' });
+    }
+
     user.downloads += 1;
     await user.save();
 
     res.json({
       message: 'Descarga registrada correctamente',
-      mediaUrl: quote.mediaUrl
+      mediaUrl: quote.mediaUrl,
+      downloadUrl: buildDownloadUrl(quote.mediaUrl),
+      fileName: buildDownloadFileName(quote)
     });
   } catch (error) {
     res.status(500).json({ message: 'Error al registrar la descarga', error: error.message });

@@ -80,7 +80,7 @@
           </section>
 
           <div class="cover-preview" *ngIf="coverPreview; else emptyCoverState">
-            <img [src]="coverPreview" alt="Vista previa de la portada" decoding="async" />
+            <img [src]="coverPreview" alt="Vista previa de la portada" width="1280" height="720" decoding="async" />
           </div>
 
           <ng-template #emptyCoverState>

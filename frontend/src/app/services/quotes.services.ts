@@ -113,8 +113,8 @@ export class QuoteService {
     );
   }
 
-  registerDownload(id: string): Observable<{ message: string; mediaUrl: string }> {
-    return this.http.post<{ message: string; mediaUrl: string }>(`${this.apiUrl}/${id}/download`, {}, {
+  registerDownload(id: string): Observable<{ message: string; mediaUrl: string; downloadUrl?: string; fileName?: string }> {
+    return this.http.post<{ message: string; mediaUrl: string; downloadUrl?: string; fileName?: string }>(`${this.apiUrl}/${id}/download`, {}, {
       headers: this.getHeaders()
     });
   }

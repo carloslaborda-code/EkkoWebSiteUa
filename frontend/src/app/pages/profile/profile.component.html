@@ -51,7 +51,7 @@
           <div class="uploads-grid" *ngIf="profile.uploads?.length; else emptyUploadsState">
             <article class="upload-card" *ngFor="let upload of profile.uploads; trackBy: trackByUploadTitle">
               <div class="upload-art" [class.upload-art--wave]="upload.type === 'audio'" [class.upload-art--mic]="upload.type === 'voice'" [class.upload-art--console]="upload.type === 'sfx'">
-                <img *ngIf="upload.image" [src]="upload.image" [alt]="upload.title" class="upload-image" loading="lazy" decoding="async" />
+                <img *ngIf="upload.image" [src]="upload.image" [alt]="upload.title" class="upload-image" width="320" height="320" loading="lazy" decoding="async" />
                 <div class="wave-bars" *ngIf="upload.type === 'audio' && !upload.image">
                   <span></span><span></span><span></span><span></span><span></span>
                 </div>
