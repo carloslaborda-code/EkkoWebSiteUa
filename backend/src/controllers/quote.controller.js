@@ -3,6 +3,8 @@ const seedQuotes = require('../data/seedQuotes');
 const User = require('../models/user');
 const { uploadToCloudinary, isDataUri } = require('../services/cloudinary.service');
 
+const UNKNOWN_LABEL = 'Unkown';
+
 const normalizeSavedQuotes = (savedQuotes = []) => {
   const seenIds = new Set();
 
@@ -150,6 +152,11 @@ const applyQuoteDefaults = (quote = {}) => ({
   category: quote.category || 'movie'
 });
 
+const withUnknownFallback = (value) => {
+  const normalizedValue = typeof value === 'string' ? value.trim() : '';
+  return normalizedValue || UNKNOWN_LABEL;
+};
+
 const getQuotes = async (req, res) => {
   try {
     await ensureSeedQuotes();
@@ -203,9 +210,9 @@ const createQuote = async (req, res) => {
       category
     } = req.body;
 
-    if (!text || !workTitle || !year || !actorName || !characterName || !synopsis || !mediaType || !mediaUrl || !category) {
+    if (!text || !workTitle || !year || !synopsis || !mediaType || !mediaUrl || !category) {
       return res.status(400).json({
-        message: 'text, workTitle, year, actorName, characterName, synopsis, mediaType, mediaUrl y category son obligatorios'
+        message: 'text, workTitle, year, synopsis, mediaType, mediaUrl y category son obligatorios'
       });
     }
 
@@ -221,6 +228,8 @@ const createQuote = async (req, res) => {
       return res.status(400).json({ message: 'El ano debe ser un numero valido mayor o igual que 0' });
     }
 
+    const normalizedActorName = withUnknownFallback(actorName);
+    const normalizedCharacterName = withUnknownFallback(characterName);
     const normalizedMediaType = mediaType === 'audio' ? 'audio' : 'video';
     const uploadedImage = typeof image === 'string' && isDataUri(image)
       ? await uploadToCloudinary(image, { folder: 'ekko/covers', resourceType: 'image' })
@@ -242,8 +251,8 @@ const createQuote = async (req, res) => {
       mediaType: normalizedMediaType,
       mediaUrl: uploadedMediaUrl,
       duration: typeof duration === 'string' && duration.trim() ? duration.trim() : '00:00',
-      actorName: String(actorName).trim(),
-      characterName: String(characterName).trim(),
+      actorName: normalizedActorName,
+      characterName: normalizedCharacterName,
       synopsis: String(synopsis).trim(),
       hashtags: normalizedHashtags,
       category,

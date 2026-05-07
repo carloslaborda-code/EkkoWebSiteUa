@@ -3,6 +3,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 
@@ -14,6 +15,7 @@ describe('PublishComponent', () => {
   let component: PublishComponent;
   let fixture: ComponentFixture<PublishComponent>;
   let quoteServiceStub: jasmine.SpyObj<QuoteService>;
+  let router: Router;
 
   beforeEach(() => {
     quoteServiceStub = jasmine.createSpyObj<QuoteService>('QuoteService', ['createQuote']);
@@ -68,12 +70,37 @@ describe('PublishComponent', () => {
       ]
     });
 
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+
     fixture = TestBed.createComponent(PublishComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    localStorage.removeItem('token');
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should publish with Unkown when actor and character are empty', () => {
+    localStorage.setItem('token', 'token');
+    component.quoteText = 'quote';
+    component.workTitle = 'title';
+    component.year = '1983';
+    component.actorName = '   ';
+    component.characterName = '';
+    component.synopsis = 'synopsis';
+    component.mediaDataUrl = 'data:audio/mp3;base64,AAA';
+
+    component.publish();
+
+    expect(quoteServiceStub.createQuote).toHaveBeenCalledWith(jasmine.objectContaining({
+      actorName: 'Unkown',
+      characterName: 'Unkown'
+    }));
   });
 });

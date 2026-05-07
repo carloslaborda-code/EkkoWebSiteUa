@@ -17,6 +17,7 @@ export class PublishComponent implements OnInit, OnDestroy {
   private readonly maxAudioSize = 8 * 1024 * 1024;
   private readonly maxVideoSize = 20 * 1024 * 1024;
   private readonly maxCoverSize = 4 * 1024 * 1024;
+  private readonly unknownLabel = 'Unkown';
   private framePreviewTimer?: ReturnType<typeof setTimeout>;
   private framePreviewRequestId = 0;
   mediaType: MediaType = 'audio';
@@ -233,8 +234,8 @@ export class PublishComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.quoteText || !this.workTitle || !this.year || !this.actorName || !this.characterName || !this.synopsis || !this.mediaDataUrl) {
-      this.message = 'Completa todos los campos y sube un archivo antes de publicar.';
+    if (!this.quoteText || !this.workTitle || !this.year || !this.synopsis || !this.mediaDataUrl) {
+      this.message = 'Completa los campos obligatorios y sube un archivo antes de publicar.';
       return;
     }
 
@@ -250,6 +251,9 @@ export class PublishComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const actorName = this.withUnknownFallback(this.actorName);
+    const characterName = this.withUnknownFallback(this.characterName);
+
     const payload: CreateQuotePayload = {
       text: this.quoteText.trim(),
       workTitle: this.workTitle.trim(),
@@ -260,8 +264,8 @@ export class PublishComponent implements OnInit, OnDestroy {
       mediaType: this.mediaType,
       mediaUrl: this.mediaDataUrl,
       duration: this.duration,
-      actorName: this.actorName.trim(),
-      characterName: this.characterName.trim(),
+      actorName,
+      characterName,
       synopsis: this.synopsis.trim(),
       hashtags: this.parseHashtags(this.hashtagsText),
       category: this.category
@@ -292,6 +296,11 @@ export class PublishComponent implements OnInit, OnDestroy {
 
   private resolveImage(): string {
     return this.selectedCoverDataUrl || this.generatedCoverDataUrl || this.getFallbackCover();
+  }
+
+  private withUnknownFallback(value: string): string {
+    const normalizedValue = value.trim();
+    return normalizedValue || this.unknownLabel;
   }
 
   private getFallbackCover(): string {
