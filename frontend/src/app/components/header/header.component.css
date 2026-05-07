@@ -74,7 +74,6 @@
   min-height: 40px;
 }
 
-.app-header__side--end > [header-end] fa-icon,
-.app-header__side--end > [header-end] app-icon {
+.app-header__side--end > [header-end] fa-icon {
   line-height: 1;
 }

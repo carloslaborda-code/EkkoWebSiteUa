@@ -4,7 +4,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/header/header.component';
-import { IconComponent } from './components/icon/icon.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { DiscoverComponent } from './pages/discover/discover.component';
 import { DetailComponent } from './pages/detail/detail.component';
@@ -26,7 +25,6 @@ import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontaweso
   declarations: [
     AppComponent,
     HeaderComponent,
-    IconComponent,
     NavbarComponent,
     DiscoverComponent,
     DetailComponent,
