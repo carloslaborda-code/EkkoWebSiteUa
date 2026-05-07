@@ -59,11 +59,6 @@
 .hashtag-chip:active { transform: scale(0.95); }
 .loading-state { min-height: 100dvh; display: flex; align-items: center; justify-content: center; color: #94a3b8; }
 
-:host-context(html[data-underline-links='true']) .detail-shell a,
-:host-context(html[data-underline-links='true']) .detail-shell button:not([disabled]) span {
-  text-decoration: none;
-}
-
 @media (min-width: 768px) {
   .detail-frame {
     max-width: var(--app-tablet-width);

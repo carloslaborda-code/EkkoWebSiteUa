@@ -107,10 +107,6 @@
   content: none;
 }
 
-html[data-underline-links='true'] .publish-shell button:not([disabled]) span {
-  text-decoration: none;
-}
-
 .format-switch {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

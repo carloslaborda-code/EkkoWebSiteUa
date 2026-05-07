@@ -99,9 +99,8 @@ html[data-readable-font='true'] a {
   line-height: 1.6;
 }
 
-html[data-underline-links='true'] a,
-html[data-underline-links='true'] button:not([disabled]) span {
-  text-decoration: underline;
+html[data-underline-links='true'] a[href] {
+  text-decoration-line: underline !important;
   text-decoration-thickness: 0.12em;
   text-underline-offset: 0.18em;
 }
