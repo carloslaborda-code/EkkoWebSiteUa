@@ -17,18 +17,17 @@
           placeholder="Busca frases ic&oacute;nicas..." />
       </label>
 
-      <button type="button" class="icon-button filter-button" aria-label="Filtros" (click)="openDiscover()">
+      <button type="button" class="icon-button filter-button" aria-label="Abrir Descubrir" (click)="openDiscover()">
         <fa-icon [icon]="faSliders" aria-hidden="true"></fa-icon>
       </button>
     </section>
 
     <section class="desktop-hero" aria-label="Resumen de exploracion">
       <div class="desktop-hero-copy">
-        <p class="desktop-kicker">Explorar contenido</p>
-        <h1>Ekko te ayuda a localizar frases, escenas y fragmentos de audio dentro de peliculas, series y videojuegos.
-        </h1>
-        <p class="desktop-summary">La aplicacion esta pensada para descubrir contenido memorable, filtrarlo por formato
-          o categoria y acceder rapido a cada fragmento para reproducirlo, guardarlo o compartirlo.</p>
+        <p class="desktop-kicker">Ranking global</p>
+        <h1>Los fragmentos mejor valorados por la comunidad, ordenados por puntuaci&oacute;n y visualizaciones.</h1>
+        <p class="desktop-summary">Inicio funciona como ranking principal. Para explorar recomendaciones, temas y picks
+          menos predecibles, entra en Descubrir.</p>
       </div>
       <div class="desktop-hero-stats">
         <article class="desktop-stat-card">
@@ -36,8 +35,8 @@
           <strong>{{ visibleQuotes.length }}</strong>
         </article>
         <article class="desktop-stat-card">
-          <span>{{ searchTerm.trim() ? 'Busqueda' : 'Formatos' }}</span>
-          <strong>{{ searchTerm.trim() ? 'Base completa' : 'Audio + Video' }}</strong>
+          <span>{{ searchTerm.trim() ? 'Busqueda' : 'Orden' }}</span>
+          <strong>{{ searchTerm.trim() ? 'Base completa' : 'Rating + views' }}</strong>
         </article>
       </div>
     </section>

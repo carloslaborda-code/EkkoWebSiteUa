@@ -117,23 +117,13 @@ export class HomeComponent implements OnInit {
   }
 
   private buildFeaturedQuotes(quotes: Quote[]): Quote[] {
-    const categoryOrder: Array<Quote['category']> = ['movie', 'series', 'game', 'sfx'];
+    return [...quotes].sort((left, right) => {
+      if (right.rating !== left.rating) {
+        return right.rating - left.rating;
+      }
 
-    return categoryOrder
-      .map((category) => {
-        const bestQuote = quotes
-          .filter((quote) => quote.category === category)
-          .sort((left, right) => {
-            if (right.rating !== left.rating) {
-              return right.rating - left.rating;
-            }
-
-            return this.parseViews(right.views) - this.parseViews(left.views);
-          })[0];
-
-        return bestQuote || null;
-      })
-      .filter((quote): quote is Quote => quote !== null);
+      return this.parseViews(right.views) - this.parseViews(left.views);
+    });
   }
 
   private getSearchScore(quote: Quote, normalizedQuery: string): number {
