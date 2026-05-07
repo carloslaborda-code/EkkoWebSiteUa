@@ -2,7 +2,7 @@
 
 ## Informe final: criterios de usabilidad y accesibilidad
 
-Buenos días. En esta unidad hemos revisado Ekko desde el punto de vista de la usabilidad y la accesibilidad. Ekko no se ha planteado como una maqueta, sino como una plataforma operativa para buscar, reproducir, guardar, valorar y publicar fragmentos multimedia de películas, series, videojuegos y efectos sonoros.
+ Buenos días. En esta unidad hemos revisado Ekko desde el punto de vista de la usabilidad y la accesibilidad. Ekko no se ha planteado como una maqueta, sino como una plataforma operativa para buscar, reproducir, guardar, valorar y publicar fragmentos multimedia de películas, series, videojuegos y efectos sonoros.
 
 La aplicación tiene frontend Angular, backend Express, base de datos MongoDB, subida de medios y portadas, autenticación de usuarios y despliegue en Vercel. Por eso la evaluación no se queda en pantallas sueltas: se analiza cómo se comportan flujos completos como buscar un contenido, filtrarlo, abrir su detalle, guardarlo, valorarlo o publicar un nuevo fragmento.
 
