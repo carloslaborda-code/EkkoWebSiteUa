@@ -6,42 +6,32 @@
   <main id="main-content" class="discover-frame" tabindex="-1">
     <app-header class="discover-topbar" [showBack]="true"></app-header>
 
-    <section class="discover-content mx-auto flex w-full max-w-[var(--app-tablet-width)] flex-col gap-7 px-4 pb-28 pt-7 lg:mx-0 lg:max-w-none lg:px-8">
+    <section
+      class="discover-content mx-auto flex w-full max-w-[var(--app-tablet-width)] flex-col gap-7 px-4 pb-28 pt-7 lg:mx-0 lg:max-w-none lg:px-8">
       <aside class="discover-filters-panel">
         <div class="discover-panel-head">
           <p class="discover-panel-kicker">Panel de filtros</p>
           <h1>Encuentra el fragmento exacto</h1>
         </div>
 
-        <label
-          for="discover-search"
-          class="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#131313] px-4 py-4 text-slate-400 shadow-[0_18px_34px_rgba(0,0,0,0.26)]"
-        >
+        <label for="discover-search"
+          class="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#131313] px-4 py-4 text-slate-400 shadow-[0_18px_34px_rgba(0,0,0,0.26)]">
           <fa-icon [icon]="faMagnifyingGlass" aria-hidden="true" class="text-slate-500"></fa-icon>
-          <input
-            id="discover-search"
-            type="search"
-            name="discoverSearch"
-            [(ngModel)]="searchTerm"
+          <input id="discover-search" type="search" name="discoverSearch" [(ngModel)]="searchTerm"
             (ngModelChange)="applyFilters()"
             class="w-full border-0 bg-transparent text-base text-white placeholder:text-slate-500 focus:outline-none"
-            placeholder="Busca citas, sonidos o escenas..."
-          />
+            placeholder="Busca citas, sonidos o escenas..." />
         </label>
 
         <section class="space-y-3">
           <h2 class="text-[0.95rem] font-extrabold uppercase tracking-[0.12em] text-[#d4bc8e]">I am looking for...</h2>
           <div class="flex flex-wrap gap-3">
-            <button
-              type="button"
+            <button type="button"
               class="inline-flex items-center gap-2 rounded-full border px-5 py-3 text-[0.95rem] font-semibold transition-all duration-200 hover:-translate-y-0.5"
-              *ngFor="let option of visibleCategoryOptions; trackBy: trackByOptionValue"
-              [ngClass]="selectedCategory === option.value
+              *ngFor="let option of visibleCategoryOptions; trackBy: trackByOptionValue" [ngClass]="selectedCategory === option.value
                 ? 'border-[#d7c29d] bg-[#c4ae88] text-[#1d1a15] shadow-[0_10px_24px_rgba(0,0,0,0.24)]'
                 : 'border-white/10 bg-[#151515] text-slate-200 hover:border-white/20 hover:bg-[#1a1a1a]'"
-              [attr.aria-pressed]="selectedCategory === option.value"
-              (click)="setCategory(option.value)"
-            >
+              [attr.aria-pressed]="selectedCategory === option.value" (click)="setCategory(option.value)">
               <fa-icon [icon]="option.icon" aria-hidden="true"></fa-icon>
               <span>{{ option.label }}</span>
             </button>
@@ -50,24 +40,33 @@
 
         <section class="space-y-3">
           <h2 class="text-[0.95rem] font-extrabold uppercase tracking-[0.12em] text-[#d4bc8e]">Formato</h2>
-          <div class="grid grid-cols-2 gap-1 rounded-2xl border border-white/10 bg-[#151515] p-1.5 shadow-[0_18px_34px_rgba(0,0,0,0.18)]">
-            <button
-              type="button"
-              class="inline-flex items-center justify-center gap-2 rounded-[14px] px-4 py-4 text-base font-semibold transition-all duration-200"
-              [ngClass]="selectedFormat === 'video' ? 'bg-[#efe4d0] text-[#1d1b17] shadow-[0_10px_24px_rgba(0,0,0,0.18)]' : 'bg-transparent text-[#8ea6d2]'"
-              [attr.aria-pressed]="selectedFormat === 'video'"
-              (click)="setFormat('video')"
-            >
+          <div
+            class="grid grid-cols-2 gap-1 rounded-2xl border border-white/10 bg-[#151515] p-1.5 shadow-[0_18px_34px_rgba(0,0,0,0.18)]">
+            <button type="button" class="inline-flex items-center justify-center gap-2 rounded-[14px] px-4 py-4 text-base font-semibold
+         transition-all duration-200 ease-out
+         hover:-translate-y-0.5 hover:scale-[1.01]
+         hover:shadow-[0_10px_22px_rgba(0,0,0,0.24)]
+         active:scale-[0.97]
+         focus-visible:outline-none
+         focus-visible:ring-2 focus-visible:ring-[#d6be8a]/60
+         focus-visible:ring-offset-2 focus-visible:ring-offset-[#151515]" [ngClass]="selectedFormat === 'video'
+    ? 'bg-[#efe4d0] text-[#1d1b17] shadow-[0_10px_24px_rgba(0,0,0,0.18)] hover:bg-[#f7ead1]'
+    : 'bg-transparent text-[#8ea6d2] hover:bg-white/5 hover:text-[#f2dcae]'"
+              [attr.aria-pressed]="selectedFormat === 'video'" (click)="setFormat('video')">
               <fa-icon [icon]="faPlay" aria-hidden="true"></fa-icon>
               <span>Video</span>
             </button>
-            <button
-              type="button"
-              class="inline-flex items-center justify-center gap-2 rounded-[14px] px-4 py-4 text-base font-semibold transition-all duration-200"
-              [ngClass]="selectedFormat === 'audio' ? 'bg-[#efe4d0] text-[#1d1b17] shadow-[0_10px_24px_rgba(0,0,0,0.18)]' : 'bg-transparent text-[#8ea6d2]'"
-              [attr.aria-pressed]="selectedFormat === 'audio'"
-              (click)="setFormat('audio')"
-            >
+            <button type="button" class="inline-flex items-center justify-center gap-2 rounded-[14px] px-4 py-4 text-base font-semibold
+         transition-all duration-200 ease-out
+         hover:-translate-y-0.5 hover:scale-[1.01]
+         hover:shadow-[0_10px_22px_rgba(0,0,0,0.24)]
+         active:scale-[0.97]
+         focus-visible:outline-none
+         focus-visible:ring-2 focus-visible:ring-[#d6be8a]/60
+         focus-visible:ring-offset-2 focus-visible:ring-offset-[#151515]" [ngClass]="selectedFormat === 'audio'
+    ? 'bg-[#efe4d0] text-[#1d1b17] shadow-[0_10px_24px_rgba(0,0,0,0.18)] hover:bg-[#f7ead1]'
+    : 'bg-transparent text-[#8ea6d2] hover:bg-white/5 hover:text-[#f2dcae]'"
+              [attr.aria-pressed]="selectedFormat === 'audio'" (click)="setFormat('audio')">
               <fa-icon [icon]="faVolumeHigh" aria-hidden="true"></fa-icon>
               <span>Audio</span>
             </button>
@@ -77,42 +76,35 @@
         <section class="space-y-3">
           <h2 class="text-[0.95rem] font-extrabold uppercase tracking-[0.12em] text-[#d4bc8e]">De...</h2>
           <div class="relative">
-            <button
-              type="button"
+            <button type="button"
               class="flex w-full items-center justify-between rounded-t-2xl border border-[#2e5cff] bg-[#151515] px-4 py-4 text-left font-semibold text-white shadow-[0_12px_26px_rgba(0,0,0,0.18)]"
-              [ngClass]="!dropdownOpen ? 'rounded-b-2xl' : ''"
-              (click)="dropdownOpen = !dropdownOpen"
-            >
+              [ngClass]="!dropdownOpen ? 'rounded-b-2xl' : ''" (click)="dropdownOpen = !dropdownOpen">
               <span>{{ currentDropdownLabel }}</span>
-              <fa-icon [icon]="faChevronDown" aria-hidden="true" class="transition-transform duration-200" [ngClass]="dropdownOpen ? 'rotate-180' : ''"></fa-icon>
+              <fa-icon [icon]="faChevronDown" aria-hidden="true" class="transition-transform duration-200"
+                [ngClass]="dropdownOpen ? 'rotate-180' : ''"></fa-icon>
             </button>
 
-            <div *ngIf="dropdownOpen" class="overflow-hidden rounded-b-2xl border-x border-b border-[#2e5cff] bg-[#171717] shadow-[0_22px_36px_rgba(0,0,0,0.22)]">
-              <button
-                type="button"
+            <div *ngIf="dropdownOpen"
+              class="overflow-hidden rounded-b-2xl border-x border-b border-[#2e5cff] bg-[#171717] shadow-[0_22px_36px_rgba(0,0,0,0.22)]">
+              <button type="button"
                 class="block w-full bg-transparent px-4 py-3 text-left font-semibold text-slate-200 transition-colors duration-150 hover:bg-white/5"
-                (click)="clearWorkTitle(); applyFilters()"
-              >
+                (click)="clearWorkTitle(); applyFilters()">
                 Todas las producciones
               </button>
-              <button
-                type="button"
+              <button type="button"
                 class="block w-full bg-transparent px-4 py-3 text-left font-semibold text-white transition-colors duration-150 hover:bg-white/5"
                 *ngFor="let title of availableWorkTitles; trackBy: trackByTitle"
                 [ngClass]="title === selectedWorkTitle ? 'bg-[#c4ae88] text-[#1d1a15]' : ''"
-                (click)="selectWorkTitle(title); applyFilters()"
-              >
+                (click)="selectWorkTitle(title); applyFilters()">
                 {{ title }}
               </button>
             </div>
           </div>
         </section>
 
-        <button
-          type="button"
+        <button type="button"
           class="rounded-2xl border border-[#ceb993] bg-[#c4ae88] px-5 py-4 text-base font-extrabold uppercase tracking-[0.16em] text-[#17140f] shadow-[0_18px_32px_rgba(0,0,0,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105"
-          (click)="applyFilters()"
-        >
+          (click)="applyFilters()">
           Aplicar filtros
         </button>
       </aside>
@@ -126,27 +118,26 @@
         </div>
 
         <section aria-live="polite" class="grid gap-4 lg:grid-cols-2 lg:gap-5">
-          <p *ngIf="!loading && !filteredQuotes.length" class="mx-1 text-center text-sm text-slate-400 lg:col-span-2">No hay publicaciones que coincidan con estos filtros.</p>
+          <p *ngIf="!loading && !filteredQuotes.length" class="mx-1 text-center text-sm text-slate-400 lg:col-span-2">No
+            hay publicaciones que coincidan con estos filtros.</p>
 
-          <article
-            *ngFor="let quote of filteredQuotes; trackBy: trackByQuoteId"
+          <article *ngFor="let quote of filteredQuotes; trackBy: trackByQuoteId"
             class="grid cursor-pointer grid-cols-[110px_1fr] gap-4 overflow-hidden rounded-[20px] border border-white/6 bg-[#10141b] shadow-[0_18px_34px_rgba(0,0,0,0.28)] transition-transform duration-200 hover:-translate-y-0.5"
-            role="button"
-            tabindex="0"
-            [attr.aria-label]="'Abrir fragmento de ' + quote.workTitle + ': ' + quote.text"
-            (click)="openQuote(quote._id)"
-            (keydown.enter)="openQuote(quote._id)"
-            (keydown.space)="$event.preventDefault(); openQuote(quote._id)"
-          >
+            role="button" tabindex="0" [attr.aria-label]="'Abrir fragmento de ' + quote.workTitle + ': ' + quote.text"
+            (click)="openQuote(quote._id)" (keydown.enter)="openQuote(quote._id)"
+            (keydown.space)="$event.preventDefault(); openQuote(quote._id)">
             <div class="relative min-h-[120px] bg-[#161b24]">
-              <img class="h-full w-full object-cover" [src]="quote.image" [alt]="quote.workTitle" width="320" height="180" loading="lazy" decoding="async" />
-              <span class="absolute bottom-2.5 right-2.5 rounded-full bg-black/60 px-2.5 py-1 text-[0.72rem] font-bold text-white">
+              <img class="h-full w-full object-cover" [src]="quote.image" [alt]="quote.workTitle" width="320"
+                height="180" loading="lazy" decoding="async" />
+              <span
+                class="absolute bottom-2.5 right-2.5 rounded-full bg-black/60 px-2.5 py-1 text-[0.72rem] font-bold text-white">
                 {{ quote.mediaType === 'audio' ? 'Audio' : 'Video' }}
               </span>
             </div>
 
             <div class="flex min-w-0 flex-col justify-center py-4 pr-4">
-              <p class="max-h-[3.9rem] overflow-hidden text-[1rem] font-bold leading-5 text-white">"{{ quote.text }}"</p>
+              <p class="max-h-[3.9rem] overflow-hidden text-[1rem] font-bold leading-5 text-white">"{{ quote.text }}"
+              </p>
               <p class="mt-2 text-[0.92rem] font-semibold text-[#cdb58c]">{{ quote.workTitle }} ({{ quote.year }})</p>
               <div class="mt-2 flex justify-between gap-3 text-[0.78rem] text-slate-400">
                 <span>{{ quote.actorName }}</span>
