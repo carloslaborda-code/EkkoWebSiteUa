@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const User = require('../models/user');
 
 const BLOCKED_ADMIN_VALUES = {
@@ -61,36 +62,70 @@ const validateAdminConfig = ({ email, password }) => {
   return true;
 };
 
+const applyAdminCredentials = async (user, { username, email, password }) => {
+  let changed = false;
+  const passwordMatches = await bcrypt.compare(password, user.password);
+
+  if (user.role !== 'admin') {
+    user.role = 'admin';
+    changed = true;
+  }
+
+  if (username && user.username !== username) {
+    user.username = username;
+    changed = true;
+  }
+
+  if (user.email !== email) {
+    user.email = email;
+    changed = true;
+  }
+
+  if (!passwordMatches) {
+    user.password = await bcrypt.hash(password, 10);
+    changed = true;
+  }
+
+  if (changed) {
+    await user.save();
+  }
+};
+
+const neutralizeLegacyAdmin = async (legacyAdmin) => {
+  if (!legacyAdmin) {
+    return;
+  }
+
+  legacyAdmin.role = 'user';
+  legacyAdmin.password = await bcrypt.hash(crypto.randomBytes(32).toString('hex'), 10);
+  await legacyAdmin.save();
+};
+
 const ensureDefaultAdminUser = async () => {
   if (!shouldEnsureAdmin()) {
     return;
   }
 
-  const { username, email, password } = getAdminConfig();
+  const adminConfig = getAdminConfig();
+  const { username, email, password } = adminConfig;
 
   if (!validateAdminConfig({ email, password })) {
     return;
   }
 
   const existingAdmin = await User.findOne({ email });
+  const legacyAdmin = email === BLOCKED_ADMIN_VALUES.email
+    ? null
+    : await User.findOne({ email: BLOCKED_ADMIN_VALUES.email });
 
   if (existingAdmin) {
-    let changed = false;
+    await applyAdminCredentials(existingAdmin, adminConfig);
+    await neutralizeLegacyAdmin(legacyAdmin);
+    return;
+  }
 
-    if (existingAdmin.role !== 'admin') {
-      existingAdmin.role = 'admin';
-      changed = true;
-    }
-
-    if (username && existingAdmin.username !== username) {
-      existingAdmin.username = username;
-      changed = true;
-    }
-
-    if (changed) {
-      await existingAdmin.save();
-    }
-
+  if (legacyAdmin) {
+    await applyAdminCredentials(legacyAdmin, adminConfig);
     return;
   }
 

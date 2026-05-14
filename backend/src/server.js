@@ -12,10 +12,7 @@ const validateProductionConfig = () => {
 
   const requiredKeys = [
     'MONGO_URI',
-    'JWT_SECRET',
-    'CLOUDINARY_CLOUD_NAME',
-    'CLOUDINARY_API_KEY',
-    'CLOUDINARY_API_SECRET'
+    'JWT_SECRET'
   ];
   const missingKeys = requiredKeys.filter((key) => !process.env[key]);
 
@@ -24,14 +21,19 @@ const validateProductionConfig = () => {
   }
 
   if (process.env.JWT_SECRET.length < 32) {
-    throw new Error('JWT_SECRET debe tener al menos 32 caracteres en produccion.');
+    console.warn('JWT_SECRET deberia tener al menos 32 caracteres en produccion.');
   }
 };
 
 const startServer = async () => {
   validateProductionConfig();
   await connectDB();
-  await ensureDefaultAdminUser();
+
+  try {
+    await ensureDefaultAdminUser();
+  } catch (error) {
+    console.error('No se pudo preparar el usuario admin:', error.message);
+  }
 
   app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);

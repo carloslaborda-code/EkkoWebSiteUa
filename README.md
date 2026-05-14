@@ -625,13 +625,15 @@ CLOUDINARY_API_SECRET=...
 No se debe subir un usuario administrador con credenciales fijas en el codigo. Para crear el primer admin en Vercel:
 
 1. En Project Settings > Environment Variables, anade `ADMIN_SEED_ENABLED=true`.
-2. Anade `ADMIN_EMAIL`, `ADMIN_USERNAME` y un `ADMIN_PASSWORD` unico, largo y aleatorio. En produccion se rechazan las credenciales locales y las contrasenas debiles.
+2. Anade `ADMIN_EMAIL`, `ADMIN_USERNAME` y un `ADMIN_PASSWORD` unico, largo y aleatorio. En produccion se rechazan las credenciales locales y las contrasenas debiles. La contrasena debe incluir mayusculas, minusculas, numeros y simbolos.
 3. Despliega el backend.
 4. Entra con esa cuenta admin y verifica que puedes acceder a `/admin`.
 5. Vuelve a Environment Variables y cambia `ADMIN_SEED_ENABLED=false` o elimina `ADMIN_SEED_ENABLED`, `ADMIN_EMAIL` y `ADMIN_PASSWORD`.
 6. Redespliega.
 
 El admin ya creado queda guardado en MongoDB. Mantener desactivada la semilla evita que una filtracion accidental de variables de entorno sirva para recrear o recuperar el usuario administrador.
+
+Si alguna vez se creo el admin local antiguo `admin@ekko.local`, al arrancar con `ADMIN_EMAIL` y `ADMIN_PASSWORD` configurados se migra o se neutraliza para que no siga funcionando con la contrasena de desarrollo.
 
 ## Cloudinary
 
