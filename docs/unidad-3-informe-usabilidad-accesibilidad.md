@@ -6,7 +6,7 @@
 
 **Curso:** 2025-2026
 
-**Grupo/autores:** Carlos Laborda Martinez, Sergio Pernas, Ionathan
+**Grupo/autores:** Carlos Laborda Martinez, Sergio Pernas Gomez, Ionathan Hudrea Colceriu
 
 **Fecha:** 06/05/2026
 
@@ -20,7 +20,7 @@ El informe está redactado para servir como memoria académica y como documento 
 
 ## 2. Introducción
 
-Ekko es una plataforma web orientada a la búsqueda, visualización, gestión y publicación de contenidos multimedia breves. La aplicación se centra especialmente en frases, escenas y fragmentos de audio o vídeo relacionados con películas, series, videojuegos y efectos sonoros. El usuario puede descubrir contenidos, filtrarlos por categoría o formato, abrir una vista de detalle, reproducir el fragmento, guardarlo, valorarlo, compartirlo, descargarlo o publicar nuevos elementos si tiene sesión iniciada.
+Ekko es una plataforma web orientada a la búsqueda, visualización, gestión y publicación de contenidos multimedia. La aplicación se centra especialmente en frases, escenas y fragmentos de audio o vídeo relacionados con películas, series, videojuegos y efectos sonoros. El usuario puede descubrir contenidos, filtrarlos por categoría o formato, abrir una vista de detalle, reproducir el fragmento, guardarlo, valorarlo, compartirlo, descargarlo o publicar nuevos elementos si tiene sesión iniciada.
 
 Aunque el proyecto nace dentro de una asignatura universitaria, se ha trabajado con enfoque de producto operativo. Esto significa que no se ha planteado como una maqueta aislada, sino como una aplicación con rutas reales, autenticación, conexión a backend, base de datos MongoDB, subida de archivos, persistencia de preferencias de accesibilidad y una estructura de navegación que cubre distintos escenarios de uso. La aplicación no solo muestra pantallas: permite realizar tareas completas.
 
@@ -230,9 +230,7 @@ La búsqueda y los filtros están planteados de forma útil. Home permite una ex
 
 También destaca la configuración de accesibilidad desde Settings. No se limita a un único modo de contraste, sino que incorpora reducción de movimiento, tamaño de texto, controles grandes, subrayado de enlaces y tipografía legible. Estos ajustes se aplican mediante atributos `data-*` en el documento, lo que permite modificar estilos globales de forma consistente.
 
-Como puntos de mejora, conviene realizar una auditoría formal con Lighthouse y axe DevTools. El proyecto incluye muchas buenas prácticas, pero una auditoría automática ayudaría a detectar contrastes concretos, nombres accesibles incompletos, orden de encabezados o posibles conflictos de foco.
-
-También sería recomendable revisar la aplicación con lectores de pantalla. Esta prueba permitiría comprobar si las tarjetas, filtros, estados activos, mensajes de feedback y controles multimedia se anuncian de forma clara. En particular, la navegación por tarjetas interactivas y los controles incluidos dentro de tarjetas deberían validarse manualmente.
+Como puntos de mejora, conviene realizar una mejora en la trascripciond e videos y audio para que estos mismos contengan subtitulos.
 
 Otra mejora importante sería realizar pruebas reales con usuarios. La aplicación tiene varios flujos relevantes: buscar un fragmento, guardar una publicación, valorar contenido, cambiar ajustes de accesibilidad y publicar un nuevo medio. Observar a usuarios reales permitiría detectar pasos confusos o textos que podrían simplificarse.
 
