@@ -49,6 +49,33 @@ const normalizeQuoteRatingState = (quote) => {
   quote.rating = safeRatingsCount > 0 ? safeRating : 0;
 };
 
+const removeQuoteReferences = async (quoteId) => {
+  await User.updateMany(
+    {},
+    {
+      $pull: {
+        savedQuotes: quoteId,
+        ratedQuotes: { quoteId },
+        uploads: { quoteId }
+      }
+    }
+  );
+
+  const usersWithUploads = await User.find({ uploadsCount: { $gt: 0 } });
+  await Promise.all(
+    usersWithUploads.map((user) => {
+      const nextUploadsCount = Array.isArray(user.uploads) ? user.uploads.length : 0;
+
+      if (user.uploadsCount === nextUploadsCount) {
+        return Promise.resolve();
+      }
+
+      user.uploadsCount = nextUploadsCount;
+      return user.save();
+    })
+  );
+};
+
 const parseCount = (value) => {
   if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
@@ -145,6 +172,7 @@ const applyQuoteDefaults = (quote = {}) => ({
   actorName: quote.actorName || '',
   characterName: quote.characterName || '',
   synopsis: quote.synopsis || '',
+  accessibilityText: quote.accessibilityText || '',
   hashtags: Array.isArray(quote.hashtags) ? quote.hashtags : [],
   ratingsCount: typeof quote.ratingsCount === 'number' ? quote.ratingsCount : 0,
   views: quote.views || '0',
@@ -162,7 +190,7 @@ const getQuotes = async (req, res) => {
     await ensureSeedQuotes();
     const quotes = await Quote.find()
       .sort({ createdAt: -1 })
-      .select('text workTitle year rating ratingsCount views image mediaType duration actorName characterName synopsis hashtags category createdAt')
+      .select('text workTitle year rating ratingsCount views image mediaType mediaUrl duration actorName characterName synopsis accessibilityText hashtags category createdAt')
       .lean();
 
     res.status(200).json(quotes.map((quote) => applyQuoteDefaults(quote)));
@@ -275,6 +303,7 @@ const createQuote = async (req, res) => {
       actorName: normalizedActorName,
       characterName: normalizedCharacterName,
       synopsis: String(synopsis).trim(),
+      accessibilityText: '',
       hashtags: normalizedHashtags,
       category,
       createdBy: user._id
@@ -301,6 +330,49 @@ const createQuote = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: 'Error al crear la publicación', error: error.message });
+  }
+};
+
+const updateQuoteAccessibility = async (req, res) => {
+  try {
+    const accessibilityText = typeof req.body?.accessibilityText === 'string'
+      ? req.body.accessibilityText.trim()
+      : '';
+    const quote = await Quote.findByIdAndUpdate(
+      req.params.id,
+      { accessibilityText },
+      { new: true, runValidators: true }
+    ).lean();
+
+    if (!quote) {
+      return res.status(404).json({ message: 'Publicacion no encontrada' });
+    }
+
+    res.json({
+      message: accessibilityText ? 'Transcripcion actualizada correctamente' : 'Transcripcion eliminada correctamente',
+      quote: applyQuoteDefaults(quote)
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al actualizar la transcripcion', error: error.message });
+  }
+};
+
+const deleteQuote = async (req, res) => {
+  try {
+    const quote = await Quote.findByIdAndDelete(req.params.id);
+
+    if (!quote) {
+      return res.status(404).json({ message: 'Publicacion no encontrada' });
+    }
+
+    await removeQuoteReferences(quote._id);
+
+    res.json({
+      message: 'Publicacion eliminada correctamente',
+      deletedQuoteId: quote._id.toString()
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al eliminar la publicacion', error: error.message });
   }
 };
 
@@ -461,6 +533,8 @@ module.exports = {
   getQuoteById,
   getUploadSignature,
   createQuote,
+  updateQuoteAccessibility,
+  deleteQuote,
   toggleSaveQuote,
   rateQuote,
   registerDownload,

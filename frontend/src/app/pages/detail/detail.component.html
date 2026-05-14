@@ -13,13 +13,35 @@
 
         <video *ngIf="isPlaying && quote.mediaType === 'video'" class="media-player" [src]="quote.mediaUrl" controls
           autoplay [attr.aria-label]="'Video de ' + quote.workTitle + ': ' + quote.text"
-          (loadedmetadata)="updateDuration($event)"></video>
+          (loadedmetadata)="updateDuration($event)"
+          (timeupdate)="updateActiveCaption($event)"
+          (seeked)="updateActiveCaption($event)"
+          (ended)="clearActiveCaption()"></video>
 
         <div *ngIf="isPlaying && quote.mediaType === 'audio'" class="audio-player-wrap">
           <img [src]="quote.image" [alt]="quote.workTitle" class="audio-poster" width="1280" height="720" decoding="async" />
           <audio class="audio-player" [src]="quote.mediaUrl" controls autoplay
             [attr.aria-label]="'Audio de ' + quote.workTitle + ': ' + quote.text"
-            (loadedmetadata)="updateDuration($event)"></audio>
+            (loadedmetadata)="updateDuration($event)"
+            (timeupdate)="updateActiveCaption($event)"
+            (seeked)="updateActiveCaption($event)"
+            (ended)="clearActiveCaption()"></audio>
+        </div>
+
+        <button
+          *ngIf="hasTimedCaptions"
+          type="button"
+          class="caption-toggle"
+          [class.caption-toggle--active]="captionsEnabled"
+          [attr.aria-pressed]="captionsEnabled"
+          [attr.aria-label]="captionsEnabled ? 'Desactivar subtitulos' : 'Activar subtitulos'"
+          (click)="toggleCaptions()"
+        >
+          CC
+        </button>
+
+        <div *ngIf="shouldShowCaptionOverlay" class="caption-overlay" aria-hidden="true">
+          <span>{{ activeCaptionText }}</span>
         </div>
 
         <button *ngIf="!isPlaying" type="button" class="play-overlay" (click)="startPlayback()"

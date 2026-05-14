@@ -532,14 +532,19 @@ JWT_SECRET=...
 CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
+ADMIN_SEED_ENABLED=false
+ADMIN_USERNAME=admin
+ADMIN_EMAIL=...
+ADMIN_PASSWORD=...
 ```
 
 Notas:
 
 - `PORT` define el puerto del servidor Express.
 - `MONGO_URI` conecta con MongoDB.
-- `JWT_SECRET` firma los tokens de autenticacion.
+- `JWT_SECRET` firma los tokens de autenticacion. En produccion debe ser largo, aleatorio y tener al menos 32 caracteres.
 - Las variables de Cloudinary permiten subir portadas y medios.
+- `ADMIN_SEED_ENABLED`, `ADMIN_EMAIL`, `ADMIN_USERNAME` y `ADMIN_PASSWORD` solo se usan para crear el administrador inicial. No hay credenciales admin por defecto en el codigo; si quieres crear un admin local, define `ADMIN_EMAIL` y `ADMIN_PASSWORD` en `backend/.env`. En produccion, `ADMIN_SEED_ENABLED` debe estar en `false` salvo durante el primer despliegue o una recuperacion controlada.
 
 El frontend no necesita `.env` para funcionar en local o en el despliegue integrado de Vercel. La URL base se resuelve en `frontend/src/app/services/api-url.ts` con estas reglas:
 
@@ -614,6 +619,19 @@ CLOUDINARY_API_SECRET=...
 ```
 
 `PORT` solo es necesario para desarrollo local o plataformas donde se arranque Express directamente. En Vercel el servicio gestiona el puerto.
+
+### Admin en produccion
+
+No se debe subir un usuario administrador con credenciales fijas en el codigo. Para crear el primer admin en Vercel:
+
+1. En Project Settings > Environment Variables, anade `ADMIN_SEED_ENABLED=true`.
+2. Anade `ADMIN_EMAIL`, `ADMIN_USERNAME` y un `ADMIN_PASSWORD` unico, largo y aleatorio. En produccion se rechazan las credenciales locales y las contrasenas debiles.
+3. Despliega el backend.
+4. Entra con esa cuenta admin y verifica que puedes acceder a `/admin`.
+5. Vuelve a Environment Variables y cambia `ADMIN_SEED_ENABLED=false` o elimina `ADMIN_SEED_ENABLED`, `ADMIN_EMAIL` y `ADMIN_PASSWORD`.
+6. Redespliega.
+
+El admin ya creado queda guardado en MongoDB. Mantener desactivada la semilla evita que una filtracion accidental de variables de entorno sirva para recrear o recuperar el usuario administrador.
 
 ## Cloudinary
 

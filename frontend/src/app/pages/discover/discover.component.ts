@@ -109,6 +109,7 @@ export class DiscoverComponent implements OnInit {
         quote.actorName.toLowerCase().includes(normalizedSearch) ||
         quote.characterName.toLowerCase().includes(normalizedSearch) ||
         quote.synopsis.toLowerCase().includes(normalizedSearch) ||
+        quote.accessibilityText.toLowerCase().includes(normalizedSearch) ||
         quote.hashtags.some((hashtag) => hashtag.toLowerCase().includes(normalizedSearch));
 
       return matchesCategory && matchesFormat && matchesWork && matchesSearch;

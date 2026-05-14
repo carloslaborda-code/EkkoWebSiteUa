@@ -19,6 +19,7 @@ export interface Quote {
   actorName: string;
   characterName: string;
   synopsis: string;
+  accessibilityText: string;
   hashtags: string[];
   category: string;
 }
@@ -136,6 +137,34 @@ export class QuoteService {
     });
   }
 
+  updateQuoteAccessibility(id: string, accessibilityText: string): Observable<{ message: string; quote: Quote }> {
+    return this.http
+      .patch<{ message: string; quote: Quote }>(
+        `${this.apiUrl}/${id}/accessibility`,
+        { accessibilityText },
+        { headers: this.getHeaders() }
+      )
+      .pipe(
+        tap(({ quote }) => {
+          this.quotesRequest$ = undefined;
+          this.upsertQuote(this.normalizeQuote(quote));
+        })
+      );
+  }
+
+  deleteQuote(id: string): Observable<{ message: string; deletedQuoteId: string }> {
+    return this.http
+      .delete<{ message: string; deletedQuoteId: string }>(`${this.apiUrl}/${id}`, {
+        headers: this.getHeaders()
+      })
+      .pipe(
+        tap(() => {
+          this.quotesById.delete(id);
+          this.quotesRequest$ = undefined;
+        })
+      );
+  }
+
   private normalizeQuote(quote: Quote): Quote {
     quote.text = typeof quote.text === 'string' ? quote.text : '';
     quote.workTitle = typeof quote.workTitle === 'string' ? quote.workTitle : '';
@@ -149,6 +178,7 @@ export class QuoteService {
     quote.actorName = typeof quote.actorName === 'string' ? quote.actorName : '';
     quote.characterName = typeof quote.characterName === 'string' ? quote.characterName : '';
     quote.synopsis = typeof quote.synopsis === 'string' ? quote.synopsis : '';
+    quote.accessibilityText = typeof quote.accessibilityText === 'string' ? quote.accessibilityText : '';
     quote.hashtags = Array.isArray(quote.hashtags) ? quote.hashtags : [];
     quote.category = typeof quote.category === 'string' && quote.category.trim() ? quote.category : 'movie';
     quote.mediaType = quote.mediaType === 'audio' ? 'audio' : 'video';

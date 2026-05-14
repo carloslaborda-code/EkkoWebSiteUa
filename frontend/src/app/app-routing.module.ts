@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { AdminComponent } from './pages/admin/admin.component';
 import { HomeComponent } from './pages/home/home.component';
 import { DiscoverComponent } from './pages/discover/discover.component';
 import { DetailComponent } from './pages/detail/detail.component';
@@ -21,7 +22,8 @@ const routes: Routes = [
   { path: 'publish', component: PublishComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'profile', component: ProfileComponent },
-  { path: 'settings', component: SettingsComponent }
+  { path: 'settings', component: SettingsComponent },
+  { path: 'admin', component: AdminComponent }
 ];
 
 @NgModule({

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { faGear, faShieldHalved } from '@fortawesome/free-solid-svg-icons';
 import { UserProfile, UserService, UserUpload } from '../../services/user.service';
 
 export type ProfileOverviewLayout = 'original' | 'compact' | 'instagram';
@@ -12,6 +12,7 @@ export type ProfileOverviewLayout = 'original' | 'compact' | 'instagram';
 })
 export class ProfileComponent implements OnInit {
   readonly faGear = faGear;
+  readonly faShieldHalved = faShieldHalved;
   readonly activeOverviewLayout: ProfileOverviewLayout = 'instagram';
   profile: UserProfile | null = null;
   avatarSaving = false;
@@ -47,6 +48,14 @@ export class ProfileComponent implements OnInit {
       .join('')
       .slice(0, 2)
       .toUpperCase();
+  }
+
+  get isAdmin(): boolean {
+    return this.profile?.role === 'admin';
+  }
+
+  openAdmin(): void {
+    this.router.navigate(['/admin']);
   }
 
   onAvatarChange(event: Event): void {

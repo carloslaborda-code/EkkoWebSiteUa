@@ -28,9 +28,9 @@ El objetivo de este informe es documentar las decisiones de usabilidad y accesib
 
 ## 3. Descripción general de la plataforma
 
-Ekko permite localizar contenidos multimedia mediante búsquedas, filtros y navegación por secciones. La pantalla de inicio presenta contenido destacado y un buscador principal. La sección Discover ofrece filtros por categoría, formato y producción. La sección Library permite consultar los contenidos guardados por el usuario autenticado. La vista Detail concentra la reproducción del fragmento y las acciones asociadas. La página Publish permite publicar nuevos contenidos con metadatos, portada y archivo multimedia. Profile y Settings completan la gestión de cuenta, estadísticas personales y ajustes de accesibilidad.
+Ekko permite localizar contenidos multimedia mediante búsquedas, filtros y navegación por secciones. La pantalla de inicio presenta contenido destacado y un buscador principal. La sección Discover ofrece filtros por categoría, formato y producción. La sección Library permite consultar los contenidos guardados por el usuario autenticado. La vista Detail concentra la reproducción del fragmento y las acciones asociadas. La página Publish permite publicar nuevos contenidos con metadatos, portada y archivo multimedia. Profile y Settings completan la gestión de cuenta, estadísticas personales y ajustes de accesibilidad. Además, el rol administrador puede acceder a una pantalla específica para revisar publicaciones, añadir o retirar transcripciones y eliminar contenidos.
 
-La aplicación contempla dos perfiles principales de usuario. El usuario invitado puede explorar contenidos, buscar, filtrar y consultar la vista de detalle. El usuario autenticado puede, además, guardar publicaciones, valorar fragmentos, descargar medios, subir nuevos contenidos, editar su perfil y configurar ajustes visuales. Esta separación se refleja en la lógica de navegación: páginas como Library y Publish redirigen al login si no existe token de sesión.
+La aplicación contempla tres perfiles principales de usuario. El usuario invitado puede explorar contenidos, buscar, filtrar y consultar la vista de detalle. El usuario autenticado puede, además, guardar publicaciones, valorar fragmentos, descargar medios, subir nuevos contenidos, editar su perfil y configurar ajustes visuales. El usuario administrador añade tareas de mantenimiento sobre todas las publicaciones, especialmente la gestión de transcripciones accesibles y la eliminación de contenidos. Esta separación se refleja en la lógica de navegación: páginas como Library y Publish redirigen al login si no existe token de sesión, mientras que Admin exige un rol específico.
 
 Las funcionalidades principales implementadas son las siguientes:
 
@@ -38,6 +38,7 @@ Las funcionalidades principales implementadas son las siguientes:
 - visualización de resultados mediante tarjetas con título, frase, formato, valoración y visitas;
 - gestión de usuarios con registro, inicio de sesión, perfil, avatar, estadísticas y cambio de contraseña;
 - subida y gestión de contenidos desde Publish, con validación de campos y límites de tamaño;
+- gestión administrativa de publicaciones, transcripciones y borrado de contenidos;
 - conexión con backend Express mediante servicios Angular centralizados;
 - persistencia de usuarios, publicaciones, guardados y valoraciones en MongoDB;
 - subida de archivos y portadas a Cloudinary desde el backend;
@@ -230,13 +231,11 @@ La búsqueda y los filtros están planteados de forma útil. Home permite una ex
 
 También destaca la configuración de accesibilidad desde Settings. No se limita a un único modo de contraste, sino que incorpora reducción de movimiento, tamaño de texto, controles grandes, subrayado de enlaces y tipografía legible. Estos ajustes se aplican mediante atributos `data-*` en el documento, lo que permite modificar estilos globales de forma consistente.
 
-Como puntos de mejora, conviene realizar una mejora en la trascripciond e videos y audio para que estos mismos contengan subtitulos.
-
-Otra mejora importante sería realizar pruebas reales con usuarios. La aplicación tiene varios flujos relevantes: buscar un fragmento, guardar una publicación, valorar contenido, cambiar ajustes de accesibilidad y publicar un nuevo medio. Observar a usuarios reales permitiría detectar pasos confusos o textos que podrían simplificarse.
+Una mejora importante sería realizar pruebas reales con usuarios. La aplicación tiene varios flujos relevantes: buscar un fragmento, guardar una publicación, valorar contenido, cambiar ajustes de accesibilidad y publicar un nuevo medio. Observar a usuarios reales permitiría detectar pasos confusos o textos que podrían simplificarse.
 
 En formularios, se podría avanzar hacia una validación más descriptiva por campo. Actualmente existen mensajes globales útiles, pero una mejora consistiría en asociar errores concretos a cada input mediante `aria-describedby`, indicando por ejemplo qué campo falta o qué regla no se cumple.
 
-Para contenido multimedia, una mejora futura sería añadir subtítulos, transcripciones o descripciones cuando el tipo de fragmento lo permita. En una plataforma basada en audio y vídeo, esta medida tendría un impacto claro en accesibilidad, especialmente para personas sordas, con dificultades auditivas o que no pueden reproducir sonido en ese momento.
+Para contenido multimedia, se ha añadido una gestión administrativa de transcripciones accesibles. El usuario que publica no introduce transcripción; esa tarea queda reservada al administrador, que puede añadir marcas de tiempo desde la pantalla Admin mientras revisa el audio o vídeo. Cuando existen marcas de tiempo, la vista Detail presenta el texto como subtítulos sincronizados sobre el reproductor, sin mostrar un bloque de transcripción independiente debajo del contenido.
 
 Por último, se recomienda revisar algunos textos internos y mensajes del backend para asegurar codificación correcta de caracteres en español. La interfaz principal utiliza entidades HTML o texto correcto en Angular, pero en algunos mensajes del backend se aprecian caracteres mal codificados. No afecta al flujo principal si no se muestran directamente, pero conviene corregirlo antes de una entrega final pública.
 

@@ -1,0 +1,135 @@
+<div class="admin-shell">
+  <div class="glow glow-left" aria-hidden="true"></div>
+  <div class="glow glow-top" aria-hidden="true"></div>
+  <div class="glow glow-right" aria-hidden="true"></div>
+
+  <main id="main-content" class="admin-frame" tabindex="-1">
+    <app-header class="admin-header" [showBack]="true"></app-header>
+
+    <section class="admin-body" *ngIf="isAdmin && !loading; else loadingState" aria-labelledby="admin-title">
+      <header class="admin-title">
+        <p><fa-icon [icon]="faShieldHalved" aria-hidden="true"></fa-icon> Admin</p>
+        <h1 id="admin-title">Gestionar publicaciones</h1>
+      </header>
+
+      <section class="admin-toolbar" aria-label="Herramientas de administracion">
+        <label class="admin-search">
+          <fa-icon [icon]="faMagnifyingGlass" aria-hidden="true"></fa-icon>
+          <input
+            type="search"
+            [(ngModel)]="searchTerm"
+            (input)="applyFilters()"
+            placeholder="Buscar publicacion"
+            aria-label="Buscar publicacion"
+          />
+        </label>
+
+        <div class="admin-stats" aria-label="Resumen de publicaciones">
+          <span><strong>{{ totalQuotes }}</strong> total</span>
+          <span><strong>{{ transcribedQuotes }}</strong> con transcripcion</span>
+        </div>
+      </section>
+
+      <p *ngIf="message" class="admin-message" role="status" aria-live="polite">{{ message }}</p>
+
+      <section class="admin-list" *ngIf="visibleQuotes.length; else emptyState">
+        <article class="admin-card" *ngFor="let quote of visibleQuotes; trackBy: trackByQuoteId">
+          <div class="admin-card__media" [class.admin-card__media--audio]="quote.mediaType === 'audio'">
+            <video
+              *ngIf="quote.mediaType === 'video'; else audioPreview"
+              class="admin-media-player"
+              [src]="quote.mediaUrl"
+              [poster]="quote.image || undefined"
+              controls
+              preload="metadata"
+              playsinline
+              [attr.aria-label]="'Previsualizar video de ' + quote.workTitle"
+              (timeupdate)="updatePreviewTime($event, quote)"
+              (seeked)="updatePreviewTime($event, quote)"
+              (loadedmetadata)="updatePreviewTime($event, quote)"
+            ></video>
+
+            <ng-template #audioPreview>
+              <div class="admin-audio-preview">
+                <img *ngIf="quote.image" [src]="quote.image" [alt]="quote.workTitle" width="320" height="180" loading="lazy" decoding="async" />
+                <div *ngIf="!quote.image" class="admin-audio-placeholder">{{ quote.workTitle | slice:0:1 }}</div>
+                <audio
+                  class="admin-audio-player"
+                  [src]="quote.mediaUrl"
+                  controls
+                  preload="metadata"
+                  [attr.aria-label]="'Previsualizar audio de ' + quote.workTitle"
+                  (timeupdate)="updatePreviewTime($event, quote)"
+                  (seeked)="updatePreviewTime($event, quote)"
+                  (loadedmetadata)="updatePreviewTime($event, quote)"
+                ></audio>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="admin-card__content">
+            <div class="admin-card__head">
+              <div>
+                <p class="admin-card__meta">{{ quote.mediaType === 'audio' ? 'Audio' : 'Video' }} &middot; {{ quote.category }} &middot; {{ quote.year }}</p>
+                <h2>"{{ quote.text }}"</h2>
+                <p>{{ quote.workTitle }}</p>
+              </div>
+              <span class="admin-card__duration">{{ quote.duration }}</span>
+            </div>
+
+            <label class="admin-field">
+              <span>TRANSCRIPCI&Oacute;N / DESCRIPCI&Oacute;N</span>
+              <textarea
+                [(ngModel)]="quote.draftAccessibilityText"
+                rows="5"
+                [attr.aria-label]="'Transcripcion de ' + quote.workTitle + ': ' + quote.text"
+                placeholder="[00:01] Primera frase&#10;[00:04 --> 00:07] Segunda frase"
+              ></textarea>
+            </label>
+
+            <div class="timestamp-tools">
+              <span>Tiempo actual: {{ formatTimestamp(quote.currentPreviewTime) }}</span>
+              <button type="button" class="timestamp-button" (click)="insertTimestamp(quote)">
+                Insertar marca de tiempo
+              </button>
+            </div>
+
+            <div class="admin-actions">
+              <button type="button" class="admin-action admin-action--save" [disabled]="quote.saving || quote.deleting" (click)="saveAccessibilityText(quote)">
+                <fa-icon [icon]="faFloppyDisk" aria-hidden="true"></fa-icon>
+                <span>{{ quote.saving ? 'Guardando...' : 'Guardar' }}</span>
+              </button>
+              <button type="button" class="admin-action" [disabled]="quote.saving || quote.deleting || !quote.draftAccessibilityText" (click)="clearAccessibilityText(quote)">
+                <span>Quitar transcripci&oacute;n</span>
+              </button>
+              <button type="button" class="admin-action admin-action--danger" [disabled]="quote.saving || quote.deleting" (click)="deleteQuote(quote)">
+                <fa-icon [icon]="faTrash" aria-hidden="true"></fa-icon>
+                <span>{{ quote.deleting ? 'Eliminando...' : 'Eliminar' }}</span>
+              </button>
+            </div>
+
+            <p
+              *ngIf="quote.statusMessage"
+              class="admin-card__status"
+              [class.admin-card__status--error]="quote.statusError"
+              role="status"
+              aria-live="polite"
+            >
+              {{ quote.statusMessage }}
+            </p>
+          </div>
+        </article>
+      </section>
+    </section>
+
+    <ng-template #emptyState>
+      <p class="admin-empty">No hay publicaciones que coincidan con la busqueda.</p>
+    </ng-template>
+
+    <ng-template #loadingState>
+      <p class="admin-empty" role="status">Cargando administracion...</p>
+    </ng-template>
+
+    <app-navbar></app-navbar>
+  </main>
+</div>

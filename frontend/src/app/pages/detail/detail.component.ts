@@ -6,6 +6,12 @@ import { faBookmark as faBookmarkSolid, faPlay, faDownload, faShareNodes, faStar
 import { Quote, QuoteService } from '../../services/quotes.services';
 import { UserService } from '../../services/user.service';
 
+interface TimedCaption {
+  start: number;
+  end: number;
+  text: string;
+}
+
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
@@ -27,6 +33,9 @@ export class DetailComponent implements OnInit {
   ratingSaving = false;
   isPlaying = false;
   displayDuration = '00:00';
+  timedCaptions: TimedCaption[] = [];
+  activeCaptionText = '';
+  captionsEnabled = true;
 
   hoverRating = 0;
 
@@ -49,6 +58,7 @@ export class DetailComponent implements OnInit {
       next: (quote) => {
         this.quote = quote;
         this.displayDuration = quote.duration;
+        this.prepareTimedCaptions(quote.accessibilityText);
         this.registerView();
       },
       error: () => {}
@@ -68,9 +78,21 @@ export class DetailComponent implements OnInit {
     return !!localStorage.getItem('token');
   }
 
+  get hasTimedCaptions(): boolean {
+    return this.timedCaptions.length > 0;
+  }
+
+  get shouldShowCaptionOverlay(): boolean {
+    return this.captionsEnabled && !!this.activeCaptionText;
+  }
+
   startPlayback(): void {
     this.isPlaying = true;
     this.message = '';
+  }
+
+  toggleCaptions(): void {
+    this.captionsEnabled = !this.captionsEnabled;
   }
 
   handleDownload(): void {
@@ -177,6 +199,26 @@ export class DetailComponent implements OnInit {
     }
 
     this.displayDuration = this.formatDuration(media.duration);
+    this.updateActiveCaption(event);
+  }
+
+  updateActiveCaption(event: Event): void {
+    if (!this.hasTimedCaptions) {
+      this.activeCaptionText = '';
+      return;
+    }
+
+    const media = event.target as HTMLMediaElement;
+    const currentTime = Number.isFinite(media.currentTime) ? media.currentTime : 0;
+    const activeCaption = this.timedCaptions.find((caption) =>
+      currentTime >= caption.start && currentTime < caption.end
+    );
+
+    this.activeCaptionText = activeCaption?.text || '';
+  }
+
+  clearActiveCaption(): void {
+    this.activeCaptionText = '';
   }
 
   openProfile(): void {
@@ -206,6 +248,77 @@ export class DetailComponent implements OnInit {
     const ss = String(seconds).padStart(2, '0');
 
     return `${hh}:${mm}:${ss}`;
+  }
+
+  private prepareTimedCaptions(rawText: string): void {
+    this.timedCaptions = this.parseTimedCaptions(rawText);
+    this.activeCaptionText = '';
+    this.captionsEnabled = true;
+  }
+
+  private parseTimedCaptions(rawText: string): TimedCaption[] {
+    const parsedCaptions = String(rawText || '')
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => this.parseCaptionLine(line))
+      .filter((caption): caption is { start: number; end?: number; text: string } => Boolean(caption))
+      .sort((first, second) => first.start - second.start);
+
+    return parsedCaptions.map((caption, index) => {
+      const nextCaption = parsedCaptions[index + 1];
+      const fallbackEnd = nextCaption ? nextCaption.start : caption.start + 4;
+      const end = typeof caption.end === 'number' && caption.end > caption.start ? caption.end : fallbackEnd;
+
+      return {
+        start: caption.start,
+        end,
+        text: caption.text
+      };
+    });
+  }
+
+  private parseCaptionLine(line: string): { start: number; end?: number; text: string } | null {
+    const timeValue = '(?:\\d{1,2}:)?\\d{1,2}:\\d{2}(?:[.,]\\d{1,3})?|\\d+(?:[.,]\\d+)?s';
+    const rangeMatch = line.match(new RegExp(`^\\[?\\s*(${timeValue})\\s*(?:-->|-)\\s*(${timeValue})\\s*\\]?\\s*(.+)$`, 'i'));
+
+    if (rangeMatch) {
+      const start = this.parseTimestamp(rangeMatch[1]);
+      const end = this.parseTimestamp(rangeMatch[2]);
+      const text = rangeMatch[3].trim();
+
+      return start === null || end === null || !text ? null : { start, end, text };
+    }
+
+    const startMatch = line.match(new RegExp(`^\\[?\\s*(${timeValue})\\s*\\]?\\s*[:\\-]?\\s*(.+)$`, 'i'));
+
+    if (!startMatch) {
+      return null;
+    }
+
+    const start = this.parseTimestamp(startMatch[1]);
+    const text = startMatch[2].trim();
+
+    return start === null || !text ? null : { start, text };
+  }
+
+  private parseTimestamp(value: string): number | null {
+    const normalizedValue = value.trim().replace(',', '.').replace(/s$/i, '');
+    const parts = normalizedValue.split(':').map((part) => Number(part));
+
+    if (!parts.length || parts.some((part) => !Number.isFinite(part) || part < 0)) {
+      return null;
+    }
+
+    if (parts.length === 3) {
+      return (parts[0] * 3600) + (parts[1] * 60) + parts[2];
+    }
+
+    if (parts.length === 2) {
+      return (parts[0] * 60) + parts[1];
+    }
+
+    return parts[0];
   }
 
   private startBrowserDownload(url: string, fileName: string): void {

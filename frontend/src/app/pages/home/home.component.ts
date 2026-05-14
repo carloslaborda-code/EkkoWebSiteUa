@@ -134,6 +134,7 @@ export class HomeComponent implements OnInit {
       quote.actorName,
       quote.characterName,
       quote.synopsis,
+      quote.accessibilityText,
       quote.category,
       ...quote.hashtags
     ].join(' '));

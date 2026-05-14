@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { AdminComponent } from './pages/admin/admin.component';
 import { HeaderComponent } from './components/header/header.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { DiscoverComponent } from './pages/discover/discover.component';
@@ -24,6 +25,7 @@ import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontaweso
 @NgModule({
   declarations: [
     AppComponent,
+    AdminComponent,
     HeaderComponent,
     NavbarComponent,
     DiscoverComponent,

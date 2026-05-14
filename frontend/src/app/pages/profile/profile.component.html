@@ -5,9 +5,14 @@
 
   <main id="main-content" class="profile-frame" tabindex="-1">
     <app-header class="profile-topbar">
-      <a header-end routerLink="/settings" class="icon-button icon-button--header" aria-label="Ajustes">
-        <fa-icon [icon]="faGear" aria-hidden="true"></fa-icon>
-      </a>
+      <div header-end class="profile-actions">
+        <button *ngIf="isAdmin" type="button" class="profile-action-button" aria-label="Administrar publicaciones" (click)="openAdmin()">
+          <fa-icon [icon]="faShieldHalved" aria-hidden="true"></fa-icon>
+        </button>
+        <a routerLink="/settings" class="profile-action-button" aria-label="Ajustes">
+          <fa-icon [icon]="faGear" aria-hidden="true"></fa-icon>
+        </a>
+      </div>
     </app-header>
 
     <section class="profile-body" *ngIf="profile; else loadingState">

@@ -58,6 +58,11 @@ const quoteSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
+    accessibilityText: {
+      type: String,
+      default: '',
+      trim: true
+    },
     hashtags: {
       type: [String],
       default: []

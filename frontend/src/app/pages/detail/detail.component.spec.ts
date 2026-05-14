@@ -36,6 +36,7 @@ describe('DetailComponent', () => {
                 actorName: 'Al Pacino',
                 characterName: 'Tony Montana',
                 synopsis: 'Synopsis',
+                accessibilityText: 'Transcripcion accesible',
                 hashtags: [],
                 category: 'movie'
               }),

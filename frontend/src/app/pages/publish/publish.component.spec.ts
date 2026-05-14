@@ -37,6 +37,7 @@ describe('PublishComponent', () => {
           actorName: 'actor',
           characterName: 'character',
           synopsis: 'synopsis',
+          accessibilityText: '',
           hashtags: [],
           category: 'movie'
         },

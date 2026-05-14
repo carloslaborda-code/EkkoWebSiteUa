@@ -34,6 +34,7 @@ export interface SavedQuote {
   duration: string;
   actorName: string;
   characterName: string;
+  accessibilityText: string;
   hashtags: string[];
   category: string;
 }

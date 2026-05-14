@@ -304,7 +304,7 @@ const getCurrentUser = async (req, res) => {
       .select('-password')
       .populate({
         path: 'savedQuotes',
-        select: 'text workTitle year rating ratingsCount views image mediaType duration actorName characterName hashtags category'
+        select: 'text workTitle year rating ratingsCount views image mediaType duration actorName characterName accessibilityText hashtags category'
       });
     await ensureUserDefaults(user);
     res.json(user);
@@ -335,7 +335,7 @@ const updateProfile = async (req, res) => {
     await user.save();
     await user.populate({
       path: 'savedQuotes',
-      select: 'text workTitle year rating ratingsCount views image mediaType duration actorName characterName hashtags category'
+      select: 'text workTitle year rating ratingsCount views image mediaType duration actorName characterName accessibilityText hashtags category'
     });
 
     res.json({
