@@ -41,7 +41,7 @@ La identidad visual actual mantiene un estilo oscuro, cinematografico y compacto
 
 - Registro e inicio de sesion con JWT.
 - Login usando correo o nombre de usuario.
-- Home con contenido destacado por categoria.
+- Home con contenido destacado, ranking por rating y visualizaciones y estados de carga consistentes.
 - Busqueda inteligente en Home con puntuacion por coincidencia y similitud.
 - Discover con filtros por categoria, formato y produccion.
 - Detail con reproductor de audio o video.
@@ -58,6 +58,8 @@ La identidad visual actual mantiene un estilo oscuro, cinematografico y compacto
 - Settings con ajustes visuales y configuracion de cuenta.
 - Cambio de contrasena desde Settings.
 - Ajustes de accesibilidad persistentes por usuario.
+- Skeleton loaders y empty states reutilizables en pantallas principales.
+- Rutas protegidas con guards e inyeccion automatica de JWT mediante interceptor.
 - Navegacion responsive para movil y escritorio.
 
 ## Stack tecnico
@@ -118,7 +120,8 @@ EkkoWebSiteUa/
 |   |   |   |-- defaultUserData.js
 |   |   |   `-- seedQuotes.js
 |   |   |-- middleware/
-|   |   |   `-- auth.middleware.js
+|   |   |   |-- auth.middleware.js
+|   |   |   `-- errorHandler.js
 |   |   |-- models/
 |   |   |   |-- quote.js
 |   |   |   `-- user.js
@@ -126,7 +129,11 @@ EkkoWebSiteUa/
 |   |   |   |-- auth.routes.js
 |   |   |   `-- quote.routes.js
 |   |   |-- services/
-|   |   |   `-- cloudinary.service.js
+|   |   |   |-- cloudinary.service.js
+|   |   |   |-- quote.service.js
+|   |   |   `-- validation.service.js
+|   |   |-- utils/
+|   |   |   `-- constants.js
 |   |   |-- app.js
 |   |   `-- server.js
 |   `-- package.json
@@ -134,8 +141,15 @@ EkkoWebSiteUa/
 |   |-- src/
 |   |   |-- app/
 |   |   |   |-- components/
+|   |   |   |   |-- empty-state/
 |   |   |   |   |-- icon/
+|   |   |   |   |-- quote-skeleton/
 |   |   |   |   `-- navbar/
+|   |   |   |-- guards/
+|   |   |   |   |-- auth.guard.ts
+|   |   |   |   `-- published.guard.ts
+|   |   |   |-- interceptors/
+|   |   |   |   `-- auth.interceptor.ts
 |   |   |   |-- pages/
 |   |   |   |   |-- detail/
 |   |   |   |   |-- discover/
@@ -150,7 +164,9 @@ EkkoWebSiteUa/
 |   |   |   |   |-- accessibility.service.ts
 |   |   |   |   |-- api-url.ts
 |   |   |   |   |-- auth.service.ts
+|   |   |   |   |-- library.service.ts
 |   |   |   |   |-- quotes.services.ts
+|   |   |   |   |-- search.service.ts
 |   |   |   |   `-- user.service.ts
 |   |   |   |-- app-routing.module.ts
 |   |   |   `-- app.module.ts
@@ -180,6 +196,12 @@ Funciones:
 
 El criterio de destacados prioriza la mayor valoracion media. En empate, se usa el numero de visitas.
 
+Ademas, Home muestra:
+
+- skeleton loaders durante carga;
+- estado vacio accionable cuando la busqueda no devuelve resultados;
+- CTA para limpiar la busqueda o saltar a Discover.
+
 ### Discover
 
 Ruta: `/discover`
@@ -192,6 +214,9 @@ Funciones:
 - filtro por formato: audio o video;
 - filtro por produccion concreta;
 - busqueda por texto dentro de los resultados filtrados;
+- boton claro para limpiar filtros;
+- skeleton loaders durante carga;
+- estado vacio reutilizable con CTA;
 - resultados navegables hacia Detail.
 
 ### Library
@@ -210,6 +235,7 @@ Funciones:
 - contador de guardados, videos y audios;
 - tarjetas con valoracion real, numero de valoraciones y visitas reales;
 - estrellas renderizadas como en Home, por ejemplo una valoracion de `3.3` muestra 3 estrellas activas.
+- estado vacio reutilizable y contextual segun haya o no guardados previos.
 
 Si el usuario no tiene sesion iniciada, la pagina redirige a Login.
 
@@ -228,7 +254,9 @@ Funciones:
 - guardado o eliminacion de biblioteca;
 - descarga del medio;
 - compartir con Web Share API o copiar enlace al portapapeles;
-- mensajes contextuales de exito o error.
+- mensajes contextuales de exito o error;
+- skeleton de detalle durante carga;
+- estado de error con reintento si falla la recuperacion del recurso.
 
 Las acciones que modifican datos requieren autenticacion.
 
@@ -321,6 +349,22 @@ Funciones:
 
 ## Componentes reutilizables
 
+### Empty State
+
+Componente reutilizable para estados vacios.
+
+- admite `kicker`, `title`, `description` y `actionLabel`;
+- expone evento `action`;
+- se reutiliza en Home, Discover, Library y Detail.
+
+### Quote Skeleton
+
+Componente reutilizable para carga visual.
+
+- soporta variantes `card`, `list` y `detail`;
+- incluye shimmer;
+- respeta `prefers-reduced-motion`.
+
 ### Navbar
 
 Componente comun de navegacion.
@@ -382,10 +426,13 @@ Por ejemplo, la lista de publicaciones queda asi:
 | GET | `/api/quotes` | No | Lista publicaciones |
 | GET | `/api/quotes/:id` | No | Obtiene una publicacion |
 | POST | `/api/quotes` | Si | Crea una publicacion |
+| POST | `/api/quotes/upload-signature` | Si | Genera firma para subida a Cloudinary |
 | POST | `/api/quotes/:id/view` | No | Registra una visita |
 | POST | `/api/quotes/:id/save` | Si | Guarda o elimina de biblioteca |
 | POST | `/api/quotes/:id/rate` | Si | Registra o actualiza valoracion |
 | POST | `/api/quotes/:id/download` | Si | Registra descarga y devuelve `mediaUrl` |
+| PATCH | `/api/quotes/:id/accessibility` | Si, admin | Actualiza transcripcion accesible |
+| DELETE | `/api/quotes/:id` | Si, admin | Elimina una publicacion |
 
 ### Respuesta raiz
 
@@ -554,6 +601,31 @@ El frontend no necesita `.env` para funcionar en local o en el despliegue integr
 
 El script `frontend/scripts/write-runtime-config.js` genera `frontend/src/assets/runtime-config.js` antes del build y permite sobrescribir la API sin tocar codigo cuando haga falta apuntar a otro backend.
 
+## Preparacion de demo
+
+La coleccion semilla incluye una base amplia de publicaciones para poder demostrar filtros, categorias y navegacion sin depender de contenido creado a ultima hora.
+
+Para preparar los 3 usuarios de prueba del enunciado en un entorno local o compartido:
+
+```bash
+cd backend
+npm run seed:demo-users
+```
+
+Usuarios creados o actualizados por el script:
+
+- `sergio.pernas@ekko.demo`
+- `carlos.laborda@ekko.demo`
+- `ionathan.hudrea@ekko.demo`
+
+Contrasena por defecto:
+
+```text
+EkkoDemo123!
+```
+
+Si quieres usar otra contrasena comun para la demostracion, ejecuta el script con `DEMO_USER_PASSWORD` en `backend/.env`.
+
 ## Despliegue en Vercel
 
 El repositorio esta preparado para desplegar frontend Angular y backend Express en Vercel desde un unico `vercel.json` en la raiz.
@@ -682,7 +754,10 @@ El proyecto incluye medidas de accesibilidad basica y ajustes personalizables:
 - objetivos tactiles grandes;
 - opcion de reducir movimiento;
 - opcion de subrayar enlaces;
-- tipografia mas legible.
+- tipografia mas legible;
+- validacion accesible de formularios con `aria-describedby`;
+- `aria-live` y mensajes `role="status"` en estados dinamicos;
+- labels y descripciones mejoradas en ratings, dropdowns y tarjetas.
 
 El servicio `accessibility.service.ts` aplica los ajustes al elemento `html` mediante:
 
@@ -701,6 +776,8 @@ Mejoras aplicadas:
 - cache compartida de `getQuotes()` con `shareReplay`;
 - invalidacion de cache al crear nuevas publicaciones;
 - actualizacion local de cache al valorar o registrar visitas;
+- interceptor JWT centralizado, sin headers manuales repetidos;
+- servicios frontend separados por responsabilidad (`search`, `library`, `quotes`, `user`);
 - `trackBy` en listas principales;
 - imagenes con carga diferida cuando procede;
 - `decoding="async"` en imagenes;
@@ -723,9 +800,9 @@ Resultado de la ultima verificacion:
 
 ```text
 Build OK
-Initial Total: 506.31 kB
-Estimated Transfer Size: 116.53 kB
-Warning: initial bundle exceeded the 500.00 kB budget by 6.31 kB
+Initial Total: 638.47 kB
+Estimated Transfer Size: 144.23 kB
+Warning: initial bundle exceeded the 500.00 kB budget by 138.47 kB
 ```
 
 ### Tests frontend
@@ -786,26 +863,32 @@ El proyecto tiene actualmente:
 - frontend Angular funcional;
 - backend Express conectado a MongoDB;
 - autenticacion JWT;
+- interceptor JWT y guards aplicados a rutas protegidas;
 - subida de medios a Cloudinary;
 - paginas principales completas;
 - biblioteca de guardados separada del perfil;
 - valoraciones y visitas persistentes;
 - publicacion avanzada de audio/video;
 - ajustes visuales y de accesibilidad;
+- estados de carga y vacio mas consistentes con componentes reutilizables;
 - configuracion de cuenta con cambio de contrasena;
 - limpieza de codigo muerto y referencias obsoletas;
 - mejoras de rendimiento en listas, imagenes y servicios;
+- backend refactorizado con servicios, constantes y middleware de error;
 - ruteo de API compatible con Vercel mediante `/_/backend/api`.
 
 ## Decisiones recientes
 
 - Los guardados se gestionan desde `Library`, no desde `Profile`.
+- `Detail` consume `LibraryService` para acciones de guardado, valoracion, visitas y descarga.
+- La autenticacion HTTP se centraliza en `AuthInterceptor` en lugar de propagar tokens manualmente.
 - Se eliminaron las opciones de modo lector de pantalla y transcripciones visibles.
 - Las tarjetas de Library muestran valoracion y visitas reales.
 - Las estrellas se renderizan con el mismo criterio visual que Home.
 - Register usa errores inline en lugar de `alert`.
 - Se elimino el enlace a recuperacion de contrasena porque no existe ruta implementada.
 - El backend mantiene una limpieza conservadora de datos heredados de usuario.
+- Home, Discover, Library y Detail comparten un patron comun de carga y estado vacio.
 - En Vercel, el backend Express se sirve bajo `/_/backend`, asi que el frontend usa `/_/backend/api` en produccion.
 
 ## Posibles mejoras futuras

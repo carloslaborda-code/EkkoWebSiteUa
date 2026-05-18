@@ -24,51 +24,20 @@ Esta combinación evita la redundancia con los filtros de `Inicio`, es viable de
 
 Orden recomendado:
 
-1. `Para ti`
-2. `Selección del día`
+1. `Selección del día`
+2. `Para ti`
 3. `Temas`
 4. `Picks inesperados`
 
 Comportamiento visual:
 
-- `Para ti` debe ser el bloque principal.
 - `Selección del día` debe tener aspecto de bloque editorial destacado.
+- `Para ti` debe ser el bloque principal.
 - `Temas` debe funcionar como entrada rápida a intereses concretos.
 - `Picks inesperados` debe cerrar la pantalla con contenido menos predecible.
 
 ## Fase 1
-
-### 1. Para Ti
-
-Objetivo:
-
-- recomendar publicaciones relacionadas con los intereses del usuario
-- tomar como referencia principal las etiquetas de las publicaciones guardadas
-
-Regla de automatización propuesta:
-
-1. Recoger todas las publicaciones guardadas por el usuario.
-2. Extraer sus `tags`.
-3. Calcular frecuencia por tag.
-4. Construir un perfil de intereses con los tags más repetidos.
-5. Buscar publicaciones no guardadas que compartan esos tags.
-6. Ordenarlas por una mezcla de:
-   - coincidencia con tags del usuario
-   - rating
-   - visualizaciones
-   - recencia, si queréis meter algo de frescura
-
-Ejemplo de scoring simple:
-
-- `score = coincidencias_de_tags * 3 + rating * 2 + log(visualizaciones)`
-
-Salvaguardas recomendadas:
-
-- excluir publicaciones ya guardadas
-- limitar publicaciones del mismo autor para que no monopolice el bloque
-- reservar una parte del bloque para contenido reciente
-
-### 2. Selección Del Día
+### 1. Selección Del Día
 
 Objetivo:
 
@@ -97,6 +66,36 @@ Regla práctica:
 
 - automático por defecto
 - manual solo cuando haya una razón clara
+
+### 2. Para Ti
+
+Objetivo:
+
+- recomendar publicaciones relacionadas con los intereses del usuario
+- tomar como referencia principal las etiquetas de las publicaciones guardadas
+
+Regla de automatización propuesta:
+
+1. Recoger todas las publicaciones guardadas por el usuario.
+2. Extraer sus `tags`.
+3. Calcular frecuencia por tag.
+4. Construir un perfil de intereses con los tags más repetidos.
+5. Buscar publicaciones no guardadas que compartan esos tags.
+6. Ordenarlas por una mezcla de:
+   - coincidencia con tags del usuario
+   - rating
+   - visualizaciones
+   - recencia, si queréis meter algo de frescura
+
+Ejemplo de scoring simple:
+
+- `score = coincidencias_de_tags * 3 + rating * 2 + log(visualizaciones)`
+
+Salvaguardas recomendadas:
+
+- excluir publicaciones ya guardadas
+- limitar publicaciones del mismo autor para que no monopolice el bloque
+- reservar una parte del bloque para contenido reciente
 
 ### 3. Temas
 

@@ -138,12 +138,15 @@
 }
 
 .upload-button {
+  border: 0;
+  font: inherit;
   margin-top: 4px;
   padding: 12px 24px;
   border-radius: 12px;
   background: #d6be8a;
   color: #1b1611 !important;
   font-weight: 700;
+  cursor: pointer;
 }
 
 textarea,
@@ -267,6 +270,10 @@ input::placeholder {
   text-align: center;
 }
 
+.cover-picker-wrap {
+  display: flex;
+}
+
 .cover-picker,
 .cover-reset,
 .cover-action {
@@ -280,6 +287,7 @@ input::placeholder {
 }
 
 .cover-picker {
+  width: 100%;
   border: 1px dashed rgba(214, 190, 138, 0.35);
   background: rgba(14, 14, 14, 0.68);
   color: #d3dbec;
@@ -382,6 +390,15 @@ input::placeholder {
   margin: 0;
   color: #d6be8a;
   font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.publish-message--error {
+  color: #f3b2b2;
+}
+
+.publish-message--success {
+  color: #b5e8c0;
 }
 
 .publish-button {

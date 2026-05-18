@@ -40,24 +40,30 @@
             <label for="username" class="sr-only">Nombre de usuario</label>
             <input id="username" name="username" type="text" autocomplete="username" [(ngModel)]="username"
               placeholder="Nombre de usuario" maxlength="50" (input)="validate(); checkUsernameAvailability()"
+              [attr.aria-invalid]="hasUsernameError || usernameAvailable === false"
+              [attr.aria-describedby]="'register-username-status'"
               class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white hover:shadow-md focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
-            <p *ngIf="usernameAvailable === true" class="mt-2 text-sm text-emerald-300">Nombre disponible.</p>
-            <p *ngIf="usernameAvailable === false" class="mt-2 text-sm text-red-200">Nombre no disponible.</p>
+            <p id="register-username-status" *ngIf="usernameAvailable === true" class="mt-2 text-sm text-emerald-300" role="status">Nombre disponible.</p>
+            <p id="register-username-status" *ngIf="usernameAvailable === false" class="mt-2 text-sm text-red-200" role="alert">Nombre no disponible.</p>
           </div>
 
           <div>
             <label for="email" class="sr-only">Correo electr&oacute;nico</label>
             <input id="email" name="email" type="email" autocomplete="email" [(ngModel)]="email"
               placeholder="Correo electr&oacute;nico" maxlength="50" (input)="validate(); checkEmailAvailability()"
+              [attr.aria-invalid]="hasEmailError || emailAvailable === false"
+              [attr.aria-describedby]="'register-email-status'"
               class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white hover:shadow-md focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
-            <p *ngIf="emailAvailable === true" class="mt-2 text-sm text-emerald-300">Correo disponible.</p>
-            <p *ngIf="emailAvailable === false" class="mt-2 text-sm text-red-200">Correo no disponible.</p>
+            <p id="register-email-status" *ngIf="emailAvailable === true" class="mt-2 text-sm text-emerald-300" role="status">Correo disponible.</p>
+            <p id="register-email-status" *ngIf="emailAvailable === false" class="mt-2 text-sm text-red-200" role="alert">Correo no disponible.</p>
           </div>
 
           <div>
             <label for="password" class="sr-only">Contrase&ntilde;a</label>
             <input id="password" name="password" type="password" autocomplete="new-password" [(ngModel)]="password"
               placeholder="Contrase&ntilde;a" maxlength="100" (input)="validate()"
+              [attr.aria-invalid]="hasPasswordError"
+              [attr.aria-describedby]="hasPasswordError ? 'register-error-message' : null"
               class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white hover:shadow-md focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
           </div>
 
@@ -66,10 +72,12 @@
             <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password"
               [(ngModel)]="confirmPassword" placeholder="Confirmar contrase&ntilde;a" maxlength="100"
               (input)="validate()"
+              [attr.aria-invalid]="hasConfirmPasswordError"
+              [attr.aria-describedby]="hasConfirmPasswordError ? 'register-error-message' : null"
               class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white hover:shadow-md focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
           </div>
 
-          <p *ngIf="errorMessage" class="rounded-xl border border-red-400/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">
+          <p *ngIf="errorMessage" id="register-error-message" role="alert" class="rounded-xl border border-red-400/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">
             {{ errorMessage }}
           </p>
 

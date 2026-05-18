@@ -30,7 +30,7 @@
         </label>
 
         <section class="space-y-3">
-          <h2 class="text-[0.95rem] font-extrabold uppercase tracking-[0.12em] text-[#d4bc8e]">I am looking for...</h2>
+          <h2 class="text-[0.95rem] font-extrabold uppercase tracking-[0.12em] text-[#d4bc8e]">Busco contenido de...</h2>
           <div class="flex flex-wrap gap-3">
             <button
               type="button"
@@ -78,29 +78,47 @@
           <h2 class="text-[0.95rem] font-extrabold uppercase tracking-[0.12em] text-[#d4bc8e]">De...</h2>
           <div class="relative">
             <button
+              #workTitleTrigger
               type="button"
               class="flex w-full items-center justify-between rounded-t-2xl border border-[#2e5cff] bg-[#151515] px-4 py-4 text-left font-semibold text-white shadow-[0_12px_26px_rgba(0,0,0,0.18)]"
               [ngClass]="!dropdownOpen ? 'rounded-b-2xl' : ''"
-              (click)="dropdownOpen = !dropdownOpen"
+              [attr.aria-expanded]="dropdownOpen"
+              aria-haspopup="listbox"
+              aria-controls="discover-worktitle-listbox"
+              (click)="toggleDropdown()"
+              (keydown)="onDropdownTriggerKeydown($event)"
             >
               <span>{{ currentDropdownLabel }}</span>
               <fa-icon [icon]="faChevronDown" aria-hidden="true" class="transition-transform duration-200" [ngClass]="dropdownOpen ? 'rotate-180' : ''"></fa-icon>
             </button>
 
-            <div *ngIf="dropdownOpen" class="overflow-hidden rounded-b-2xl border-x border-b border-[#2e5cff] bg-[#171717] shadow-[0_22px_36px_rgba(0,0,0,0.22)]">
+            <div
+              *ngIf="dropdownOpen"
+              #workTitleListbox
+              id="discover-worktitle-listbox"
+              role="listbox"
+              aria-label="Selecciona una produccion"
+              class="overflow-hidden rounded-b-2xl border-x border-b border-[#2e5cff] bg-[#171717] shadow-[0_22px_36px_rgba(0,0,0,0.22)]"
+            >
               <button
                 type="button"
                 class="block w-full bg-transparent px-4 py-3 text-left font-semibold text-slate-200 transition-colors duration-150 hover:bg-white/5"
+                role="option"
+                [attr.aria-selected]="!selectedWorkTitle"
                 (click)="clearWorkTitle(); applyFilters()"
+                (keydown)="onDropdownOptionKeydown($event, 0)"
               >
                 Todas las producciones
               </button>
               <button
                 type="button"
                 class="block w-full bg-transparent px-4 py-3 text-left font-semibold text-white transition-colors duration-150 hover:bg-white/5"
-                *ngFor="let title of availableWorkTitles; trackBy: trackByTitle"
+                *ngFor="let title of availableWorkTitles; let optionIndex = index; trackBy: trackByTitle"
+                role="option"
+                [attr.aria-selected]="title === selectedWorkTitle"
                 [ngClass]="title === selectedWorkTitle ? 'bg-[#c4ae88] text-[#1d1a15]' : ''"
                 (click)="selectWorkTitle(title); applyFilters()"
+                (keydown)="onDropdownOptionKeydown($event, optionIndex + 1)"
               >
                 {{ title }}
               </button>
@@ -108,13 +126,23 @@
           </div>
         </section>
 
-        <button
-          type="button"
-          class="rounded-2xl border border-[#ceb993] bg-[#c4ae88] px-5 py-4 text-base font-extrabold uppercase tracking-[0.16em] text-[#17140f] shadow-[0_18px_32px_rgba(0,0,0,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105"
-          (click)="applyFilters()"
-        >
-          Aplicar filtros
-        </button>
+        <div class="discover-filter-actions">
+          <button
+            type="button"
+            class="rounded-2xl border border-[#ceb993] bg-[#c4ae88] px-5 py-4 text-base font-extrabold uppercase tracking-[0.16em] text-[#17140f] shadow-[0_18px_32px_rgba(0,0,0,0.24)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105"
+            (click)="applyFilters()"
+          >
+            Aplicar filtros
+          </button>
+
+          <button
+            type="button"
+            class="discover-reset-button"
+            (click)="resetFilters()"
+          >
+            Limpiar filtros
+          </button>
+        </div>
       </aside>
 
       <section class="discover-results-panel">
@@ -122,6 +150,9 @@
           <div>
             <p class="discover-panel-kicker">Resultados</p>
             <h2>{{ filteredQuotes.length }} fragmentos disponibles</h2>
+            <p class="discover-results-copy">
+              Explora resultados filtrados por categoria, formato, produccion y texto. Puedes abrir cualquier tarjeta con teclado usando Enter o espacio.
+            </p>
           </div>
         </div>
 

@@ -64,6 +64,20 @@ export class LoginComponent {
       });
   }
 
+  get hasEmailError(): boolean {
+    return !!this.errorMessage && (
+      this.errorMessage.includes('correo') ||
+      this.errorMessage.includes('usuario')
+    );
+  }
+
+  get hasPasswordError(): boolean {
+    return !!this.errorMessage && (
+      this.errorMessage.includes('contrasena') ||
+      this.errorMessage.includes('contraseña')
+    );
+  }
+
   private getValidationError(showIncompleteError: boolean): string {
     const emailOrUsername = this.email.trim();
     const hasAnyValue = emailOrUsername || this.password;

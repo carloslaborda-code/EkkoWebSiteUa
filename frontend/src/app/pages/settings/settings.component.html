@@ -16,11 +16,23 @@
 
       <section class="settings-group" aria-labelledby="account-title">
         <h2 id="account-title">CUENTA</h2>
-        <button type="button" class="settings-item" (click)="toggleAccountConfig()" [attr.aria-expanded]="accountConfigOpen">
+        <button
+          type="button"
+          class="settings-item"
+          (click)="toggleAccountConfig()"
+          [attr.aria-expanded]="accountConfigOpen"
+          aria-controls="settings-account-form"
+        >
           <span class="item-left">Configuraci&oacute;n de la cuenta</span>
-          <fa-icon [icon]="faChevronRight" aria-hidden="true"></fa-icon>
+          <fa-icon class="item-arrow" [icon]="faChevronRight" aria-hidden="true"></fa-icon>
         </button>
-        <form class="password-form" *ngIf="accountConfigOpen" (ngSubmit)="submitPasswordChange()" aria-label="Cambiar contrasena">
+        <form
+          id="settings-account-form"
+          class="password-form"
+          *ngIf="accountConfigOpen"
+          (ngSubmit)="submitPasswordChange()"
+          aria-label="Cambiar contrasena"
+        >
           <label class="password-field" for="current-password">
             <span>Contrase&ntilde;a actual</span>
             <input
@@ -68,10 +80,10 @@
             {{ passwordMessage }}
           </p>
         </form>
-        <button type="button" class="settings-item">
-          <span class="item-left">Privacidad</span>
-          <fa-icon [icon]="faChevronRight" aria-hidden="true"></fa-icon>
-        </button>
+        <!-- <div class="settings-note" role="note">
+          <strong>Privacidad</strong>
+          <span>La gestion avanzada de privacidad no forma parte de esta entrega y no se muestra como accion independiente para evitar flujos vacios.</span>
+        </div> -->
         <button type="button" class="settings-item" (click)="logout()">
           <span class="item-left">Cerrar sesi&oacute;n</span>
         </button>

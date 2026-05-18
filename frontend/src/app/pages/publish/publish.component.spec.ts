@@ -97,7 +97,7 @@ describe('PublishComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should publish with Unkown when actor and character are empty', async () => {
+  it('should publish with Desconocido when actor and character are empty', async () => {
     localStorage.setItem('token', 'token');
     component.quoteText = 'quote';
     component.workTitle = 'title';
@@ -110,8 +110,8 @@ describe('PublishComponent', () => {
     await component.publish();
 
     expect(quoteServiceStub.createQuote).toHaveBeenCalledWith(jasmine.objectContaining({
-      actorName: 'Unkown',
-      characterName: 'Unkown'
+      actorName: 'Desconocido',
+      characterName: 'Desconocido'
     }));
   });
 });

@@ -40,6 +40,8 @@
             <label for="email" class="sr-only">Email o usuario</label>
             <input id="email" name="email" type="text" autocomplete="username" [(ngModel)]="email"
               placeholder="Email o usuario" maxlength="50" (input)="validate()"
+              [attr.aria-invalid]="hasEmailError"
+              [attr.aria-describedby]="hasEmailError ? 'login-error-message' : null"
               class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white hover:shadow-md focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
           </div>
 
@@ -47,10 +49,12 @@
             <label for="password" class="sr-only">Contrase&ntilde;a</label>
             <input id="password" name="password" type="password" autocomplete="current-password" [(ngModel)]="password"
               placeholder="Contrase&ntilde;a" maxlength="100" (input)="validate()"
+              [attr.aria-invalid]="hasPasswordError"
+              [attr.aria-describedby]="hasPasswordError ? 'login-error-message' : null"
               class="w-full rounded-xl bg-[#F1F4FF] px-5 py-4 text-base text-[#626262] outline-none placeholder:text-[#626262] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white hover:shadow-md focus:bg-white focus:shadow-[inset_0_0_0_2px_#FFE8B7]" />
           </div>
 
-          <p *ngIf="errorMessage" class="rounded-xl border border-red-400/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">
+          <p *ngIf="errorMessage" id="login-error-message" role="alert" class="rounded-xl border border-red-400/30 bg-red-950/40 px-4 py-3 text-sm text-red-200">
             {{ errorMessage }}
           </p>
 

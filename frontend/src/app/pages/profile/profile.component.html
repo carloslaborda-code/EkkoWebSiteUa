@@ -51,8 +51,11 @@
       </aside>
 
       <div class="profile-library">
-        <section class="uploads-section">
+        <section class="uploads-section" aria-labelledby="profile-uploads-title" aria-describedby="profile-uploads-copy">
           <h2>Mis Subidas</h2>
+          <p id="profile-uploads-copy" class="uploads-copy">
+            {{ profile.uploads.length || 0 }} publicaciones creadas. Abre una tarjeta para revisar el detalle publicado.
+          </p>
           <div class="uploads-grid" *ngIf="profile.uploads?.length; else emptyUploadsState">
             <a
               class="upload-card"
@@ -73,14 +76,14 @@
             </a>
           </div>
           <ng-template #emptyUploadsState>
-            <p class="empty-state">Todav&iacute;a no has subido contenido.</p>
+            <p class="empty-state" role="status">Todav&iacute;a no has subido contenido. Usa la secci&oacute;n Publicar para preparar tu primer fragmento.</p>
           </ng-template>
         </section>
       </div>
     </section>
 
     <ng-template #loadingState>
-      <p class="empty-state">Cargando perfil...</p>
+      <p class="empty-state" role="status">Cargando perfil...</p>
     </ng-template>
 
     <app-navbar activeTab="profile"></app-navbar>

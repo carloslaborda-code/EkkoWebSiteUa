@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faChevronDown, faClapperboard, faGamepad, faMagnifyingGlass, faPlay, faTv, faVolumeHigh } from '@fortawesome/free-solid-svg-icons';
@@ -13,6 +13,8 @@ type DiscoverFormat = 'video' | 'audio';
   styleUrls: ['./discover.component.css']
 })
 export class DiscoverComponent implements OnInit {
+  @ViewChild('workTitleTrigger') workTitleTrigger?: ElementRef<HTMLButtonElement>;
+  @ViewChild('workTitleListbox') workTitleListbox?: ElementRef<HTMLDivElement>;
   allQuotes: Quote[] = [];
   filteredQuotes: Quote[] = [];
   searchTerm = '';
@@ -35,10 +37,34 @@ export class DiscoverComponent implements OnInit {
 
   constructor(private quoteService: QuoteService, public router: Router) {}
 
+  @HostListener('document:click', ['$event'])
+  handleDocumentClick(event: MouseEvent): void {
+    if (!this.dropdownOpen) {
+      return;
+    }
+
+    const target = event.target as Node | null;
+    const trigger = this.workTitleTrigger?.nativeElement;
+    const listbox = this.workTitleListbox?.nativeElement;
+
+    if (target && (trigger?.contains(target) || listbox?.contains(target))) {
+      return;
+    }
+
+    this.closeDropdown();
+  }
+
+  @HostListener('document:keydown.escape')
+  handleEscapeKey(): void {
+    this.closeDropdown(true);
+  }
+
   ngOnInit(): void {
     this.quoteService.getQuotes().subscribe({
       next: (quotes) => {
         this.allQuotes = quotes;
+        this.ensureValidCategory();
+        this.ensureValidFormat();
         this.loading = false;
         this.ensureValidWorkTitle();
         this.applyFilters();
@@ -75,6 +101,7 @@ export class DiscoverComponent implements OnInit {
 
   setCategory(category: DiscoverCategory): void {
     this.selectedCategory = category;
+    this.ensureValidFormat();
     this.ensureValidWorkTitle();
     this.applyFilters();
   }
@@ -87,12 +114,12 @@ export class DiscoverComponent implements OnInit {
 
   selectWorkTitle(workTitle: string): void {
     this.selectedWorkTitle = workTitle;
-    this.dropdownOpen = false;
+    this.closeDropdown(true);
   }
 
   clearWorkTitle(): void {
     this.selectedWorkTitle = '';
-    this.dropdownOpen = false;
+    this.closeDropdown(true);
   }
 
   applyFilters(): void {
@@ -120,6 +147,80 @@ export class DiscoverComponent implements OnInit {
     this.router.navigate(['/quote', quoteId]);
   }
 
+  toggleDropdown(): void {
+    this.dropdownOpen = !this.dropdownOpen;
+
+    if (this.dropdownOpen) {
+      queueMicrotask(() => {
+        this.workTitleListbox?.nativeElement.querySelector<HTMLButtonElement>('button')?.focus();
+      });
+      return;
+    }
+
+    this.workTitleTrigger?.nativeElement.focus();
+  }
+
+  onDropdownTriggerKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (!this.dropdownOpen) {
+      this.dropdownOpen = true;
+    }
+
+    queueMicrotask(() => {
+      const options = this.getDropdownOptions();
+      if (!options.length) {
+        return;
+      }
+
+      const targetIndex = event.key === 'ArrowUp' ? options.length - 1 : 0;
+      options[targetIndex].focus();
+    });
+  }
+
+  onDropdownOptionKeydown(event: KeyboardEvent, optionIndex: number): void {
+    const options = this.getDropdownOptions();
+    if (!options.length) {
+      return;
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      options[(optionIndex + 1) % options.length].focus();
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      options[(optionIndex - 1 + options.length) % options.length].focus();
+      return;
+    }
+
+    if (event.key === 'Home') {
+      event.preventDefault();
+      options[0].focus();
+      return;
+    }
+
+    if (event.key === 'End') {
+      event.preventDefault();
+      options[options.length - 1].focus();
+    }
+  }
+
+  resetFilters(): void {
+    this.searchTerm = '';
+    this.ensureValidCategory();
+    this.ensureValidFormat();
+    this.selectedWorkTitle = '';
+    this.applyFilters();
+    this.closeDropdown();
+  }
+
   trackByQuoteId(_index: number, quote: Quote): string {
     return quote._id;
   }
@@ -140,5 +241,43 @@ export class DiscoverComponent implements OnInit {
     if (!this.availableWorkTitles.includes(this.selectedWorkTitle)) {
       this.selectedWorkTitle = '';
     }
+  }
+
+  private ensureValidCategory(): void {
+    const visibleCategories = this.visibleCategoryOptions.map((option) => option.value);
+    if (visibleCategories.includes(this.selectedCategory) || !visibleCategories.length) {
+      return;
+    }
+
+    this.selectedCategory = visibleCategories[0];
+  }
+
+  private ensureValidFormat(): void {
+    const hasSelectedFormat = this.allQuotes.some((quote) =>
+      quote.category === this.selectedCategory && quote.mediaType === this.selectedFormat
+    );
+
+    if (hasSelectedFormat) {
+      return;
+    }
+
+    const fallbackFormat = this.allQuotes.find((quote) => quote.category === this.selectedCategory)?.mediaType;
+    this.selectedFormat = fallbackFormat === 'audio' ? 'audio' : 'video';
+  }
+
+  private closeDropdown(returnFocus = false): void {
+    if (!this.dropdownOpen) {
+      return;
+    }
+
+    this.dropdownOpen = false;
+
+    if (returnFocus) {
+      queueMicrotask(() => this.workTitleTrigger?.nativeElement.focus());
+    }
+  }
+
+  private getDropdownOptions(): HTMLButtonElement[] {
+    return Array.from(this.workTitleListbox?.nativeElement.querySelectorAll<HTMLButtonElement>('button') || []);
   }
 }

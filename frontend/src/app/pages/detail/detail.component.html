@@ -65,7 +65,7 @@
           </button>
         </div>
         <p class="rating-summary">{{ quote.rating.toFixed(1) }} / 5 - {{ quote.ratingsCount }} valoraciones</p>
-        <p *ngIf="ratingMessage" class="rating-feedback">{{ ratingMessage }}</p>
+        <p *ngIf="ratingMessage" class="rating-feedback" role="status" aria-live="polite">{{ ratingMessage }}</p>
       </section>
 
       <div class="action-card">
@@ -92,7 +92,7 @@
         </button>
       </div>
 
-      <p *ngIf="message" class="detail-message">{{ message }}</p>
+      <p *ngIf="message" class="detail-message" role="status" aria-live="polite">{{ message }}</p>
 
       <section class="credits-row">
         <div class="credit-avatar">AP</div>
@@ -118,12 +118,22 @@
           <span class="hashtag-chip" *ngFor="let hashtag of quote.hashtags; trackBy: trackByText">#{{ hashtag }}</span>
         </div>
       </section>
+
+      <section *ngIf="hasTranscript" class="transcript-block" aria-labelledby="transcript-title">
+        <div class="section-heading">
+          <h3 id="transcript-title">TRANSCRIPCION ACCESIBLE</h3>
+          <span></span>
+        </div>
+        <ol class="transcript-list">
+          <li *ngFor="let line of transcriptLines; trackBy: trackByText">{{ line }}</li>
+        </ol>
+      </section>
     </section>
 
     <app-navbar></app-navbar>
   </main>
 
   <ng-template #loadingState>
-    <div class="loading-state">Cargando detalle...</div>
+    <div class="loading-state" role="status" aria-live="polite">Cargando detalle...</div>
   </ng-template>
 </div>

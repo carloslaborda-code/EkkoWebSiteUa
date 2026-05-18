@@ -16,11 +16,13 @@ type Category = 'movie' | 'series' | 'game' | 'sfx';
 })
 export class PublishComponent implements OnInit, OnDestroy {
   @ViewChild('videoCoverPreview') videoCoverPreview?: ElementRef<HTMLVideoElement>;
+  @ViewChild('mediaInput') mediaInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('coverInput') coverInput?: ElementRef<HTMLInputElement>;
 
   private readonly maxAudioSize = 8 * 1024 * 1024;
   private readonly maxVideoSize = 20 * 1024 * 1024;
   private readonly maxCoverSize = 4 * 1024 * 1024;
-  private readonly unknownLabel = 'Unkown';
+  private readonly unknownLabel = 'Desconocido';
   private framePreviewTimer?: ReturnType<typeof setTimeout>;
   private framePreviewRequestId = 0;
   mediaType: MediaType = 'audio';
@@ -44,6 +46,7 @@ export class PublishComponent implements OnInit, OnDestroy {
   duration = '00:00';
   submitting = false;
   message = '';
+  messageType: 'status' | 'error' | 'success' = 'status';
 
   readonly categories: Array<{ label: string; value: Category }> = [
     { label: 'Pelicula', value: 'movie' },
@@ -76,6 +79,14 @@ export class PublishComponent implements OnInit, OnDestroy {
     return this.selectedCoverDataUrl || this.generatedCoverDataUrl || this.getFallbackCover();
   }
 
+  openMediaPicker(): void {
+    this.mediaInput?.nativeElement.click();
+  }
+
+  openCoverPicker(): void {
+    this.coverInput?.nativeElement.click();
+  }
+
   setMediaType(type: MediaType): void {
     if (this.mediaType === type) {
       return;
@@ -96,9 +107,9 @@ export class PublishComponent implements OnInit, OnDestroy {
     const maxAllowedSize = this.mediaType === 'audio' ? this.maxAudioSize : this.maxVideoSize;
     if (file.size > maxAllowedSize) {
       this.resetSelectedMedia();
-      this.message = this.mediaType === 'audio'
+      this.setMessage(this.mediaType === 'audio'
         ? 'El audio es demasiado pesado. Usa un archivo de hasta 8 MB.'
-        : 'El video es demasiado pesado. Usa un archivo de hasta 20 MB.';
+        : 'El video es demasiado pesado. Usa un archivo de hasta 20 MB.', 'error');
       input.value = '';
       return;
     }
@@ -109,7 +120,7 @@ export class PublishComponent implements OnInit, OnDestroy {
     this.generatedCoverDataUrl = '';
     this.videoDurationSeconds = 0;
     this.selectedCoverTimeSeconds = 0;
-    this.message = '';
+    this.setMessage('');
 
     if (this.mediaType === 'video') {
       this.revokeVideoPreviewUrl();
@@ -124,10 +135,16 @@ export class PublishComponent implements OnInit, OnDestroy {
       .then(([duration, coverDataUrl]) => {
         this.duration = duration;
         this.generatedCoverDataUrl = coverDataUrl;
+        this.setMessage(
+          this.mediaType === 'audio'
+            ? 'Archivo cargado. Ya puedes completar el resto de datos.'
+            : 'Video cargado. Revisa la portada y completa los metadatos.',
+          'status'
+        );
       })
       .catch(() => {
         this.resetSelectedMedia();
-        this.message = 'No se pudo procesar el archivo seleccionado.';
+        this.setMessage('No se pudo procesar el archivo seleccionado.', 'error');
       });
   }
 
@@ -142,13 +159,13 @@ export class PublishComponent implements OnInit, OnDestroy {
     if (file.size > this.maxCoverSize) {
       this.coverFileName = '';
       this.selectedCoverDataUrl = '';
-      this.message = 'La portada es demasiado pesada. Usa una imagen de hasta 4 MB.';
+      this.setMessage('La portada es demasiado pesada. Usa una imagen de hasta 4 MB.', 'error');
       input.value = '';
       return;
     }
 
     this.coverFileName = file.name;
-    this.message = '';
+    this.setMessage('Portada lista para publicar.', 'status');
 
     this.readFileAsDataUrl(file)
       .then((dataUrl) => {
@@ -157,13 +174,19 @@ export class PublishComponent implements OnInit, OnDestroy {
       .catch(() => {
         this.coverFileName = '';
         this.selectedCoverDataUrl = '';
-        this.message = 'No se pudo procesar la portada seleccionada.';
+        this.setMessage('No se pudo procesar la portada seleccionada.', 'error');
       });
   }
 
   clearSelectedCover(): void {
     this.coverFileName = '';
     this.selectedCoverDataUrl = '';
+    this.setMessage(
+      this.mediaType === 'audio'
+        ? 'Se usara la portada por defecto de audio.'
+        : 'Se restaurara la portada generada desde el video.',
+      'status'
+    );
   }
 
   onVideoPreviewLoaded(event: Event): void {
@@ -194,13 +217,13 @@ export class PublishComponent implements OnInit, OnDestroy {
     const video = this.videoCoverPreview?.nativeElement;
 
     if (!video || !this.videoPreviewUrl) {
-      this.message = 'Sube un video antes de elegir una portada desde el fragmento.';
+      this.setMessage('Sube un video antes de elegir una portada desde el fragmento.', 'error');
       return;
     }
 
     const requestId = ++this.framePreviewRequestId;
     this.capturingCover = true;
-    this.message = '';
+    this.setMessage('');
 
     try {
       const dataUrl = await this.captureFrameAtTime(video, this.selectedCoverTimeSeconds);
@@ -209,8 +232,9 @@ export class PublishComponent implements OnInit, OnDestroy {
       }
       this.selectedCoverDataUrl = dataUrl;
       this.coverFileName = `Frame ${this.formatTimestamp(this.selectedCoverTimeSeconds)}`;
+      this.setMessage('Portada generada desde el frame seleccionado.', 'success');
     } catch {
-      this.message = 'No se pudo capturar esa portada desde el video.';
+      this.setMessage('No se pudo capturar esa portada desde el video.', 'error');
     } finally {
       if (requestId === this.framePreviewRequestId) {
         this.capturingCover = false;
@@ -240,19 +264,19 @@ export class PublishComponent implements OnInit, OnDestroy {
     }
 
     if (!this.quoteText || !this.workTitle || !this.year || !this.synopsis || !this.mediaDataUrl) {
-      this.message = 'Completa los campos obligatorios y sube un archivo antes de publicar.';
+      this.setMessage('Completa los campos obligatorios y sube un archivo antes de publicar.', 'error');
       return;
     }
 
     const parsedYear = Number(this.year);
     if (!Number.isFinite(parsedYear) || parsedYear < 0) {
-      this.message = 'El ano debe ser valido.';
+      this.setMessage('El ano debe ser valido.', 'error');
       return;
     }
 
     const image = this.resolveImage();
     if (!image) {
-      this.message = 'No se pudo generar la portada del video. Elige una imagen manual.';
+      this.setMessage('No se pudo generar la portada del video. Elige una imagen manual.', 'error');
       return;
     }
 
@@ -260,7 +284,7 @@ export class PublishComponent implements OnInit, OnDestroy {
     const characterName = this.withUnknownFallback(this.characterName);
 
     this.submitting = true;
-    this.message = 'Subiendo archivos...';
+    this.setMessage('Subiendo archivos...', 'status');
 
     try {
       const [uploadedImage, uploadedMediaUrl] = await Promise.all([
@@ -285,14 +309,14 @@ export class PublishComponent implements OnInit, OnDestroy {
         category: this.category
       };
 
-      this.message = 'Publicando contenido...';
+      this.setMessage('Publicando contenido...', 'status');
       const { quote, user } = await firstValueFrom(this.quoteService.createQuote(payload));
       this.submitting = false;
       this.userService.syncPublishedUpload(user);
       this.router.navigate(['/quote', quote._id]);
     } catch {
       this.submitting = false;
-      this.message = 'No se pudo publicar el contenido.';
+      this.setMessage('No se pudo publicar el contenido.', 'error');
     }
   }
 
@@ -478,7 +502,13 @@ export class PublishComponent implements OnInit, OnDestroy {
     this.videoDurationSeconds = 0;
     this.selectedCoverTimeSeconds = 0;
     this.duration = '00:00';
-    this.message = '';
+    this.setMessage('');
+    if (this.mediaInput) {
+      this.mediaInput.nativeElement.value = '';
+    }
+    if (this.coverInput) {
+      this.coverInput.nativeElement.value = '';
+    }
   }
 
   private clearFramePreviewTimer(): void {
@@ -502,5 +532,10 @@ export class PublishComponent implements OnInit, OnDestroy {
 
     URL.revokeObjectURL(this.videoPreviewUrl);
     this.videoPreviewUrl = '';
+  }
+
+  private setMessage(message: string, type: 'status' | 'error' | 'success' = 'status'): void {
+    this.message = message;
+    this.messageType = type;
   }
 }

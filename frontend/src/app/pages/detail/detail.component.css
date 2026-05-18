@@ -51,10 +51,13 @@
 .duration-pill { display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(214,190,138,.45); color: #d6be8a; font-weight: 600; white-space: nowrap; transition: all .25s ease; cursor: default; }
 .duration-pill:hover { background: #d6be8a; color: #151515; border-color: #d6be8a; transform: translateY(-1px); }
 .synopsis-block { margin-top: 28px; }
+.transcript-block { margin-top: 28px; }
 .section-heading { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; margin-bottom: 14px; }
 .section-heading h3 { margin: 0; color: #d6be8a; font-size: 1rem; letter-spacing: .14em; }
 .section-heading span { height: 1px; background: rgba(214,190,138,.22); }
 .synopsis-block p { margin: 0; color: #dde3ee; line-height: 1.8; font-size: 1.02rem; }
+.transcript-list { margin: 0; padding-left: 1.2rem; color: #dde3ee; line-height: 1.8; }
+.transcript-list li + li { margin-top: 8px; }
 .hashtags-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
 .hashtag-chip { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border-radius: 12px; border: 1px solid rgba(214, 190, 138, 0.12); background: rgba(20, 17, 13, 0.5); color: #aeb9d1; font-size: 0.95rem; transition: all .25s ease; cursor: default; }
 .hashtag-chip:hover { background: rgba(214, 190, 138, 0.12); color: #f2dcae; border-color: rgba(214, 190, 138, 0.35); transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3); }
@@ -92,7 +95,8 @@
     grid-template-areas:
       "quote rating"
       "credits actions"
-      "synopsis synopsis";
+      "synopsis synopsis"
+      "transcript transcript";
     gap: 24px 28px;
     align-items: start;
   }
@@ -102,6 +106,7 @@
   .action-card { grid-area: actions; }
   .credits-row { grid-area: credits; margin-top: 0; }
   .synopsis-block { grid-area: synopsis; margin-top: 0; }
+  .transcript-block { grid-area: transcript; margin-top: 0; }
 
   .media-frame,
   .media-poster,

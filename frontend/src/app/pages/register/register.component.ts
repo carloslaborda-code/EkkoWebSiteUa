@@ -119,6 +119,22 @@ export class RegisterComponent implements OnDestroy {
       });
   }
 
+  get hasUsernameError(): boolean {
+    return !!this.errorMessage && this.errorMessage.includes('nombre de usuario');
+  }
+
+  get hasEmailError(): boolean {
+    return !!this.errorMessage && this.errorMessage.includes('correo electronico');
+  }
+
+  get hasPasswordError(): boolean {
+    return !!this.errorMessage && this.errorMessage.includes('contrasena');
+  }
+
+  get hasConfirmPasswordError(): boolean {
+    return !!this.errorMessage && this.errorMessage.includes('coinciden');
+  }
+
   private getValidationError(showIncompleteError: boolean): string {
     const username = this.username.trim();
     const email = this.email.trim();

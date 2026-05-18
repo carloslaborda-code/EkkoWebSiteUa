@@ -86,6 +86,21 @@ export class DetailComponent implements OnInit {
     return this.captionsEnabled && !!this.activeCaptionText;
   }
 
+  get transcriptLines(): string[] {
+    if (this.hasTimedCaptions) {
+      return this.timedCaptions.map((caption) => `[${this.formatTranscriptTime(caption.start)}] ${caption.text}`);
+    }
+
+    return String(this.quote?.accessibilityText || '')
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+  }
+
+  get hasTranscript(): boolean {
+    return this.transcriptLines.length > 0;
+  }
+
   startPlayback(): void {
     this.isPlaying = true;
     this.message = '';
@@ -248,6 +263,13 @@ export class DetailComponent implements OnInit {
     const ss = String(seconds).padStart(2, '0');
 
     return `${hh}:${mm}:${ss}`;
+  }
+
+  private formatTranscriptTime(seconds: number): string {
+    const totalSeconds = Math.max(0, Math.floor(seconds));
+    const minutes = Math.floor(totalSeconds / 60);
+    const remainingSeconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   }
 
   private prepareTimedCaptions(rawText: string): void {

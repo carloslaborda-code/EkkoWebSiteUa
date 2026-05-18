@@ -27,14 +27,14 @@
           </button>
         </div>
 
-        <label class="upload-dropzone">
-          <input type="file" [accept]="acceptTypes" (change)="onFileChange($event)" hidden />
+        <div class="upload-dropzone" role="group" aria-labelledby="publish-media-title" aria-describedby="publish-media-help">
+          <input #mediaInput type="file" [accept]="acceptTypes" (change)="onFileChange($event)" class="sr-only" />
           <span class="upload-icon">&#8679;</span>
-          <strong>Subir fragmento</strong>
-          <span>{{ mediaType === 'audio' ? 'MP3 hasta 8MB' : 'MP4 o MOV hasta 20MB' }}</span>
-          <span class="upload-button">Buscar archivo</span>
+          <strong id="publish-media-title">Subir fragmento</strong>
+          <span id="publish-media-help">{{ mediaType === 'audio' ? 'MP3 hasta 8MB' : 'MP4 o MOV hasta 20MB' }}</span>
+          <button type="button" class="upload-button" (click)="openMediaPicker()">Buscar archivo</button>
           <small *ngIf="selectedFileName">{{ selectedFileName }}</small>
-        </label>
+        </div>
 
         <section class="cover-panel">
           <div class="section-head">
@@ -89,10 +89,12 @@
             </div>
           </ng-template>
 
-          <label class="cover-picker">
-            <input type="file" accept="image/*" (change)="onCoverChange($event)" hidden />
-            <span>{{ coverFileName || (mediaType === 'audio' ? 'Elegir portada opcional' : 'Elegir imagen de portada') }}</span>
-          </label>
+          <div class="cover-picker-wrap">
+            <input #coverInput type="file" accept="image/*" (change)="onCoverChange($event)" class="sr-only" />
+            <button type="button" class="cover-picker" (click)="openCoverPicker()">
+              <span>{{ coverFileName || (mediaType === 'audio' ? 'Elegir portada opcional' : 'Elegir imagen de portada') }}</span>
+            </button>
+          </div>
 
           <button *ngIf="coverFileName" type="button" class="cover-reset" (click)="clearSelectedCover()">
             {{ mediaType === 'audio' ? 'Usar placeholder de audio' : 'Usar portada automatica del video' }}
@@ -124,13 +126,13 @@
           <button
             type="button"
             class="category-chip"
-            *ngFor="let option of categories; trackBy: trackByCategory"
-            [class.category-chip--active]="category === option.value"
-            [attr.aria-pressed]="category === option.value"
-            (click)="category = option.value"
-          >
-            {{ option.label }}
-          </button>
+              *ngFor="let option of categories; trackBy: trackByCategory"
+              [class.category-chip--active]="category === option.value"
+              [attr.aria-pressed]="category === option.value"
+              (click)="category = option.value"
+            >
+              {{ option.label }}
+            </button>
         </div>
 
         <div class="form-grid">
@@ -168,7 +170,16 @@
           <input type="text" [(ngModel)]="hashtagsText" placeholder="crimen, drama, iconico, cine80s" />
         </label>
 
-        <p *ngIf="message" class="publish-message">{{ message }}</p>
+        <p
+          *ngIf="message"
+          class="publish-message"
+          [class.publish-message--error]="messageType === 'error'"
+          [class.publish-message--success]="messageType === 'success'"
+          [attr.role]="messageType === 'error' ? 'alert' : 'status'"
+          aria-live="polite"
+        >
+          {{ message }}
+        </p>
 
         <button type="button" class="publish-button" (click)="publish()" [disabled]="submitting">
           {{ submitting ? 'Publicando...' : 'PUBLICAR CONTENIDO' }}

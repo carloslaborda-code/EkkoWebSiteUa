@@ -87,6 +87,28 @@
   line-height: 1.6;
 }
 
+.discover-filter-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.discover-reset-button {
+  min-height: 52px;
+  border: 1px solid rgba(214, 190, 138, 0.28);
+  border-radius: 18px;
+  background: rgba(18, 24, 35, 0.9);
+  color: #d8e0f1;
+  font: inherit;
+  font-weight: 700;
+  transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.discover-reset-button:hover {
+  transform: translateY(-1px);
+  background: rgba(25, 32, 46, 0.95);
+  border-color: rgba(214, 190, 138, 0.4);
+}
+
 @media (min-width: 768px) {
   .discover-frame {
     max-width: var(--app-tablet-width);
@@ -140,7 +162,6 @@
   }
 
   .discover-results-copy {
-    max-width: 32ch;
-    text-align: right;
+    max-width: 40ch;
   }
 }
