@@ -8,7 +8,7 @@
 
 **Grupo/autores:** Carlos Laborda Martinez, Sergio Pernas Gomez, Ionathan Hudrea Colceriu
 
-**Fecha:** 06/05/2026
+**Fecha:** 18/05/2026
 
 ---
 
@@ -29,6 +29,8 @@ El objetivo de este informe es documentar las decisiones de usabilidad y accesib
 ## 3. Descripción general de la plataforma
 
 Ekko permite localizar contenidos multimedia mediante búsquedas, filtros y navegación por secciones. La pantalla de inicio presenta contenido destacado y un buscador principal. La sección Discover ofrece filtros por categoría, formato y producción. La sección Library permite consultar los contenidos guardados por el usuario autenticado. La vista Detail concentra la reproducción del fragmento y las acciones asociadas. La página Publish permite publicar nuevos contenidos con metadatos, portada y archivo multimedia. Profile y Settings completan la gestión de cuenta, estadísticas personales y ajustes de accesibilidad. Además, el rol administrador puede acceder a una pantalla específica para revisar publicaciones, añadir o retirar transcripciones y eliminar contenidos.
+
+En la revisión final del 18/05/2026 se reforzaron varios flujos clave. Discover incorpora limpieza de filtros y un selector de producción accesible por teclado; Login y Register asocian estados de error y disponibilidad a sus campos; Publish usa controles de archivo accionables con teclado y mensajes con roles accesibles; Profile mejora el estado de subidas; Settings elimina acciones vacías y declara mejor el despliegue del formulario de cuenta. También se amplió la base semilla y se añadió un script de usuarios demo para preparar la defensa con datos consistentes.
 
 La aplicación contempla tres perfiles principales de usuario. El usuario invitado puede explorar contenidos, buscar, filtrar y consultar la vista de detalle. El usuario autenticado puede, además, guardar publicaciones, valorar fragmentos, descargar medios, subir nuevos contenidos, editar su perfil y configurar ajustes visuales. El usuario administrador añade tareas de mantenimiento sobre todas las publicaciones, especialmente la gestión de transcripciones accesibles y la eliminación de contenidos. Esta separación se refleja en la lógica de navegación: páginas como Library y Publish redirigen al login si no existe token de sesión, mientras que Admin exige un rol específico.
 
@@ -85,7 +87,7 @@ El beneficio es que la interfaz evita fallos visibles cuando una respuesta llega
 
 La recuperabilidad consiste en facilitar que el usuario corrija una acción o vuelva a un estado válido. En Ekko se aplica mediante botones de vuelta, limpieza de filtros, mensajes de error y redirecciones controladas. Cuando un usuario intenta acceder a Library o Publish sin sesión, la aplicación no muestra una pantalla rota: lo redirige al login.
 
-Una acción concreta implementada es el botón "Limpiar filtros" en Library, que restaura la búsqueda, formato, categoría y ordenación al estado inicial. En Publish, si el archivo supera el tamaño permitido, se limpia la selección y se muestra un mensaje indicando el límite correspondiente.
+Una acción concreta implementada es el botón "Limpiar filtros" en Discover y Library. En Discover restaura búsqueda, categoría, formato y producción, y en Library devuelve búsqueda, formato, categoría y ordenación al estado inicial. En Publish, si el archivo supera el tamaño permitido, se limpia la selección y se muestra un mensaje indicando el límite correspondiente.
 
 El beneficio es que el usuario puede recuperarse sin abandonar la aplicación. Si se equivoca filtrando, vuelve a empezar con un clic; si sube un archivo demasiado grande, entiende por qué no puede continuar.
 
@@ -177,7 +179,7 @@ Como mejora recomendada, se podría revisar la valoración por estrellas para a�
 
 ### 6.6 Uso completo de la interfaz con teclado
 
-Una interfaz accesible debe poder utilizarse sin ratón. Ekko incorpora navegación por teclado en tarjetas interactivas mediante `tabindex="0"` y gestión de `keydown.enter` y `keydown.space` en Home, Discover y Library. También existen estilos globales de `:focus-visible`, skip-link al contenido principal y controles nativos para inputs, selects, botones, audio y vídeo.
+Una interfaz accesible debe poder utilizarse sin ratón. Ekko incorpora navegación por teclado en tarjetas interactivas mediante `tabindex="0"` y gestión de `keydown.enter` y `keydown.space` en Home, Discover y Library. En Discover, el selector de producción se puede abrir desde teclado, expone `aria-expanded`, `aria-controls`, `role="listbox"` y `role="option"`, permite moverse con flechas, `Home`, `End` y `Esc`, y devuelve el foco al disparador al cerrarse. También existen estilos globales de `:focus-visible`, skip-link al contenido principal y controles nativos para inputs, selects, botones, audio y vídeo.
 
 Esta directriz beneficia a usuarios de teclado, personas con movilidad reducida y usuarios de tecnologías de apoyo. Se relaciona con WCAG 2.1, criterios 2.1.1 Teclado, 2.4.1 Evitar bloques y 2.4.7 Foco visible.
 
@@ -199,7 +201,7 @@ El principio perceptible se trabaja mediante textos legibles, contraste elevado,
 
 El principio operable se refleja en el uso de elementos nativos como botones, enlaces, inputs, selects, audio y vídeo con controles. La aplicación incluye skip-link al contenido principal, estilos de foco visibles y tarjetas accesibles por teclado. La navegación principal tiene `aria-label="Navegacion principal"` y marca el destino activo con `aria-current`.
 
-El principio comprensible se observa en la organización de tareas y en el feedback. Login y Register muestran errores inline, Publish informa de campos incompletos o archivos demasiado grandes, Settings comunica el guardado de ajustes y Detail muestra mensajes tras valorar, guardar o copiar enlaces. Los formularios usan campos agrupados y textos de ayuda cuando la tarea lo necesita.
+El principio comprensible se observa en la organización de tareas y en el feedback. Login y Register muestran errores inline asociados a los campos mediante `aria-invalid` y `aria-describedby`; Register comunica disponibilidad de usuario y correo con `role="status"` o `role="alert"`. Publish informa de campos incompletos o archivos demasiado grandes, Settings comunica el guardado de ajustes y Detail muestra mensajes tras valorar, guardar o copiar enlaces. Los formularios usan campos agrupados y textos de ayuda cuando la tarea lo necesita.
 
 El principio robusto se apoya en la estructura Angular, la centralización de servicios HTTP, la normalización de datos, la validación en backend y el uso de roles/atributos ARIA cuando complementan a la semántica. La aplicación identifica el idioma del documento y evita maquetar con tablas, lo que favorece la interpretación por navegadores y tecnologías de asistencia.
 
@@ -233,9 +235,9 @@ También destaca la configuración de accesibilidad desde Settings. No se limita
 
 Una mejora importante sería realizar pruebas reales con usuarios. La aplicación tiene varios flujos relevantes: buscar un fragmento, guardar una publicación, valorar contenido, cambiar ajustes de accesibilidad y publicar un nuevo medio. Observar a usuarios reales permitiría detectar pasos confusos o textos que podrían simplificarse.
 
-En formularios, se podría avanzar hacia una validación más descriptiva por campo. Actualmente existen mensajes globales útiles, pero una mejora consistiría en asociar errores concretos a cada input mediante `aria-describedby`, indicando por ejemplo qué campo falta o qué regla no se cumple.
+En formularios, ya se ha avanzado hacia una validación más descriptiva por campo en Login y Register mediante `aria-invalid`, `aria-describedby` y mensajes con rol accesible. Como mejora futura, convendría extender ese mismo nivel de detalle a otros formularios complejos, especialmente Publish y Settings, indicando de forma específica qué campo falta o qué regla no se cumple.
 
-Para contenido multimedia, se ha añadido una gestión administrativa de transcripciones accesibles. El usuario que publica no introduce transcripción; esa tarea queda reservada al administrador, que puede añadir marcas de tiempo desde la pantalla Admin mientras revisa el audio o vídeo. Cuando existen marcas de tiempo, la vista Detail presenta el texto como subtítulos sincronizados sobre el reproductor, sin mostrar un bloque de transcripción independiente debajo del contenido.
+Para contenido multimedia, se ha añadido una gestión administrativa de transcripciones accesibles. El usuario que publica no introduce transcripción; esa tarea queda reservada al administrador, que puede añadir marcas de tiempo desde la pantalla Admin mientras revisa el audio o vídeo. Cuando existen marcas de tiempo, la vista Detail puede mostrarlas como subtítulos sincronizados sobre el reproductor y también mantiene un bloque de transcripción accesible con las líneas temporales debajo del contenido.
 
 Por último, se recomienda revisar algunos textos internos y mensajes del backend para asegurar codificación correcta de caracteres en español. La interfaz principal utiliza entidades HTML o texto correcto en Angular, pero en algunos mensajes del backend se aprecian caracteres mal codificados. No afecta al flujo principal si no se muestran directamente, pero conviene corregirlo antes de una entrega final pública.
 
@@ -257,7 +259,7 @@ En conjunto, Ekko demuestra una aplicación práctica de criterios de usabilidad
 | Flexibilidad | Búsqueda, filtros, biblioteca y acceso directo a detalle | Home, Discover, Library, ruta `/quote/:id` | Añadir filtros server-side si la colección crece mucho |
 | Consistencia | Reutilización de patrones visuales y navegación | `navbar.component`, tarjetas, botones, chips | Crear una guía visual formal del sistema |
 | Robustez | Normalización de datos y validaciones backend/frontend | `quotes.services.ts`, `quote.controller.js`, Publish | Añadir tests e2e de flujos críticos |
-| Recuperabilidad | Botones de vuelta, limpieza de filtros y mensajes de error | Library, Publish, Login, Detail | Asociar errores a campos concretos con `aria-describedby` |
+| Recuperabilidad | Botones de vuelta, limpieza de filtros y mensajes de error | Discover, Library, Publish, Login, Detail | Extender mensajes por campo al resto de formularios complejos |
 | Tiempo de respuesta | Cache con `shareReplay` y filtrado local | `QuoteService.getQuotes()`, Home, Discover, Library | Medir rendimiento con colecciones grandes |
 | Adecuación de tareas | Pantallas separadas por objetivo | Home, Discover, Detail, Library, Publish, Settings | Validar flujo de publicación con usuarios no técnicos |
 | Disminución de carga cognitiva | Chips, estados activos, agrupaciones y textos de ayuda | Discover, Library, Settings, Publish | Simplificar textos secundarios donde haya saturación visual |
@@ -266,10 +268,18 @@ En conjunto, Ekko demuestra una aplicación práctica de criterios de usabilidad
 | Sintaxis válida | Compilación Angular y revisión sintáctica posible en backend | `npm run build`, `node --check` | Incorporar validadores HTML/a11y en CI |
 | Alto contraste | Ajuste de alto contraste persistente | Settings, `accessibility.service.ts`, `styles.css` | Medición formal de contraste WCAG |
 | No depender solo del color | Texto, iconos, `aria-pressed` y mensajes explícitos | Filtros, Register, Settings, rating | Añadir más descripciones visibles en algunos indicadores |
-| Uso con teclado | Skip-link, foco visible y tarjetas con Enter/Espacio | `app.component.html`, `styles.css`, Home, Discover, Library | Revisar controles anidados dentro de tarjetas |
+| Uso con teclado | Skip-link, foco visible, tarjetas con Enter/Espacio y selector accesible en Discover | `app.component.html`, `styles.css`, Home, Discover, Library | Revisar controles anidados dentro de tarjetas |
 | No usar tablas para maquetar | Layout con Grid, Flexbox, secciones y artículos | Plantillas Angular y CSS | Usar tablas solo si aparece contenido realmente tabular |
 | Responsive design | Barra inferior/lateral, grids adaptables y variables CSS | Navbar, Discover, Library, Detail, Publish | Pruebas en dispositivos reales y Lighthouse móvil |
 
 ## Cambios de accesibilidad realizados durante esta revisión
 
-No se han realizado cambios de código durante la elaboración de este informe. La revisión detecta buenas prácticas ya implementadas y recoge mejoras recomendadas, pero no se ha modificado lógica funcional ni plantillas de la aplicación.
+Durante la revisión final sí se incorporaron cambios de código y documentación. Los más relevantes para este informe son:
+
+- `Discover`: selector de producción con soporte de teclado, roles ARIA, cierre con `Esc`, devolución de foco y acción `Limpiar filtros`.
+- `Login` y `Register`: campos con `aria-invalid`, mensajes asociados mediante `aria-describedby` y estados anunciables para errores o disponibilidad.
+- `Publish`: selección de archivo multimedia y portada mediante botones enfocables, mensajes con `role="alert"` o `role="status"` y copy más claro.
+- `Settings`: formulario de cuenta asociado con `aria-controls` y eliminación de una acción de privacidad sin flujo real en la entrega.
+- `Profile`: texto contextual y estado vacío más explícito en el bloque de subidas.
+- `Detail`: subtítulos sincronizados y bloque de transcripción accesible cuando existen marcas de tiempo.
+- `Backend y demo`: ampliación de la colección semilla y script `npm run seed:demo-users` para preparar usuarios de prueba.
