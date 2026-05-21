@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faStar as faStarRegular, faBookmark } from '@fortawesome/free-regular-svg-icons';
 import { faBookmark as faBookmarkSolid, faPlay, faDownload, faShareNodes, faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons';
@@ -17,7 +17,8 @@ interface TimedCaption {
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.css']
 })
-export class DetailComponent implements OnInit {
+export class DetailComponent implements OnInit, OnDestroy {
+  @ViewChildren('transcriptLine') transcriptLineElements?: QueryList<ElementRef<HTMLElement>>;
   readonly faBookmark = faBookmark;
   readonly faBookmarkSolid = faBookmarkSolid;
   readonly faPlay = faPlay;
@@ -34,8 +35,10 @@ export class DetailComponent implements OnInit {
   isPlaying = false;
   displayDuration = '00:00';
   timedCaptions: TimedCaption[] = [];
-  activeCaptionText = '';
-  captionsEnabled = true;
+  captionsVttUrl: string | null = null;
+  transcriptVisible = false;
+  transcriptExpanded = false;
+  activeCaptionIndex = -1;
 
   hoverRating = 0;
 
@@ -74,6 +77,10 @@ export class DetailComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.revokeCaptionsVttUrl();
+  }
+
   get isLoggedIn(): boolean {
     return !!localStorage.getItem('token');
   }
@@ -82,8 +89,8 @@ export class DetailComponent implements OnInit {
     return this.timedCaptions.length > 0;
   }
 
-  get shouldShowCaptionOverlay(): boolean {
-    return this.captionsEnabled && !!this.activeCaptionText;
+  get hasNativeCaptions(): boolean {
+    return this.quote?.mediaType === 'video' && !!this.captionsVttUrl;
   }
 
   get transcriptLines(): string[] {
@@ -101,13 +108,43 @@ export class DetailComponent implements OnInit {
     return this.transcriptLines.length > 0;
   }
 
+  get transcriptSyncLabel(): string {
+    return this.hasTimedCaptions
+      ? ''
+      : 'Transcripcion disponible, pero no sincronizada porque no incluye marcas de tiempo.';
+  }
+
+  get mobileTranscriptPreview(): string {
+    if (this.hasTimedCaptions && this.activeCaptionIndex >= 0) {
+      return this.timedCaptions[this.activeCaptionIndex]?.text || '';
+    }
+
+    if (this.hasTimedCaptions) {
+      return this.timedCaptions[0]?.text || '';
+    }
+
+    return this.transcriptLines[0] || '';
+  }
+
+  get ccButtonLabel(): string {
+    return this.transcriptVisible ? 'Ocultar bloque de transcripcion' : 'Mostrar bloque de transcripcion';
+  }
+
   startPlayback(): void {
     this.isPlaying = true;
     this.message = '';
   }
 
-  toggleCaptions(): void {
-    this.captionsEnabled = !this.captionsEnabled;
+  toggleTranscript(): void {
+    this.transcriptVisible = !this.transcriptVisible;
+
+    if (!this.transcriptVisible) {
+      this.transcriptExpanded = false;
+    }
+  }
+
+  toggleTranscriptExpanded(): void {
+    this.transcriptExpanded = !this.transcriptExpanded;
   }
 
   handleDownload(): void {
@@ -214,26 +251,26 @@ export class DetailComponent implements OnInit {
     }
 
     this.displayDuration = this.formatDuration(media.duration);
-    this.updateActiveCaption(event);
+    this.updateActiveTranscript(event);
   }
 
-  updateActiveCaption(event: Event): void {
+  updateActiveTranscript(event: Event): void {
     if (!this.hasTimedCaptions) {
-      this.activeCaptionText = '';
+      this.setActiveCaptionIndex(-1);
       return;
     }
 
     const media = event.target as HTMLMediaElement;
     const currentTime = Number.isFinite(media.currentTime) ? media.currentTime : 0;
-    const activeCaption = this.timedCaptions.find((caption) =>
+    const activeIndex = this.timedCaptions.findIndex((caption) =>
       currentTime >= caption.start && currentTime < caption.end
     );
 
-    this.activeCaptionText = activeCaption?.text || '';
+    this.setActiveCaptionIndex(activeIndex);
   }
 
-  clearActiveCaption(): void {
-    this.activeCaptionText = '';
+  clearActiveTranscript(): void {
+    this.setActiveCaptionIndex(-1);
   }
 
   openProfile(): void {
@@ -250,6 +287,14 @@ export class DetailComponent implements OnInit {
 
   trackByText(_index: number, value: string): string {
     return value;
+  }
+
+  trackByCaption(_index: number, caption: TimedCaption): string {
+    return `${caption.start}-${caption.text}`;
+  }
+
+  formatTimestamp(seconds: number): string {
+    return this.formatTranscriptTime(seconds);
   }
 
   private formatDuration(durationInSeconds: number): string {
@@ -274,8 +319,11 @@ export class DetailComponent implements OnInit {
 
   private prepareTimedCaptions(rawText: string): void {
     this.timedCaptions = this.parseTimedCaptions(rawText);
-    this.activeCaptionText = '';
-    this.captionsEnabled = true;
+    this.transcriptVisible = false;
+    this.transcriptExpanded = false;
+    this.activeCaptionIndex = -1;
+    this.revokeCaptionsVttUrl();
+    this.captionsVttUrl = this.createVttUrl(this.timedCaptions);
   }
 
   private parseTimedCaptions(rawText: string): TimedCaption[] {
@@ -343,6 +391,35 @@ export class DetailComponent implements OnInit {
     return parts[0];
   }
 
+  private createVttUrl(captions: TimedCaption[]): string | null {
+    if (!captions.length) {
+      return null;
+    }
+
+    const lines = ['WEBVTT', ''];
+
+    captions.forEach((caption) => {
+      lines.push(
+        `${this.toVttTime(caption.start)} --> ${this.toVttTime(caption.end)}`,
+        caption.text,
+        ''
+      );
+    });
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/vtt' });
+    return URL.createObjectURL(blob);
+  }
+
+  private toVttTime(seconds: number): string {
+    const totalMilliseconds = Math.max(0, Math.floor(seconds * 1000));
+    const hours = Math.floor(totalMilliseconds / 3600000);
+    const minutes = Math.floor((totalMilliseconds % 3600000) / 60000);
+    const secs = Math.floor((totalMilliseconds % 60000) / 1000);
+    const milliseconds = totalMilliseconds % 1000;
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+  }
+
   private startBrowserDownload(url: string, fileName: string): void {
     const link = document.createElement('a');
     link.href = new URL(url, window.location.origin).toString();
@@ -382,6 +459,32 @@ export class DetailComponent implements OnInit {
           };
         }
       }
+    });
+  }
+
+  private revokeCaptionsVttUrl(): void {
+    if (!this.captionsVttUrl) {
+      return;
+    }
+
+    URL.revokeObjectURL(this.captionsVttUrl);
+    this.captionsVttUrl = null;
+  }
+
+  private setActiveCaptionIndex(index: number): void {
+    if (this.activeCaptionIndex === index) {
+      return;
+    }
+
+    this.activeCaptionIndex = index;
+
+    if (index < 0 || !this.transcriptVisible) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      const targetLine = this.transcriptLineElements?.get(index)?.nativeElement;
+      targetLine?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
   }
 }
