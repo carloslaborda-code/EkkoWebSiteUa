@@ -7,48 +7,149 @@
     <app-header class="detail-header" [showBack]="true"></app-header>
 
     <section class="hero-card">
-      <div class="media-frame" [class.media-frame--audio]="quote.mediaType === 'audio'">
-        <img *ngIf="!isPlaying" [src]="quote.image" [alt]="quote.workTitle" class="media-poster" width="1280" height="720" decoding="async"
-          fetchpriority="high" />
+      <div class="hero-media-layout" [class.hero-media-layout--with-transcript]="hasTranscript && transcriptVisible">
+        <div class="media-frame" [class.media-frame--audio]="quote.mediaType === 'audio'">
+          <img
+            *ngIf="!isPlaying"
+            [src]="quote.image"
+            [alt]="quote.workTitle"
+            class="media-poster"
+            width="1280"
+            height="720"
+            decoding="async"
+            fetchpriority="high"
+          />
 
-        <video *ngIf="isPlaying && quote.mediaType === 'video'" class="media-player" [src]="quote.mediaUrl" controls
-          autoplay [attr.aria-label]="'Video de ' + quote.workTitle + ': ' + quote.text"
-          (loadedmetadata)="updateDuration($event)"
-          (timeupdate)="updateActiveCaption($event)"
-          (seeked)="updateActiveCaption($event)"
-          (ended)="clearActiveCaption()"></video>
-
-        <div *ngIf="isPlaying && quote.mediaType === 'audio'" class="audio-player-wrap">
-          <img [src]="quote.image" [alt]="quote.workTitle" class="audio-poster" width="1280" height="720" decoding="async" />
-          <audio class="audio-player" [src]="quote.mediaUrl" controls autoplay
-            [attr.aria-label]="'Audio de ' + quote.workTitle + ': ' + quote.text"
+          <video
+            *ngIf="isPlaying && quote.mediaType === 'video'"
+            class="media-player"
+            [src]="quote.mediaUrl"
+            controls
+            autoplay
+            [attr.aria-label]="'Video de ' + quote.workTitle + ': ' + quote.text"
             (loadedmetadata)="updateDuration($event)"
-            (timeupdate)="updateActiveCaption($event)"
-            (seeked)="updateActiveCaption($event)"
-            (ended)="clearActiveCaption()"></audio>
+            (timeupdate)="updateActiveTranscript($event)"
+            (seeked)="updateActiveTranscript($event)"
+            (ended)="clearActiveTranscript()"
+          >
+            <track
+              *ngIf="hasNativeCaptions"
+              kind="captions"
+              srclang="es"
+              label="Transcripcion accesible"
+              [src]="captionsVttUrl!"
+              default
+            />
+          </video>
+
+          <div *ngIf="isPlaying && quote.mediaType === 'audio'" class="audio-player-wrap">
+            <img [src]="quote.image" [alt]="quote.workTitle" class="audio-poster" width="1280" height="720" decoding="async" />
+            <audio
+              class="audio-player"
+              [src]="quote.mediaUrl"
+              controls
+              autoplay
+              [attr.aria-label]="'Audio de ' + quote.workTitle + ': ' + quote.text"
+              (loadedmetadata)="updateDuration($event)"
+              (timeupdate)="updateActiveTranscript($event)"
+              (seeked)="updateActiveTranscript($event)"
+              (ended)="clearActiveTranscript()"
+            ></audio>
+          </div>
+
+          <button
+            *ngIf="hasTranscript"
+            type="button"
+            class="caption-toggle"
+            [class.caption-toggle--active]="transcriptVisible"
+            [attr.aria-pressed]="transcriptVisible"
+            [attr.aria-label]="ccButtonLabel"
+            (click)="toggleTranscript()"
+          >
+            {{ transcriptVisible ? 'Ocultar transcripcion' : 'Ver transcripcion' }}
+          </button>
+
+          <button
+            *ngIf="!isPlaying"
+            type="button"
+            class="play-overlay"
+            (click)="startPlayback()"
+            [attr.aria-label]="'Reproducir ' + quote.workTitle"
+          >
+            <fa-icon [icon]="faPlay" aria-hidden="true"></fa-icon>
+          </button>
         </div>
 
+        <section *ngIf="hasTranscript && transcriptVisible" class="hero-transcript-panel" aria-labelledby="hero-transcript-title">
+          <div class="hero-transcript-head">
+            <p class="hero-transcript-kicker">Transcripcion</p>
+            <h2 id="hero-transcript-title">Texto sincronizado</h2>
+            <p class="hero-transcript-note">{{ transcriptSyncLabel }}</p>
+          </div>
+
+          <ol *ngIf="hasTimedCaptions" class="hero-transcript-list">
+            <li
+              #transcriptLine
+              *ngFor="let caption of timedCaptions; let captionIndex = index; trackBy: trackByCaption"
+              class="hero-transcript-line"
+              [class.hero-transcript-line--active]="captionIndex === activeCaptionIndex"
+            >
+              <span class="hero-transcript-time">{{ formatTimestamp(caption.start) }}</span>
+              <span class="hero-transcript-copy">{{ caption.text }}</span>
+            </li>
+          </ol>
+
+          <ol *ngIf="!hasTimedCaptions" class="hero-transcript-list">
+            <li *ngFor="let line of transcriptLines; trackBy: trackByText" class="hero-transcript-line">
+              <span class="hero-transcript-copy">{{ line }}</span>
+            </li>
+          </ol>
+        </section>
+      </div>
+    </section>
+
+    <section *ngIf="hasTranscript && transcriptVisible" class="mobile-transcript-card" aria-labelledby="mobile-transcript-title">
+      <div class="mobile-transcript-head">
+        <div>
+          <p class="hero-transcript-kicker">Transcripcion</p>
+          <h2 id="mobile-transcript-title">Lectura del fragmento</h2>
+        </div>
         <button
-          *ngIf="hasTimedCaptions"
           type="button"
-          class="caption-toggle"
-          [class.caption-toggle--active]="captionsEnabled"
-          [attr.aria-pressed]="captionsEnabled"
-          [attr.aria-label]="captionsEnabled ? 'Desactivar subtitulos' : 'Activar subtitulos'"
-          (click)="toggleCaptions()"
+          class="mobile-transcript-toggle"
+          [attr.aria-expanded]="transcriptExpanded"
+          aria-controls="mobile-transcript-content"
+          [attr.aria-label]="transcriptExpanded ? 'Contraer' : 'Expandir'"
+          (click)="toggleTranscriptExpanded()"
         >
-          CC
-        </button>
-
-        <div *ngIf="shouldShowCaptionOverlay" class="caption-overlay" aria-hidden="true">
-          <span>{{ activeCaptionText }}</span>
-        </div>
-
-        <button *ngIf="!isPlaying" type="button" class="play-overlay" (click)="startPlayback()"
-          [attr.aria-label]="'Reproducir ' + quote.workTitle">
-          <fa-icon [icon]="faPlay" aria-hidden="true"></fa-icon>
+          <span>{{ transcriptExpanded ? 'Contraer' : 'Expandir' }}</span>
+          <span *ngIf="transcriptExpanded" class="mobile-transcript-toggle__chevron" aria-hidden="true">&#9652;</span>
+          <span *ngIf="!transcriptExpanded" class="mobile-transcript-toggle__chevron" aria-hidden="true">&#9662;</span>
         </button>
       </div>
+
+      <p class="mobile-transcript-note">{{ transcriptSyncLabel }}</p>
+
+      <div *ngIf="!transcriptExpanded" class="mobile-transcript-preview">
+        <p>{{ mobileTranscriptPreview }}</p>
+      </div>
+
+      <ol *ngIf="transcriptExpanded && hasTimedCaptions" id="mobile-transcript-content" class="transcript-list">
+        <li
+          #transcriptLine
+          *ngFor="let caption of timedCaptions; let captionIndex = index; trackBy: trackByCaption"
+          [class.transcript-list__item--active]="captionIndex === activeCaptionIndex"
+        >
+          <span class="transcript-list__time">{{ formatTimestamp(caption.start) }}</span>
+          <span>{{ caption.text }}</span>
+        </li>
+      </ol>
+
+      <ol *ngIf="transcriptExpanded && !hasTimedCaptions" id="mobile-transcript-content" class="transcript-list">
+        <li *ngFor="let line of transcriptLines; trackBy: trackByText">
+          <span>{{ line }}</span>
+        </li>
+      </ol>
     </section>
 
     <section class="detail-body">
@@ -57,10 +158,16 @@
       <section class="rating-panel">
         <p class="rating-label">VALORA ESTE CONTENIDO</p>
         <div class="rating-stars" aria-label="Valorar contenido" (mouseleave)="hoverRating = 0">
-          <button type="button" class="rating-star" *ngFor="let star of ratingStars; trackBy: trackByNumber"
-            [class.rating-star--active]="star <= (hoverRating || userRating)" [disabled]="ratingSaving"
-            [attr.aria-label]="'Valorar con ' + star + ' de 5'" (mouseenter)="hoverRating = star"
-            (click)="rateQuote(star)">
+          <button
+            type="button"
+            class="rating-star"
+            *ngFor="let star of ratingStars; trackBy: trackByNumber"
+            [class.rating-star--active]="star <= (hoverRating || userRating)"
+            [disabled]="ratingSaving"
+            [attr.aria-label]="'Valorar con ' + star + ' de 5'"
+            (mouseenter)="hoverRating = star"
+            (click)="rateQuote(star)"
+          >
             <fa-icon [icon]="star <= (hoverRating || userRating) ? faStarSolid : faStarRegular" aria-hidden="true"></fa-icon>
           </button>
         </div>
@@ -69,22 +176,19 @@
       </section>
 
       <div class="action-card">
-        <button type="button" class="action-button" (click)="handleDownload()"
-          [attr.aria-label]="'Descargar ' + quote.workTitle">
+        <button type="button" class="action-button" (click)="handleDownload()" [attr.aria-label]="'Descargar ' + quote.workTitle">
           <span class="action-icon">
             <fa-icon [icon]="faDownload" aria-hidden="true"></fa-icon>
           </span>
           <span>DESCARGAR</span>
         </button>
-        <button type="button" class="action-button" (click)="shareContent()"
-          [attr.aria-label]="'Compartir ' + quote.workTitle">
+        <button type="button" class="action-button" (click)="shareContent()" [attr.aria-label]="'Compartir ' + quote.workTitle">
           <span class="action-icon">
             <fa-icon [icon]="faShareNodes" aria-hidden="true"></fa-icon>
           </span>
           <span>COMPARTIR</span>
         </button>
-        <button type="button" class="action-button" (click)="toggleSave()"
-          [attr.aria-label]="isSaved ? 'Quitar de guardados' : 'Guardar ' + quote.workTitle">
+        <button type="button" class="action-button" (click)="toggleSave()" [attr.aria-label]="isSaved ? 'Quitar de guardados' : 'Guardar ' + quote.workTitle">
           <span class="action-icon">
             <fa-icon [icon]="isSaved ? faBookmarkSolid : faBookmark" aria-hidden="true"></fa-icon>
           </span>
@@ -117,16 +221,6 @@
         <div class="hashtags-row" *ngIf="quote.hashtags?.length">
           <span class="hashtag-chip" *ngFor="let hashtag of quote.hashtags; trackBy: trackByText">#{{ hashtag }}</span>
         </div>
-      </section>
-
-      <section *ngIf="hasTranscript" class="transcript-block" aria-labelledby="transcript-title">
-        <div class="section-heading">
-          <h3 id="transcript-title">TRANSCRIPCION ACCESIBLE</h3>
-          <span></span>
-        </div>
-        <ol class="transcript-list">
-          <li *ngFor="let line of transcriptLines; trackBy: trackByText">{{ line }}</li>
-        </ol>
       </section>
     </section>
 
